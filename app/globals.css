@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+:root {
+  --color-burgundy: #3b1119;
+  --color-burgundy-dark: #260b10;
+  --color-backdrop: #0f080a;
+  --color-cream: #fbf8f1;
+  --color-cream-dark: #f4efe6;
+  --color-gold: #d4af37;
+  --color-gold-dark: #a9872c;
+  --color-charcoal: #222222;
+}
+
+@theme inline {
+  --color-burgundy: var(--color-burgundy);
+  --color-burgundy-dark: var(--color-burgundy-dark);
+  --color-backdrop: var(--color-backdrop);
+  --color-cream: var(--color-cream);
+  --color-cream-dark: var(--color-cream-dark);
+  --color-gold: var(--color-gold);
+  --color-gold-dark: var(--color-gold-dark);
+  --color-charcoal: var(--color-charcoal);
+
+  --font-display: var(--font-playfair);
+  --font-sans: var(--font-manrope);
+}
+
+body {
+  color: var(--color-charcoal);
+}
+
+/* Faint paper grain for cream surfaces — floating cards use this, not the page body */
+.paper-grain {
+  position: relative;
+}
+.paper-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+.paper-grain > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmerSheen {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+/* Shared visual standard for every active tab/button on the site */
+.tab-active-glow {
+  color: var(--color-gold);
+  text-shadow: 0 1px 3px rgba(15, 8, 10, 0.7);
+  background-image: linear-gradient(
+    110deg,
+    var(--color-burgundy),
+    var(--color-gold),
+    var(--color-burgundy)
+  );
+  background-size: 200% 100%;
+  animation: shimmerSheen 3s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
