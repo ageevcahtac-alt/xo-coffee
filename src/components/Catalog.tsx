@@ -190,7 +190,7 @@ export default function Catalog() {
                     <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal/50">
                       {lot.name}
                     </span>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gold-dark">
+                    <span className="border border-gold/40 bg-cream/95 px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.12em] text-burgundy">
                       Паспорт
                     </span>
                   </div>
@@ -205,7 +205,7 @@ export default function Catalog() {
                           {lot.region}
                         </p>
                       </div>
-                      <span className="shrink-0 border border-gold px-2 py-0.5 text-[11px] font-bold text-gold-dark">
+                      <span className="shrink-0 border border-gold/40 bg-cream/95 px-2 py-0.5 text-[11px] font-bold text-burgundy">
                         {lot.qScore} Q
                       </span>
                     </div>
