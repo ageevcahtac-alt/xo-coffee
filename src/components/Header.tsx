@@ -22,7 +22,7 @@ export default function Header() {
   }, [totalCount]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gold/20 bg-[#0F080A]/80 backdrop-blur-md">
+    <header className="fixed left-0 right-0 top-0 z-50 border-b border-gold/20 bg-[#0F080A]/75 backdrop-blur-md">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-10">
         <a
           href="#top"
