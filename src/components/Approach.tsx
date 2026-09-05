@@ -26,13 +26,13 @@ export default function Approach() {
         </div>
 
         <div className="grid gap-5 sm:gap-6 md:grid-cols-2">
-          <div className="rounded-xl border border-gold/25 bg-cream/45 p-6 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-2.5 hover:shadow-2xl sm:p-7 lg:p-9">
+          <div className="rounded-xl border border-gold/30 bg-cream/85 p-6 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-2.5 hover:shadow-2xl sm:p-7 lg:p-9">
             <h3 className="font-display text-xl font-semibold text-burgundy">
               Классическая обжарка
             </h3>
             <ul className="mt-5 space-y-3">
               {CLASSIC_POINTS.map((point) => (
-                <li key={point} className="flex gap-3 text-sm text-charcoal/80">
+                <li key={point} className="flex gap-3 text-sm text-burgundy/80">
                   <span className="mt-0.5 leading-none">—</span>
                   <span className="leading-relaxed">{point}</span>
                 </li>
