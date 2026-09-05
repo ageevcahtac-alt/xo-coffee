@@ -167,7 +167,7 @@ export default function Catalog() {
           className={`transition-all duration-300 ease-in-out ${gridTransition.className}`}
         >
           {visibleLots.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-gold/30 bg-cream/45 px-8 py-16 text-center backdrop-blur-md">
+            <div className="rounded-xl border border-dashed border-gold/30 bg-cream/85 px-8 py-16 text-center backdrop-blur-md">
               <p className="font-display text-xl font-semibold text-burgundy">
                 Скоро в каталоге
               </p>
@@ -184,13 +184,13 @@ export default function Catalog() {
                   tabIndex={0}
                   onClick={() => openLot(lot)}
                   onKeyDown={(event) => handleCardKeyDown(event, lot)}
-                  className="flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gold/25 bg-cream/45 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:border-gold hover:shadow-xl active:scale-[0.98]"
+                  className="flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gold/30 bg-cream/85 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:border-gold hover:shadow-xl active:scale-[0.98]"
                 >
-                  <div className="flex items-center justify-between border-b border-charcoal/10 px-5 py-3">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal/50">
+                  <div className="flex items-center justify-between border-b border-burgundy/10 px-5 py-3">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-burgundy/70">
                       {lot.name}
                     </span>
-                    <span className="border border-gold/40 bg-cream/95 px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.12em] text-burgundy">
+                    <span className="border border-gold/40 bg-cream px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.12em] text-burgundy">
                       Паспорт
                     </span>
                   </div>
@@ -201,55 +201,55 @@ export default function Catalog() {
                         <h3 className="font-display text-xl font-semibold text-burgundy">
                           {lot.country}
                         </h3>
-                        <p className="text-xs uppercase tracking-[0.1em] text-charcoal/50">
+                        <p className="text-xs uppercase tracking-[0.1em] text-burgundy/70">
                           {lot.region}
                         </p>
                       </div>
-                      <span className="shrink-0 border border-gold/40 bg-cream/95 px-2 py-0.5 text-[11px] font-bold text-burgundy">
+                      <span className="shrink-0 border border-gold/40 bg-cream px-2 py-0.5 text-[11px] font-bold text-burgundy">
                         {lot.qScore} Q
                       </span>
                     </div>
 
-                    <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-charcoal/10 pt-3 text-[11px]">
+                    <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-burgundy/10 pt-3 text-[11px]">
                       <div>
-                        <dt className="text-charcoal/45">Высота</dt>
-                        <dd className="font-medium">{lot.altitudeMasl} MASL</dd>
+                        <dt className="text-burgundy/55">Высота</dt>
+                        <dd className="font-medium text-burgundy">{lot.altitudeMasl} MASL</dd>
                       </div>
                       <div>
-                        <dt className="text-charcoal/45">Обработка</dt>
-                        <dd className="font-medium">{lot.process}</dd>
+                        <dt className="text-burgundy/55">Обработка</dt>
+                        <dd className="font-medium text-burgundy">{lot.process}</dd>
                       </div>
                       <div>
-                        <dt className="text-charcoal/45">Сорт</dt>
-                        <dd className="truncate font-medium">{lot.variety}</dd>
+                        <dt className="text-burgundy/55">Сорт</dt>
+                        <dd className="truncate font-medium text-burgundy">{lot.variety}</dd>
                       </div>
                       <div>
-                        <dt className="text-charcoal/45">Ферма</dt>
-                        <dd className="truncate font-medium">{lot.farm}</dd>
+                        <dt className="text-burgundy/55">Ферма</dt>
+                        <dd className="truncate font-medium text-burgundy">{lot.farm}</dd>
                       </div>
                     </dl>
 
-                    <p className="mt-3 text-xs italic text-charcoal/60 line-clamp-2">
+                    <p className="mt-3 text-xs italic text-burgundy/75 line-clamp-2">
                       {lot.sensory.join(", ")}
                     </p>
 
-                    <p className="mt-2 font-display text-sm italic leading-snug text-burgundy/85 line-clamp-2">
+                    <p className="mt-2 font-display text-sm italic leading-snug text-burgundy line-clamp-2">
                       «{lot.cupNote}»
                     </p>
 
-                    <p className="mt-3 text-[10px] uppercase tracking-[0.06em] text-charcoal/40">
+                    <p className="mt-3 text-[10px] uppercase tracking-[0.06em] text-burgundy/50">
                       Только цельное зерно
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-charcoal/10 px-4 py-3 sm:px-5 sm:py-4">
+                  <div className="flex items-center justify-between border-t border-burgundy/10 px-4 py-3 sm:px-5 sm:py-4">
                     <span className="font-display text-lg font-semibold text-burgundy">
                       {formatPrice(lot.price)}
                     </span>
                     <button
                       type="button"
                       onClick={(event) => handleAddToCart(event, lot)}
-                      className="flex h-11 items-center justify-center border border-burgundy px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-burgundy transition-all active:scale-95 hover:bg-burgundy hover:text-cream"
+                      className="flex h-11 items-center justify-center border border-gold/40 bg-burgundy px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
                     >
                       В корзину
                     </button>
