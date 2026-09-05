@@ -16,17 +16,17 @@ const PRINCIPLES = [
 export default function Manifest() {
   return (
     <section id="manifest" className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
-      <div className="paper-grain mx-auto max-w-7xl overflow-hidden rounded-2xl border border-gold/25 bg-cream/82 text-charcoal shadow-2xl backdrop-blur-md md:rounded-3xl">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-gold/20 bg-backdrop/35 text-cream shadow-2xl backdrop-blur-[10px] md:rounded-3xl">
         <div className="relative mx-auto max-w-5xl px-5 py-12 text-center sm:px-8 sm:py-16 md:px-10 lg:py-20">
-          <span className="text-xs font-semibold uppercase tracking-[0.35em] text-gold-dark">
+          <span className="text-xs font-semibold uppercase tracking-[0.35em] text-gold">
             Манифест
           </span>
 
-          <h2 className="mx-auto mt-6 max-w-3xl font-display text-3xl font-semibold leading-tight text-burgundy sm:text-4xl md:text-5xl lg:text-6xl">
+          <h2 className="mx-auto mt-6 max-w-3xl font-display text-3xl font-semibold leading-tight text-cream sm:text-4xl md:text-5xl lg:text-6xl">
             Мы боремся за вкус
           </h2>
 
-          <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-charcoal/70 sm:text-lg">
+          <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-cream/80 sm:text-lg">
             Против пережаренного зерна, которое всё на одно лицо. Против
             обжарки, которая прячет брак вместо того, чтобы раскрывать
             происхождение. Вкус — это то, ради чего кофе вообще существует.

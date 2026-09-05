@@ -111,7 +111,7 @@ export default function Catalog() {
 
   return (
     <section id="catalog" className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
-      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-white/10 bg-backdrop/45 p-5 shadow-2xl backdrop-blur-md sm:p-8 md:rounded-3xl md:p-12 lg:p-16">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-gold/20 bg-backdrop/35 p-5 shadow-2xl backdrop-blur-[10px] sm:p-8 md:rounded-3xl md:p-12 lg:p-16">
         <div className="mb-8 max-w-2xl sm:mb-10">
           <span className="text-xs font-semibold uppercase tracking-[0.35em] text-gold">
             Каталог
@@ -167,7 +167,7 @@ export default function Catalog() {
           className={`transition-all duration-300 ease-in-out ${gridTransition.className}`}
         >
           {visibleLots.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-gold/30 bg-cream/88 px-8 py-16 text-center backdrop-blur-md">
+            <div className="rounded-xl border border-dashed border-gold/30 bg-cream/45 px-8 py-16 text-center backdrop-blur-md">
               <p className="font-display text-xl font-semibold text-burgundy">
                 Скоро в каталоге
               </p>
@@ -184,7 +184,7 @@ export default function Catalog() {
                   tabIndex={0}
                   onClick={() => openLot(lot)}
                   onKeyDown={(event) => handleCardKeyDown(event, lot)}
-                  className="flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gold/25 bg-cream/88 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:border-gold hover:shadow-xl active:scale-[0.98]"
+                  className="flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gold/25 bg-cream/45 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:border-gold hover:shadow-xl active:scale-[0.98]"
                 >
                   <div className="flex items-center justify-between border-b border-charcoal/10 px-5 py-3">
                     <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-charcoal/50">
