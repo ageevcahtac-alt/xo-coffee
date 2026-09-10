@@ -1,25 +1,32 @@
-import type { FlavorProfile, Lot } from "@/src/types/lot";
+import type { Lot } from "@/src/types/lot";
 import { getWhoLikesIt, isEntryProduct } from "@/src/lib/lotPresentation";
+import {
+  FLAVOR_DIRECTIONS,
+  FLAVOR_DIRECTION_PROFILES,
+  averageProfile,
+  getFlavorDirectionScore,
+  historyAdjustment,
+  profileDistance,
+  MAX_PROFILE_DISTANCE,
+  type FlavorDirection,
+} from "@/src/lib/flavorMatch";
 
 /**
  * Coffee Discovery matching engine.
  *
  * A pure, deterministic function of (lots, answers) — no randomness, no
- * network calls, no account/history state. It reuses the site's existing
- * 5-axis FlavorProfile, tags, sensory notes and brew data; it does not
- * introduce a second taxonomy or touch the FlavorProfile shape.
+ * network calls, no account state of its own. It reuses the site's existing
+ * 5-axis FlavorProfile, tags, sensory notes and brew data via
+ * src/lib/flavorMatch.ts (the same primitives back the catalog's flavor
+ * chips and Similar Lots) — it does not introduce a second taxonomy or
+ * touch the FlavorProfile shape.
  *
  * Kept as plain functions (not a class/hook) so a future step — feeding in
  * Coffee Passport tasting history or past purchases — can wrap or extend
  * this module without changing how it scores a single lot today.
  */
 
-export type TasteAnswer =
-  | "bright-fruity"
-  | "sweet-mellow"
-  | "floral-tea"
-  | "chocolate-dense"
-  | "unknown";
+export type TasteAnswer = FlavorDirection | "unknown";
 
 export type BrewAnswer = "espresso" | "filter" | "aeropress" | "batch" | "other";
 
@@ -49,10 +56,10 @@ export type DiscoveryHistory = {
 };
 
 export const TASTE_OPTIONS: { value: TasteAnswer; label: string }[] = [
-  { value: "bright-fruity", label: "Яркий и фруктовый" },
-  { value: "sweet-mellow", label: "Сладкий и мягкий" },
-  { value: "floral-tea", label: "Цветочный и чайный" },
-  { value: "chocolate-dense", label: "Шоколадный и плотный" },
+  ...FLAVOR_DIRECTIONS.map((direction) => ({
+    value: direction as TasteAnswer,
+    label: FLAVOR_DIRECTION_PROFILES[direction].label,
+  })),
   { value: "unknown", label: "Не знаю" },
 ];
 
@@ -72,94 +79,11 @@ export const NOVELTY_OPTIONS: { value: NoveltyAnswer; label: string }[] = [
 
 // --- Taste matching -------------------------------------------------------
 
-type TasteProfile = {
-  target: FlavorProfile;
-  keywords: string[];
-  reason: string;
-};
-
-const TASTE_PROFILES: Record<Exclude<TasteAnswer, "unknown">, TasteProfile> = {
-  "bright-fruity": {
-    target: { acidity: 9, sweetness: 6, body: 5, aroma: 8, finish: 7 },
-    keywords: [
-      "ягод",
-      "вишня",
-      "грейпфрут",
-      "цитрус",
-      "персик",
-      "абрикос",
-      "фрукт",
-      "смородина",
-      "инжир",
-      "яркая кислотность",
-    ],
-    reason: "яркий ягодный вкус и заметная, сочная кислотность",
-  },
-  "sweet-mellow": {
-    target: { acidity: 4, sweetness: 8, body: 6, aroma: 6, finish: 6 },
-    keywords: [
-      "мёд",
-      "карамель",
-      "сахар",
-      "патока",
-      "миндаль",
-      "орех",
-      "яблоко",
-      "сбалансированный",
-    ],
-    reason: "мягкий, сладкий кофе без резкой кислинки",
-  },
-  "floral-tea": {
-    target: { acidity: 7, sweetness: 6, body: 4, aroma: 9, finish: 7 },
-    keywords: ["жасмин", "бергамот", "цветоч", "чайн"],
-    reason: "цветочный, чайный характер с лёгким, ароматным телом",
-  },
-  "chocolate-dense": {
-    target: { acidity: 4, sweetness: 8, body: 9, aroma: 6, finish: 7 },
-    keywords: ["какао", "шоколад", "орех", "патока", "карамель", "плотн"],
-    reason: "плотный, шоколадный кофе с ощутимой сладостью",
-  },
-};
-
-const FLAVOR_AXES: (keyof FlavorProfile)[] = [
-  "acidity",
-  "sweetness",
-  "body",
-  "aroma",
-  "finish",
-];
-
 const UNKNOWN_TASTE_SCORE = 0.5;
-const KEYWORD_BONUS_STEP = 0.08;
-const KEYWORD_BONUS_CAP = 0.4;
-
-function lotSearchText(lot: Lot): string {
-  return [...lot.tags, ...lot.sensory, lot.cupNote].join(" ").toLowerCase();
-}
 
 function tasteScore(lot: Lot, taste: TasteAnswer): number {
   if (taste === "unknown") return UNKNOWN_TASTE_SCORE;
-
-  const profile = lot.flavorProfile;
-  const { target, keywords } = TASTE_PROFILES[taste];
-
-  let closeness = 0.5;
-  if (profile) {
-    const totalDiff = FLAVOR_AXES.reduce((sum, axis) => {
-      const lotValue = profile[axis] ?? 5;
-      return sum + Math.abs(target[axis] - lotValue);
-    }, 0);
-    closeness = 1 - totalDiff / (FLAVOR_AXES.length * 10);
-  }
-
-  const text = lotSearchText(lot);
-  const matchedKeywords = keywords.filter((keyword) => text.includes(keyword));
-  const keywordBonus = Math.min(
-    KEYWORD_BONUS_CAP,
-    matchedKeywords.length * KEYWORD_BONUS_STEP,
-  );
-
-  return closeness + keywordBonus;
+  return getFlavorDirectionScore(lot, taste);
 }
 
 // --- Brew matching ----------------------------------------------------------
@@ -199,39 +123,15 @@ function brewScore(lot: Lot, brew: BrewAnswer): number {
 
 // --- Novelty adjustment -----------------------------------------------------
 
-function profileDistance(a: FlavorProfile, b: FlavorProfile): number {
-  const sumSquares = FLAVOR_AXES.reduce((sum, axis) => {
-    const diff = (a[axis] ?? 5) - (b[axis] ?? 5);
-    return sum + diff * diff;
-  }, 0);
-  return Math.sqrt(sumSquares);
-}
-
-const MAX_PROFILE_DISTANCE = Math.sqrt(FLAVOR_AXES.length * 10 * 10);
 const NEW_RELEVANCE_FLOOR = 0.45;
 const UNUSUAL_ENTRY_SET_BONUS = 0.15;
-
-function averageProfile(lots: Lot[]): FlavorProfile {
-  const withProfile = lots.filter((lot) => lot.flavorProfile);
-  const count = withProfile.length || 1;
-  const sums: FlavorProfile = { acidity: 0, sweetness: 0, body: 0, aroma: 0, finish: 0 };
-  for (const lot of withProfile) {
-    for (const axis of FLAVOR_AXES) {
-      sums[axis] += lot.flavorProfile[axis] ?? 5;
-    }
-  }
-  for (const axis of FLAVOR_AXES) {
-    sums[axis] = sums[axis] / count;
-  }
-  return sums;
-}
 
 function noveltyBonus(
   lot: Lot,
   taste: number,
   novelty: NoveltyAnswer,
   topPick: Lot,
-  corpusAverage: FlavorProfile,
+  corpusAverage: ReturnType<typeof averageProfile>,
 ): number {
   if (novelty === "familiar") return 0;
 
@@ -253,22 +153,12 @@ function noveltyBonus(
   return bonus;
 }
 
-// --- Tasting history adjustment ---------------------------------------------
-
-const HISTORY_WEIGHT = 0.2;
-
-function historyScore(lot: Lot, history: DiscoveryHistory | undefined): number {
-  if (!history) return 0;
-  if (history.dislikedLotIds?.includes(lot.id)) return -1;
-  if (history.likedLotIds?.includes(lot.id)) return 1;
-  return 0;
-}
-
 // --- Composite scoring -------------------------------------------------------
 
 const TASTE_WEIGHT = 0.6;
 const BREW_WEIGHT = 0.25;
 const NOVELTY_WEIGHT = 0.15;
+const HISTORY_WEIGHT = 0.2;
 const LOW_CONFIDENCE_SPREAD_THRESHOLD = 0.12;
 
 function getDiscoveryReason(
@@ -283,7 +173,7 @@ function getDiscoveryReason(
     return getWhoLikesIt(lot);
   }
 
-  const { reason: direction } = TASTE_PROFILES[answers.taste];
+  const { reason: direction } = FLAVOR_DIRECTION_PROFILES[answers.taste];
   const notes = lot.sensory.slice(0, 2);
   if (notes.length > 0) {
     return `Подойдёт, если вам нравится ${direction}. В чашке это раскрывается нотами: ${notes.join(", ")}.`;
@@ -320,7 +210,7 @@ export function getDiscoveryRecommendations(
       taste * TASTE_WEIGHT +
       brew * BREW_WEIGHT +
       novelty * NOVELTY_WEIGHT +
-      historyScore(lot, history) * HISTORY_WEIGHT;
+      historyAdjustment(lot, history) * HISTORY_WEIGHT;
     return { lot, index, composite };
   });
 

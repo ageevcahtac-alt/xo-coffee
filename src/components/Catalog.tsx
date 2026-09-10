@@ -19,6 +19,13 @@ import {
   isEntryProduct,
 } from "@/src/lib/lotPresentation";
 import { useDiscovery } from "@/src/context/DiscoveryContext";
+import {
+  FLAVOR_DIRECTIONS,
+  FLAVOR_DIRECTION_PROFILES,
+  rankLotsByFlavorDirection,
+  type FlavorDirection,
+} from "@/src/lib/flavorMatch";
+import { getLikedDislikedLotIds } from "@/src/lib/coffeePassport";
 
 export default function Catalog() {
   const { addItem, flyToCart } = useCart();
@@ -27,6 +34,7 @@ export default function Catalog() {
   const [activeCountry, setActiveCountry] = useState<RegionCountry | null>(
     null,
   );
+  const [activeFlavor, setActiveFlavor] = useState<FlavorDirection | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const gridTransition = useCrossfadeTransition(300);
@@ -46,6 +54,17 @@ export default function Catalog() {
     });
   };
 
+  // Flavor exploration re-ranks whatever the category tabs already show —
+  // it never hides a lot, only reorders. Toggling the same chip again (or
+  // "Все") clears it. This only ever runs from a click, well after
+  // hydration, so reading tasting history directly here (no effect) can't
+  // cause a server/client mismatch.
+  const selectFlavor = (direction: FlavorDirection) => {
+    gridTransition.runTransition(() => {
+      setActiveFlavor((prev) => (prev === direction ? null : direction));
+    });
+  };
+
   const regionLots = LOTS.filter((lot) =>
     REGION_COUNTRIES.includes(lot.country as RegionCountry),
   );
@@ -61,6 +80,10 @@ export default function Catalog() {
             : regionLots
           : [];
 
+  const orderedLots = activeFlavor
+    ? rankLotsByFlavorDirection(visibleLots, activeFlavor, getLikedDislikedLotIds())
+    : visibleLots;
+
   // Only the first entry-product card gets the #degustation anchor id, so
   // adding a second specialty-set lot later can't create a duplicate DOM id.
   const firstEntryLotId = LOTS.find((lot) => isEntryProduct(lot))?.id ?? null;
@@ -74,10 +97,10 @@ export default function Catalog() {
     }
   }, [modalOpen]);
 
-  const displayLot = activeIndex !== null ? (visibleLots[activeIndex] ?? null) : null;
+  const displayLot = activeIndex !== null ? (orderedLots[activeIndex] ?? null) : null;
 
   const openLot = (lot: Lot) => {
-    const index = visibleLots.findIndex((l) => l.id === lot.id);
+    const index = orderedLots.findIndex((l) => l.id === lot.id);
     setActiveIndex(index === -1 ? 0 : index);
     setModalOpen(true);
   };
@@ -85,8 +108,8 @@ export default function Catalog() {
   const goToPrevLot = () => {
     lotTransition.runTransition(() => {
       setActiveIndex((index) => {
-        if (index === null || visibleLots.length === 0) return index;
-        return (index - 1 + visibleLots.length) % visibleLots.length;
+        if (index === null || orderedLots.length === 0) return index;
+        return (index - 1 + orderedLots.length) % orderedLots.length;
       });
     });
   };
@@ -94,10 +117,28 @@ export default function Catalog() {
   const goToNextLot = () => {
     lotTransition.runTransition(() => {
       setActiveIndex((index) => {
-        if (index === null || visibleLots.length === 0) return index;
-        return (index + 1) % visibleLots.length;
+        if (index === null || orderedLots.length === 0) return index;
+        return (index + 1) % orderedLots.length;
       });
     });
+  };
+
+  // A similar-lot pick from inside the Passport may not belong to the
+  // currently active category/region — fall back to "Все" so it's always
+  // reachable, then open it there.
+  const selectLotById = (lotId: string) => {
+    const indexInOrdered = orderedLots.findIndex((l) => l.id === lotId);
+    if (indexInOrdered !== -1) {
+      lotTransition.runTransition(() => setActiveIndex(indexInOrdered));
+      return;
+    }
+    gridTransition.runTransition(() => {
+      setActiveSection("all");
+      setActiveCountry(null);
+      setActiveFlavor(null);
+    });
+    const indexInAll = LOTS.findIndex((l) => l.id === lotId);
+    lotTransition.runTransition(() => setActiveIndex(indexInAll === -1 ? null : indexInAll));
   };
 
   const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>, lot: Lot) => {
@@ -148,6 +189,48 @@ export default function Catalog() {
           </button>
         </div>
 
+        <div className="mb-8 sm:mb-10">
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+            Какой характер кофе вы ищете?
+          </span>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              aria-pressed={activeFlavor === null}
+              onClick={() => setActiveFlavor(null)}
+              className={`min-h-11 border px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] backdrop-blur-md transition-all duration-150 active:scale-95 ${
+                activeFlavor === null
+                  ? "tab-active-glow border-gold"
+                  : "border-white/15 bg-white/15 text-cream/80 hover:border-gold/50 hover:bg-white/20 hover:text-gold"
+              }`}
+            >
+              Все характеры
+            </button>
+            {FLAVOR_DIRECTIONS.map((direction) => (
+              <button
+                key={direction}
+                type="button"
+                aria-pressed={activeFlavor === direction}
+                onClick={() => selectFlavor(direction)}
+                className={`min-h-11 border px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] backdrop-blur-md transition-all duration-150 active:scale-95 ${
+                  activeFlavor === direction
+                    ? "tab-active-glow border-gold"
+                    : "border-white/15 bg-white/15 text-cream/80 hover:border-gold/50 hover:bg-white/20 hover:text-gold"
+                }`}
+              >
+                {FLAVOR_DIRECTION_PROFILES[direction].label}
+              </button>
+            ))}
+          </div>
+          {activeFlavor && (
+            <p className="mt-3 text-xs text-cream/60">
+              Каталог ниже отсортирован по близости к «
+              {FLAVOR_DIRECTION_PROFILES[activeFlavor].label}» — остальные лоты никуда
+              не делись, просто ниже в списке.
+            </p>
+          )}
+        </div>
+
         <div className="mb-8 sm:mb-12">
           <div className="flex flex-wrap gap-2">
             {TOP_CATEGORIES.map((category) => (
@@ -189,7 +272,7 @@ export default function Catalog() {
         <div
           className={`transition-all duration-300 ease-in-out ${gridTransition.className}`}
         >
-          {visibleLots.length === 0 ? (
+          {orderedLots.length === 0 ? (
             <div className="rounded-xl border border-dashed border-gold/30 bg-cream/85 px-8 py-16 text-center backdrop-blur-md">
               <p className="font-display text-xl font-semibold text-burgundy">
                 Скоро в каталоге
@@ -200,7 +283,7 @@ export default function Catalog() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {visibleLots.map((lot) => {
+              {orderedLots.map((lot) => {
                 const entry = isEntryProduct(lot);
                 const brewHighlight = getBrewHighlight(lot);
                 return (
@@ -294,10 +377,11 @@ export default function Catalog() {
         onClose={() => setModalOpen(false)}
         onPrev={goToPrevLot}
         onNext={goToNextLot}
-        hasMultiple={visibleLots.length > 1}
+        onSelectLot={selectLotById}
+        hasMultiple={orderedLots.length > 1}
         position={
           activeIndex !== null
-            ? { index: activeIndex, total: visibleLots.length }
+            ? { index: activeIndex, total: orderedLots.length }
             : null
         }
         transitionClassName={lotTransition.className}

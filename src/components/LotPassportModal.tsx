@@ -11,6 +11,9 @@ import {
   getWhoLikesIt,
   isEntryProduct,
 } from "@/src/lib/lotPresentation";
+import { getSimilarLots } from "@/src/lib/flavorMatch";
+import { getLikedDislikedLotIds } from "@/src/lib/coffeePassport";
+import { LOTS } from "@/src/data/lots";
 import type { Lot } from "@/src/types/lot";
 
 const BREW_LABELS = {
@@ -25,6 +28,7 @@ export default function LotPassportModal({
   onClose,
   onPrev,
   onNext,
+  onSelectLot,
   hasMultiple,
   position,
   transitionClassName = "",
@@ -34,6 +38,11 @@ export default function LotPassportModal({
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
+  /** Jump straight to a specific lot (e.g. from "Похожие лоты"), instead of
+   *  stepping through the current prev/next order. Omit to render similar
+   *  lots as non-interactive (e.g. from the post-purchase Coffee Passport,
+   *  which navigates its own separate set of purchased lots). */
+  onSelectLot?: (lotId: string) => void;
   hasMultiple: boolean;
   position: { index: number; total: number } | null;
   transitionClassName?: string;
@@ -51,6 +60,7 @@ export default function LotPassportModal({
             onClose={onClose}
             onPrev={onPrev}
             onNext={onNext}
+            onSelectLot={onSelectLot}
             hasMultiple={hasMultiple}
             position={position}
           />
@@ -65,6 +75,7 @@ function LotPassportContent({
   onClose,
   onPrev,
   onNext,
+  onSelectLot,
   hasMultiple,
   position,
 }: {
@@ -72,6 +83,7 @@ function LotPassportContent({
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
+  onSelectLot?: (lotId: string) => void;
   hasMultiple: boolean;
   position: { index: number; total: number } | null;
 }) {
@@ -80,6 +92,10 @@ function LotPassportContent({
   const entry = isEntryProduct(lot);
   const whoLikesIt = getWhoLikesIt(lot);
   const brewHighlight = getBrewHighlight(lot);
+  // This content only ever mounts from a click (opening the modal), always
+  // well after hydration — safe to read tasting history directly here with
+  // no server/client mismatch risk.
+  const similarLots = getSimilarLots(lot, LOTS, 3, getLikedDislikedLotIds());
 
   const handleAdd = (event: MouseEvent<HTMLButtonElement>) => {
     flyToCart(event.currentTarget.getBoundingClientRect());
@@ -323,6 +339,60 @@ function LotPassportContent({
                 )}
               </div>
             </section>
+
+            {similarLots.length > 0 && (
+              <section>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
+                  Если вам нравится этот кофе
+                </h3>
+                <div className="mt-3 space-y-3">
+                  {similarLots.map(({ lot: similarLot, reason }) => {
+                    const cardBody = (
+                      <>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="font-display text-base font-semibold text-burgundy">
+                              {similarLot.country}
+                            </p>
+                            <p className="text-xs uppercase tracking-[0.08em] text-charcoal/50">
+                              {similarLot.region}
+                            </p>
+                          </div>
+                          <span className="shrink-0 font-display text-sm font-semibold text-burgundy">
+                            {formatPrice(similarLot.price)}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm leading-relaxed text-charcoal/75">
+                          {reason}
+                        </p>
+                      </>
+                    );
+
+                    if (!onSelectLot) {
+                      return (
+                        <div
+                          key={similarLot.id}
+                          className="border border-charcoal/15 bg-cream-dark p-4 text-left"
+                        >
+                          {cardBody}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <button
+                        key={similarLot.id}
+                        type="button"
+                        onClick={() => onSelectLot(similarLot.id)}
+                        className="block w-full border border-charcoal/15 bg-cream-dark p-4 text-left transition-all active:scale-[0.99] hover:border-gold/50 hover:bg-cream"
+                      >
+                        {cardBody}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             <WholeBeanNotice />
           </div>
