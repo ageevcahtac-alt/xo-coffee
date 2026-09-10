@@ -98,6 +98,18 @@ export default function CoffeePassportDetail({
   const availableBrewMethods = (["v60", "immersion", "espresso"] as const).filter(
     (method) => Boolean(lot.brew?.[method]),
   );
+  // Only join fields that actually exist — never render a stray "· ·" or
+  // an "undefined" fragment for a lot with partial data.
+  const referenceParts: string[] = [];
+  if (lot.region) referenceParts.push(lot.region);
+  if (lot.variety) referenceParts.push(lot.variety);
+  if (lot.process) referenceParts.push(lot.process);
+  if (typeof lot.altitudeMasl === "number" && Number.isFinite(lot.altitudeMasl)) {
+    referenceParts.push(`${lot.altitudeMasl} MASL`);
+  }
+  if (typeof lot.qScore === "number" && Number.isFinite(lot.qScore)) {
+    referenceParts.push(`Q ${lot.qScore}`);
+  }
 
   const [records, setRecords] = useState<TastingRecord[]>([]);
   const [hydrated, setHydrated] = useState(false);
@@ -392,10 +404,9 @@ export default function CoffeePassportDetail({
         ) : (
           <p className="mt-3 text-sm text-charcoal/60">Профиль пока не описан.</p>
         )}
-        <p className="mt-3 text-xs text-charcoal/60">
-          {lot.region} · {lot.variety} · {lot.process} · {lot.altitudeMasl} MASL · Q{" "}
-          {lot.qScore}
-        </p>
+        {referenceParts.length > 0 && (
+          <p className="mt-3 text-xs text-charcoal/60">{referenceParts.join(" · ")}</p>
+        )}
         <button
           type="button"
           onClick={onOpenLotPassport}

@@ -101,6 +101,27 @@ function LotPassportContent({
   const entry = isEntryProduct(lot);
   const brewHighlight = getBrewHighlight(lot);
   const factChips = getLotFactChips(lot);
+  // Level 2's deep technical table — same "only show what's actually
+  // there" rule as everything else here. Kept local rather than reusing
+  // getLotFactChips: this table has different labels/wording for its
+  // "read this if you want to go deep" audience (vs. the Level-1 chips'
+  // glanceable ones) and also carries farm, which chips deliberately don't.
+  const techRows: { label: string; value: string }[] = [];
+  if (typeof lot.farm === "string" && lot.farm.trim()) {
+    techRows.push({ label: "Ферма / станция", value: lot.farm });
+  }
+  if (typeof lot.altitudeMasl === "number" && Number.isFinite(lot.altitudeMasl)) {
+    techRows.push({ label: "Высота", value: `${lot.altitudeMasl} MASL` });
+  }
+  if (typeof lot.variety === "string" && lot.variety.trim()) {
+    techRows.push({ label: "Разновидность", value: lot.variety });
+  }
+  if (typeof lot.process === "string" && lot.process.trim()) {
+    techRows.push({ label: "Обработка", value: lot.process });
+  }
+  if (typeof lot.qScore === "number" && Number.isFinite(lot.qScore)) {
+    techRows.push({ label: "Оценка Q-грейдера", value: `${lot.qScore} / 100` });
+  }
   // A tasting set's one FlavorProfile blends three different lots' worth of
   // character — same reasoning src/lib/personalTaste.ts uses to exclude it
   // from direction tallying, so it isn't given a single misleading label
@@ -143,9 +164,14 @@ function LotPassportContent({
                 <h2 className="font-display text-2xl font-semibold text-burgundy">
                   {lot.country}
                 </h2>
-                <span className="shrink-0 border border-gold px-2 py-0.5 text-[11px] font-bold text-gold-dark">
-                  {lot.qScore} Q
-                </span>
+                {typeof lot.qScore === "number" && (
+                  <span
+                    aria-label={`Оценка Q-грейдера: ${lot.qScore} из 100`}
+                    className="shrink-0 border border-gold px-2 py-0.5 text-[11px] font-bold text-gold-dark"
+                  >
+                    {lot.qScore} Q
+                  </span>
+                )}
               </div>
               <p className="text-sm uppercase tracking-[0.1em] text-charcoal/50">
                 {lot.region}
@@ -321,42 +347,40 @@ function LotPassportContent({
               </section>
             )}
 
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
-                Технические данные
-              </h3>
-              <dl className="mt-3 divide-y divide-charcoal/10 border-y border-charcoal/10 text-sm">
-                <div className="flex justify-between py-2.5">
-                  <dt className="text-charcoal/50">Ферма / станция</dt>
-                  <dd className="text-right font-medium">{lot.farm}</dd>
-                </div>
-                <div className="flex justify-between py-2.5">
-                  <dt className="text-charcoal/50">Высота</dt>
-                  <dd className="font-medium">{lot.altitudeMasl} MASL</dd>
-                </div>
-                <div className="flex justify-between py-2.5">
-                  <dt className="text-charcoal/50">Разновидность</dt>
-                  <dd className="text-right font-medium">{lot.variety}</dd>
-                </div>
-                <div className="flex justify-between py-2.5">
-                  <dt className="text-charcoal/50">Обработка</dt>
-                  <dd className="font-medium">{lot.process}</dd>
-                </div>
-                <div className="flex justify-between py-2.5">
-                  <dt className="text-charcoal/50">Оценка Q-грейдера</dt>
-                  <dd className="font-medium">{lot.qScore} / 100</dd>
-                </div>
-              </dl>
-            </section>
+            {techRows.length > 0 && (
+              <section>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
+                  Технические данные
+                </h3>
+                <dl className="mt-3 divide-y divide-charcoal/10 border-y border-charcoal/10 text-sm">
+                  {techRows.map((row) => (
+                    <div key={row.label} className="flex justify-between py-2.5">
+                      <dt className="text-charcoal/50">{row.label}</dt>
+                      <dd className="text-right font-medium">{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                {typeof lot.qScore === "number" && (
+                  <p className="mt-2 text-xs leading-relaxed text-charcoal/50">
+                    Q-грейд — независимая оценка качества зелёного кофе по
+                    100-балльной шкале: от 80 баллов начинается уровень
+                    спешелти. Это не рейтинг XO COFFEE и не про личный вкус —
+                    за это отвечают профиль лота и «Кому понравится» выше.
+                  </p>
+                )}
+              </section>
+            )}
 
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
-                Ферма и терруар
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-charcoal/75">
-                {lot.farmStory}
-              </p>
-            </section>
+            {lot.farmStory && (
+              <section>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
+                  Ферма и терруар
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-charcoal/75">
+                  {lot.farmStory}
+                </p>
+              </section>
+            )}
 
             {(() => {
               // Defensive: the Lot type declares all three brew methods as

@@ -320,9 +320,14 @@ export default function Catalog() {
                           {lot.region}
                         </p>
                       </div>
-                      <span className="shrink-0 border border-gold/40 bg-cream px-2 py-0.5 text-[11px] font-bold text-burgundy">
-                        {lot.qScore} Q
-                      </span>
+                      {typeof lot.qScore === "number" && (
+                        <span
+                          aria-label={`Оценка Q-грейдера: ${lot.qScore} из 100`}
+                          className="shrink-0 border border-gold/40 bg-cream px-2 py-0.5 text-[11px] font-bold text-burgundy"
+                        >
+                          {lot.qScore} Q
+                        </span>
+                      )}
                     </div>
 
                     {entry && (
