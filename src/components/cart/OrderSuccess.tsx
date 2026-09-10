@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { CARRIER_LABELS } from "@/src/components/cart/CheckoutForm";
 import { PAYMENT_LABELS, type OrderDetails } from "@/src/components/cart/PaymentStep";
 
@@ -11,7 +12,7 @@ export default function OrderSuccess({
   onClose: () => void;
 }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-8 py-10 text-center">
+    <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8 py-10 text-center">
       <span className="flex h-16 w-16 items-center justify-center rounded-full border border-gold text-gold">
         <svg
           width="26"
@@ -66,10 +67,30 @@ export default function OrderSuccess({
         Чек и трек-номер придут на {order.email}
       </p>
 
+      {order.items.length > 0 && (
+        <div className="mt-6 w-full max-w-xs border border-gold/40 bg-cream-dark px-5 py-4 text-left">
+          <p className="font-display text-sm font-semibold text-burgundy">
+            Coffee Passport
+          </p>
+          <p className="mt-1.5 text-sm leading-relaxed text-charcoal/70">
+            Попробуйте {order.items.length > 1 ? "эти лоты" : "этот лот"} и
+            сохраните своё впечатление в Coffee Passport — рецепт
+            приготовления и место для собственной заметки о чашке.
+          </p>
+          <Link
+            href={`/passport/${order.orderNumber}`}
+            onClick={onClose}
+            className="mt-4 flex h-11 w-full items-center justify-center bg-burgundy text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
+          >
+            Открыть Coffee Passport
+          </Link>
+        </div>
+      )}
+
       <button
         type="button"
         onClick={onClose}
-        className="mt-8 flex h-12 w-full max-w-xs items-center justify-center border border-burgundy px-8 text-sm font-semibold uppercase tracking-[0.15em] text-burgundy transition-all active:scale-95 hover:bg-burgundy hover:text-cream"
+        className="mt-4 flex h-12 w-full max-w-xs items-center justify-center border border-burgundy px-8 text-sm font-semibold uppercase tracking-[0.15em] text-burgundy transition-all active:scale-95 hover:bg-burgundy hover:text-cream"
       >
         Продолжить покупки
       </button>

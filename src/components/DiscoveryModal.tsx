@@ -8,6 +8,7 @@ import { useCart } from "@/src/context/CartContext";
 import { LOTS } from "@/src/data/lots";
 import { formatPrice } from "@/src/lib/format";
 import { getBrewHighlight } from "@/src/lib/lotPresentation";
+import { getLikedDislikedLotIds } from "@/src/lib/coffeePassport";
 import {
   BREW_OPTIONS,
   NOVELTY_OPTIONS,
@@ -59,7 +60,11 @@ export default function DiscoveryModal() {
 
   const recommendations: DiscoveryResult[] = useMemo(() => {
     if (!taste || !brew || !novelty) return [];
-    return getDiscoveryRecommendations(LOTS, { taste, brew, novelty });
+    // Liked/disliked lots come from Coffee Passport tastings, if any exist
+    // yet — a first-time buyer has none, so this is a no-op until they've
+    // actually tasted something.
+    const history = getLikedDislikedLotIds();
+    return getDiscoveryRecommendations(LOTS, { taste, brew, novelty }, 3, history);
   }, [taste, brew, novelty]);
 
   const restart = () => {

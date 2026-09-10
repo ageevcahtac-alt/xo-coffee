@@ -9,6 +9,7 @@ import CheckoutForm, {
 } from "@/src/components/cart/CheckoutForm";
 import PaymentStep, { type OrderDetails } from "@/src/components/cart/PaymentStep";
 import OrderSuccess from "@/src/components/cart/OrderSuccess";
+import { saveOrderRecord } from "@/src/lib/coffeePassport";
 
 type Step = "cart" | "checkout" | "payment" | "success";
 
@@ -36,6 +37,11 @@ export default function CartDrawer() {
   };
 
   const handleOrderConfirm = (order: OrderDetails) => {
+    saveOrderRecord({
+      orderNumber: order.orderNumber,
+      createdAt: new Date().toISOString(),
+      items: order.items,
+    });
     setCompletedOrder(order);
     setStep("success");
     clearCart();

@@ -7,6 +7,7 @@ import { getDeliveryFee } from "@/src/lib/shop";
 import { generateOrderNumber } from "@/src/lib/orderNumber";
 import { CARRIER_LABELS, type ContactInfo } from "@/src/components/cart/CheckoutForm";
 import type { OrderPayload, PaymentMethodCode } from "@/src/types/order";
+import type { OrderRecordItem } from "@/src/types/coffeePassport";
 
 export type PaymentMethod = PaymentMethodCode;
 
@@ -14,6 +15,9 @@ export type OrderDetails = ContactInfo & {
   orderNumber: string;
   paymentMethod: PaymentMethod;
   company?: { name: string; inn: string };
+  // A snapshot of what was bought, captured before the cart is cleared —
+  // this is what lets Success/Coffee Passport know which lots to open.
+  items: OrderRecordItem[];
 };
 
 export const PAYMENT_LABELS: Record<PaymentMethod, string> = {
@@ -160,7 +164,17 @@ export default function PaymentStep({
       setSubmitting(false);
     }
 
-    onConfirm({ ...contact, orderNumber, paymentMethod: method, company });
+    onConfirm({
+      ...contact,
+      orderNumber,
+      paymentMethod: method,
+      company,
+      items: items.map((item) => ({
+        lotId: item.id,
+        name: item.name,
+        quantity: item.quantity,
+      })),
+    });
   };
 
   const inputClass =

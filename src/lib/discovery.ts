@@ -37,6 +37,17 @@ export type DiscoveryResult = {
   isEntryFallback: boolean;
 };
 
+/**
+ * Optional signal from Coffee Passport tasting history (see
+ * src/lib/coffeePassport.ts's getLikedDislikedLotIds). Omitting it, or
+ * passing empty arrays — always true before anyone has tasted anything —
+ * leaves ranking identical to having no history at all.
+ */
+export type DiscoveryHistory = {
+  likedLotIds?: string[];
+  dislikedLotIds?: string[];
+};
+
 export const TASTE_OPTIONS: { value: TasteAnswer; label: string }[] = [
   { value: "bright-fruity", label: "Яркий и фруктовый" },
   { value: "sweet-mellow", label: "Сладкий и мягкий" },
@@ -242,6 +253,17 @@ function noveltyBonus(
   return bonus;
 }
 
+// --- Tasting history adjustment ---------------------------------------------
+
+const HISTORY_WEIGHT = 0.2;
+
+function historyScore(lot: Lot, history: DiscoveryHistory | undefined): number {
+  if (!history) return 0;
+  if (history.dislikedLotIds?.includes(lot.id)) return -1;
+  if (history.likedLotIds?.includes(lot.id)) return 1;
+  return 0;
+}
+
 // --- Composite scoring -------------------------------------------------------
 
 const TASTE_WEIGHT = 0.6;
@@ -279,6 +301,7 @@ export function getDiscoveryRecommendations(
   lots: Lot[],
   answers: DiscoveryAnswers,
   limit = 3,
+  history?: DiscoveryHistory,
 ): DiscoveryResult[] {
   if (lots.length === 0) return [];
 
@@ -294,7 +317,10 @@ export function getDiscoveryRecommendations(
     const brew = brewScore(lot, answers.brew);
     const novelty = noveltyBonus(lot, taste, answers.novelty, topPick, corpusAverage);
     const composite =
-      taste * TASTE_WEIGHT + brew * BREW_WEIGHT + novelty * NOVELTY_WEIGHT;
+      taste * TASTE_WEIGHT +
+      brew * BREW_WEIGHT +
+      novelty * NOVELTY_WEIGHT +
+      historyScore(lot, history) * HISTORY_WEIGHT;
     return { lot, index, composite };
   });
 

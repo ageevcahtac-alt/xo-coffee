@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useCart } from "@/src/context/CartContext";
 import { NAV_LINKS } from "@/src/lib/nav";
 import MobileMenu from "@/src/components/MobileMenu";
@@ -24,12 +25,12 @@ export default function Header() {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 border-b border-gold/20 bg-[#0F080A]/75 backdrop-blur-md">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-10">
-        <a
-          href="#top"
+        <Link
+          href="/#top"
           className="font-display text-2xl font-semibold tracking-[0.08em] text-cream"
         >
           XO <span className="text-gold">COFFEE</span>
-        </a>
+        </Link>
 
         <nav className="hidden items-center gap-10 md:flex">
           {NAV_LINKS.map((link) => (
