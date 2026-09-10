@@ -11,18 +11,18 @@ import {
   type RegionCountry,
   type TopCategoryId,
 } from "@/src/data/categories";
-import lotsData from "@/src/data/lots.json";
+import { LOTS } from "@/src/data/lots";
 import type { Lot } from "@/src/types/lot";
 import {
   getBrewHighlight,
   getWhoLikesIt,
   isEntryProduct,
 } from "@/src/lib/lotPresentation";
-
-const LOTS = lotsData as Lot[];
+import { useDiscovery } from "@/src/context/DiscoveryContext";
 
 export default function Catalog() {
   const { addItem, flyToCart } = useCart();
+  const { openDiscovery } = useDiscovery();
   const [activeSection, setActiveSection] = useState<TopCategoryId>("all");
   const [activeCountry, setActiveCountry] = useState<RegionCountry | null>(
     null,
@@ -132,6 +132,20 @@ export default function Catalog() {
             Нажмите на лот, чтобы открыть полный паспорт: происхождение,
             сенсорный профиль и рекомендации по завариванию.
           </p>
+        </div>
+
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border border-gold/25 bg-cream/10 px-5 py-4 sm:mb-10">
+          <p className="text-sm text-cream/80">
+            Не знаете, что выбрать?{" "}
+            <span className="text-cream/60">Подберём за 1 минуту.</span>
+          </p>
+          <button
+            type="button"
+            onClick={openDiscovery}
+            className="flex h-11 shrink-0 items-center justify-center border border-gold/50 px-5 text-xs font-semibold uppercase tracking-[0.1em] text-gold transition-all active:scale-95 hover:bg-gold hover:text-burgundy"
+          >
+            Подобрать кофе
+          </button>
         </div>
 
         <div className="mb-8 sm:mb-12">
