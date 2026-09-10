@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Drawer from "@/src/components/ui/Drawer";
 import { NAV_LINKS } from "@/src/lib/nav";
 
@@ -32,16 +33,16 @@ export default function MobileMenu({
         </button>
       </div>
 
-      <nav className="flex flex-col gap-3 px-6 py-6">
+      <nav aria-label="Меню" className="flex flex-col gap-3 px-6 py-6">
         {NAV_LINKS.map((link) => (
-          <a
+          <Link
             key={link.href}
             href={link.href}
             onClick={onClose}
             className="rounded-lg border border-charcoal/10 bg-cream-dark px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.12em] text-charcoal/80 shadow-lg transition-all duration-150 active:scale-95 active:border-burgundy active:bg-burgundy active:text-cream hover:border-gold hover:text-burgundy hover:shadow-xl"
           >
             {link.label}
-          </a>
+          </Link>
         ))}
       </nav>
     </Drawer>

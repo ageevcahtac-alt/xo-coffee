@@ -32,15 +32,15 @@ export default function Header() {
           XO <span className="text-gold">COFFEE</span>
         </Link>
 
-        <nav className="hidden items-center gap-10 md:flex">
+        <nav aria-label="Основная навигация" className="hidden items-center gap-10 md:flex">
           {NAV_LINKS.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="text-sm font-medium uppercase tracking-[0.12em] text-cream/75 transition-colors hover:text-gold"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -79,7 +79,7 @@ export default function Header() {
             aria-label="Меню"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(true)}
-            className="flex h-11 w-11 items-center justify-center border border-cream/20 text-cream transition-transform active:scale-90 hover:border-gold/50 hover:text-gold"
+            className="flex h-11 w-11 items-center justify-center border border-cream/20 text-cream transition-transform active:scale-90 hover:border-gold/50 hover:text-gold md:hidden"
           >
             <svg
               width="18"

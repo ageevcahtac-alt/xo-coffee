@@ -102,6 +102,10 @@ export default function MyCoffeePage() {
           {getTasteSummary(context)}
         </p>
         {brewHabit && <p className="mt-1 text-sm text-cream/60">{brewHabit}</p>}
+        <p className="mt-3 text-xs text-cream/40">
+          История дегустаций хранится локально, в этом браузере — без аккаунта
+          и синхронизации между устройствами.
+        </p>
 
         {context.tastingCount > 0 && (
           <div className="mt-6 flex flex-wrap gap-6 text-sm text-cream/70">
