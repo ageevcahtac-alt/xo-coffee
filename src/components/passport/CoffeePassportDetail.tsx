@@ -8,6 +8,7 @@ import {
   saveTastingRecord,
 } from "@/src/lib/coffeePassport";
 import { getWhoLikesIt, isEntryProduct } from "@/src/lib/lotPresentation";
+import { FLAVOR_DIRECTION_PROFILES, getBestFlavorDirection } from "@/src/lib/flavorMatch";
 import type { BrewMethodKey, MyCupRating, TastingRecord } from "@/src/types/coffeePassport";
 import type { Lot } from "@/src/types/lot";
 
@@ -93,6 +94,7 @@ export default function CoffeePassportDetail({
   onOpenLotPassport: () => void;
 }) {
   const entry = isEntryProduct(lot);
+  const characterDirection = entry ? null : getBestFlavorDirection(lot);
   const availableBrewMethods = (["v60", "immersion", "espresso"] as const).filter(
     (method) => Boolean(lot.brew?.[method]),
   );
@@ -194,7 +196,10 @@ export default function CoffeePassportDetail({
         )}
         <p className="mt-3 text-sm leading-relaxed text-burgundy/80">
           <span className="font-semibold text-burgundy">Что почувствовать: </span>
-          {getWhoLikesIt(lot)}
+          {getWhoLikesIt(
+            lot,
+            characterDirection ? FLAVOR_DIRECTION_PROFILES[characterDirection].reason : null,
+          )}
         </p>
       </section>
 

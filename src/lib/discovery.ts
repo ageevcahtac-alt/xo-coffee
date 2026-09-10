@@ -4,6 +4,7 @@ import {
   FLAVOR_DIRECTIONS,
   FLAVOR_DIRECTION_PROFILES,
   averageProfile,
+  getBestFlavorDirection,
   getFlavorDirectionScore,
   historyAdjustment,
   profileDistance,
@@ -170,7 +171,11 @@ function getDiscoveryReason(
     return "Если пока не знаете, какой характер кофе ваш — начните с дегустации.";
   }
   if (answers.taste === "unknown") {
-    return getWhoLikesIt(lot);
+    const lotDirection = isEntryProduct(lot) ? null : getBestFlavorDirection(lot);
+    return getWhoLikesIt(
+      lot,
+      lotDirection ? FLAVOR_DIRECTION_PROFILES[lotDirection].reason : null,
+    );
   }
 
   const { reason: direction } = FLAVOR_DIRECTION_PROFILES[answers.taste];

@@ -285,7 +285,10 @@ function getSimilarityReason(base: Lot, candidate: Lot): string {
     return `Похожий характер: ${sharedDescriptiveTags[0].toLowerCase()}.`;
   }
 
-  return getWhoLikesIt(candidate);
+  return getWhoLikesIt(
+    candidate,
+    candidateDirection ? FLAVOR_DIRECTION_PROFILES[candidateDirection].reason : null,
+  );
 }
 
 const DIVERSITY_PENALTY_WEIGHT = 0.35;

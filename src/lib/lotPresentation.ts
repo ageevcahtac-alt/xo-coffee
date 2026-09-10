@@ -20,12 +20,22 @@ export function getEntryProductPitch(): string {
 }
 
 /**
- * One plain-language sentence answering "кому понравится", derived from the
- * lot's numeric flavor profile. Buckets are intentionally coarse — this is a
- * simple-layer hint, not a substitute for the full profile in the Passport.
+ * One plain-language sentence answering "кому понравится". When the caller
+ * already has a confident flavor-direction reason for this lot (from
+ * src/lib/flavorMatch.ts's getBestFlavorDirection/FLAVOR_DIRECTION_PROFILES
+ * — passed in rather than computed here to avoid a circular import, same
+ * reasoning as getWhyTry above), that reason is used directly so this
+ * sentence can never contradict a direction label shown next to it. Without
+ * one, this falls back to the lot's numeric flavor profile with
+ * intentionally coarse buckets — a simple-layer hint, not a substitute for
+ * the full profile in the Passport.
  */
-export function getWhoLikesIt(lot: Lot): string {
+export function getWhoLikesIt(lot: Lot, characterReason?: string | null): string {
   if (isEntryProduct(lot)) return getEntryProductPitch();
+
+  if (characterReason) {
+    return `Если любите ${characterReason}.`;
+  }
 
   const profile = lot.flavorProfile;
   if (!profile) {
@@ -94,4 +104,59 @@ export function getBrewHighlight(lot: Lot): BrewHighlight | null {
     label: BREW_METHOD_LABELS[method] ?? method,
     spec,
   };
+}
+
+// --- Product Experience helpers ---------------------------------------------
+//
+// The "Product" level (catalog card + the top of the Lot Passport modal)
+// needs a few more compact, honest summaries than the Simple Layer above
+// originally covered. Same rule as everything else in this file: derive
+// from fields the lot already has, degrade quietly when a field is missing,
+// never invent a fact about a specific lot.
+
+export type LotFactChip = { label: string; value: string };
+
+/**
+ * A short, scannable strip of what actually makes this lot identifiable —
+ * variety, process, altitude, Q-grade — pulled straight from the lot's own
+ * fields. This is deliberately NOT the full spec table (the Passport further
+ * down already has that in detail); it only includes a fact if the field is
+ * present, so a lot with partial data still renders a sane, shorter strip
+ * instead of blank/undefined entries.
+ */
+export function getLotFactChips(lot: Lot): LotFactChip[] {
+  const chips: LotFactChip[] = [];
+  if (isNonEmptyValue(lot.variety)) chips.push({ label: "Сорт", value: lot.variety });
+  if (isNonEmptyValue(lot.process)) chips.push({ label: "Обработка", value: lot.process });
+  if (typeof lot.altitudeMasl === "number" && Number.isFinite(lot.altitudeMasl)) {
+    chips.push({ label: "Высота", value: `${lot.altitudeMasl} MASL` });
+  }
+  if (typeof lot.qScore === "number" && Number.isFinite(lot.qScore)) {
+    chips.push({ label: "Q-грейд", value: `${lot.qScore}` });
+  }
+  return chips;
+}
+
+function isNonEmptyValue(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+/**
+ * "Почему попробовать" — one honest sentence connecting Pure Roast (a
+ * roasting method, not a second brand — kept to a single short clause, no
+ * manifesto) to this specific lot. `characterReason` is the flavor-
+ * direction phrasing from src/lib/flavorMatch.ts's FLAVOR_DIRECTION_PROFILES
+ * — passed in by the caller rather than imported here, since flavorMatch.ts
+ * already imports from this module and a reverse import would create a
+ * cycle. Never claims "unique"/"best"/"rarest" — only what the data (or the
+ * lack of a confident direction) actually supports.
+ */
+export function getWhyTry(lot: Lot, characterReason: string | null): string {
+  if (isEntryProduct(lot)) {
+    return "Один заказ — сразу три обжарки, каждая доведена до своей точки раскрытия. Так проще понять, какой характер кофе ваш.";
+  }
+  if (characterReason) {
+    return `Pure Roast для этого лота: обжарка, подобранная так, чтобы раскрыть ${characterReason}.`;
+  }
+  return "Pure Roast для этого лота: обжарка, подобранная под характер именно этого зерна — подробности в паспорте ниже.";
 }

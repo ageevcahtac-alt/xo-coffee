@@ -8,11 +8,20 @@ import { useCart } from "@/src/context/CartContext";
 import { formatPrice } from "@/src/lib/format";
 import {
   getBrewHighlight,
+  getLotFactChips,
   getWhoLikesIt,
+  getWhyTry,
   isEntryProduct,
 } from "@/src/lib/lotPresentation";
-import { getSimilarLots } from "@/src/lib/flavorMatch";
-import { getLikedDislikedLotIds } from "@/src/lib/coffeePassport";
+import {
+  FLAVOR_DIRECTION_PROFILES,
+  getBestFlavorDirection,
+  getSimilarLots,
+} from "@/src/lib/flavorMatch";
+import {
+  getLikedDislikedLotIds,
+  getTastingRecordsForLot,
+} from "@/src/lib/coffeePassport";
 import { LOTS } from "@/src/data/lots";
 import type { Lot } from "@/src/types/lot";
 
@@ -90,12 +99,25 @@ function LotPassportContent({
   const { addItem, flyToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const entry = isEntryProduct(lot);
-  const whoLikesIt = getWhoLikesIt(lot);
   const brewHighlight = getBrewHighlight(lot);
+  const factChips = getLotFactChips(lot);
+  // A tasting set's one FlavorProfile blends three different lots' worth of
+  // character — same reasoning src/lib/personalTaste.ts uses to exclude it
+  // from direction tallying, so it isn't given a single misleading label
+  // here either.
+  const characterDirection = entry ? null : getBestFlavorDirection(lot);
+  const characterReason = characterDirection
+    ? FLAVOR_DIRECTION_PROFILES[characterDirection].reason
+    : null;
+  const whyTry = getWhyTry(lot, characterReason);
+  // Pass the same character reason through so this sentence can never
+  // contradict the direction label shown just above it.
+  const whoLikesIt = getWhoLikesIt(lot, characterReason);
   // This content only ever mounts from a click (opening the modal), always
   // well after hydration — safe to read tasting history directly here with
   // no server/client mismatch risk.
   const similarLots = getSimilarLots(lot, LOTS, 3, getLikedDislikedLotIds());
+  const myTastings = getTastingRecordsForLot(lot.id);
 
   const handleAdd = (event: MouseEvent<HTMLButtonElement>) => {
     flyToCart(event.currentTarget.getBoundingClientRect());
@@ -203,6 +225,11 @@ function LotPassportContent({
                   Точка входа · Попробовать несколько характеров
                 </span>
               )}
+              {characterDirection && (
+                <span className="mb-2 block text-xs font-bold uppercase tracking-[0.1em] text-gold-dark">
+                  {FLAVOR_DIRECTION_PROFILES[characterDirection].label}
+                </span>
+              )}
               {lot.cupNote && (
                 <p className="font-display text-lg italic leading-relaxed text-burgundy">
                   «{lot.cupNote}»
@@ -210,10 +237,36 @@ function LotPassportContent({
               )}
               <p className="mt-4 text-sm leading-relaxed text-burgundy/80">
                 <span className="font-semibold text-burgundy">
+                  Почему попробовать:{" "}
+                </span>
+                {whyTry}
+              </p>
+              {factChips.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-burgundy/70">
+                  {factChips.map((chip) => (
+                    <span key={chip.label}>
+                      <span className="text-burgundy/50">{chip.label}: </span>
+                      {chip.value}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <p className="mt-3 text-sm leading-relaxed text-burgundy/80">
+                <span className="font-semibold text-burgundy">
                   Кому понравится:{" "}
                 </span>
                 {whoLikesIt}
               </p>
+              {myTastings.length > 0 && (
+                <p className="mt-2 text-sm leading-relaxed text-burgundy/80">
+                  <span className="font-semibold text-burgundy">
+                    Вы уже пробовали этот кофе.{" "}
+                  </span>
+                  {myTastings.length === 1
+                    ? `Ваша оценка — ${myTastings[0].rating.overall}/5.`
+                    : `Дегустаций: ${myTastings.length}. Последняя оценка — ${myTastings[0].rating.overall}/5.`}
+                </p>
+              )}
               {brewHighlight && (
                 <p className="mt-2 text-sm leading-relaxed text-burgundy/80">
                   <span className="font-semibold text-burgundy">
@@ -257,14 +310,16 @@ function LotPassportContent({
               </section>
             )}
 
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
-                Вкусовая диаграмма
-              </h3>
-              <div className="mt-4 rounded-2xl border border-gold/20 bg-cream-dark/60 p-4 shadow-sm backdrop-blur-md sm:p-6">
-                <FlavorProfileChart profile={lot.flavorProfile} />
-              </div>
-            </section>
+            {lot.flavorProfile && (
+              <section>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
+                  Вкусовая диаграмма
+                </h3>
+                <div className="mt-4 rounded-2xl border border-gold/20 bg-cream-dark/60 p-4 shadow-sm backdrop-blur-md sm:p-6">
+                  <FlavorProfileChart profile={lot.flavorProfile} />
+                </div>
+              </section>
+            )}
 
             <section>
               <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
@@ -303,42 +358,52 @@ function LotPassportContent({
               </p>
             </section>
 
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
-                Рекомендации по завариванию
-              </h3>
-              <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                {(Object.keys(BREW_LABELS) as (keyof typeof BREW_LABELS)[]).map(
-                  (method) => {
-                    const spec = lot.brew[method];
-                    return (
-                      <div
-                        key={method}
-                        className="border border-charcoal/15 bg-cream-dark p-4"
-                      >
-                        <p className="font-display text-base font-semibold text-burgundy">
-                          {BREW_LABELS[method]}
-                        </p>
-                        <dl className="mt-3 space-y-1.5 text-xs">
-                          <div className="flex justify-between">
-                            <dt className="text-charcoal/50">Пропорция</dt>
-                            <dd className="font-medium">{spec.ratio}</dd>
-                          </div>
-                          <div className="flex justify-between">
-                            <dt className="text-charcoal/50">Температура</dt>
-                            <dd className="font-medium">{spec.tempC}°C</dd>
-                          </div>
-                          <div className="flex justify-between">
-                            <dt className="text-charcoal/50">Время</dt>
-                            <dd className="font-medium">{spec.timeLabel}</dd>
-                          </div>
-                        </dl>
-                      </div>
-                    );
-                  },
-                )}
-              </div>
-            </section>
+            {(() => {
+              // Defensive: the Lot type declares all three brew methods as
+              // required, but nothing here should crash if real data ever
+              // ships with one missing — skip that method's card instead of
+              // rendering an invented ratio/temp/time.
+              const brewMethods = (
+                Object.keys(BREW_LABELS) as (keyof typeof BREW_LABELS)[]
+              ).filter((method) => lot.brew?.[method]);
+              if (brewMethods.length === 0) return null;
+              return (
+                <section>
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
+                    Рекомендации по завариванию
+                  </h3>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                    {brewMethods.map((method) => {
+                      const spec = lot.brew[method];
+                      return (
+                        <div
+                          key={method}
+                          className="border border-charcoal/15 bg-cream-dark p-4"
+                        >
+                          <p className="font-display text-base font-semibold text-burgundy">
+                            {BREW_LABELS[method]}
+                          </p>
+                          <dl className="mt-3 space-y-1.5 text-xs">
+                            <div className="flex justify-between">
+                              <dt className="text-charcoal/50">Пропорция</dt>
+                              <dd className="font-medium">{spec.ratio}</dd>
+                            </div>
+                            <div className="flex justify-between">
+                              <dt className="text-charcoal/50">Температура</dt>
+                              <dd className="font-medium">{spec.tempC}°C</dd>
+                            </div>
+                            <div className="flex justify-between">
+                              <dt className="text-charcoal/50">Время</dt>
+                              <dd className="font-medium">{spec.timeLabel}</dd>
+                            </div>
+                          </dl>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })()}
 
             {similarLots.length > 0 && (
               <section>

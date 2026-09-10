@@ -22,6 +22,7 @@ import { useDiscovery } from "@/src/context/DiscoveryContext";
 import {
   FLAVOR_DIRECTIONS,
   FLAVOR_DIRECTION_PROFILES,
+  getBestFlavorDirection,
   rankLotsByFlavorDirection,
   type FlavorDirection,
 } from "@/src/lib/flavorMatch";
@@ -286,6 +287,10 @@ export default function Catalog() {
               {orderedLots.map((lot) => {
                 const entry = isEntryProduct(lot);
                 const brewHighlight = getBrewHighlight(lot);
+                // Same "one lot, one blended profile can't honestly stand
+                // in for a single character" reasoning as elsewhere — no
+                // direction tag for the tasting set.
+                const characterDirection = entry ? null : getBestFlavorDirection(lot);
                 return (
                 <article
                   key={lot.id}
@@ -326,6 +331,12 @@ export default function Catalog() {
                       </span>
                     )}
 
+                    {characterDirection && (
+                      <span className="mt-3 block text-[11px] font-bold uppercase tracking-[0.08em] text-gold-dark">
+                        {FLAVOR_DIRECTION_PROFILES[characterDirection].label}
+                      </span>
+                    )}
+
                     {lot.cupNote && (
                       <p className="mt-3 font-display text-base italic leading-snug text-burgundy line-clamp-3">
                         «{lot.cupNote}»
@@ -333,7 +344,12 @@ export default function Catalog() {
                     )}
 
                     <p className="mt-3 text-xs leading-relaxed text-burgundy/75 line-clamp-2">
-                      {getWhoLikesIt(lot)}
+                      {getWhoLikesIt(
+                        lot,
+                        characterDirection
+                          ? FLAVOR_DIRECTION_PROFILES[characterDirection].reason
+                          : null,
+                      )}
                     </p>
 
                     {brewHighlight && (
