@@ -13,6 +13,11 @@ import {
 } from "@/src/data/categories";
 import lotsData from "@/src/data/lots.json";
 import type { Lot } from "@/src/types/lot";
+import {
+  getBrewHighlight,
+  getWhoLikesIt,
+  isEntryProduct,
+} from "@/src/lib/lotPresentation";
 
 const LOTS = lotsData as Lot[];
 
@@ -55,6 +60,10 @@ export default function Catalog() {
             ? regionLots.filter((lot) => lot.country === activeCountry)
             : regionLots
           : [];
+
+  // Only the first entry-product card gets the #degustation anchor id, so
+  // adding a second specialty-set lot later can't create a duplicate DOM id.
+  const firstEntryLotId = LOTS.find((lot) => isEntryProduct(lot))?.id ?? null;
 
   // Keep activeIndex alive through the closing animation (Modal fades out
   // over ~400ms) so the displayed lot doesn't disappear mid-transition.
@@ -177,14 +186,18 @@ export default function Catalog() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {visibleLots.map((lot) => (
+              {visibleLots.map((lot) => {
+                const entry = isEntryProduct(lot);
+                const brewHighlight = getBrewHighlight(lot);
+                return (
                 <article
                   key={lot.id}
+                  id={lot.id === firstEntryLotId ? "degustation" : undefined}
                   role="button"
                   tabIndex={0}
                   onClick={() => openLot(lot)}
                   onKeyDown={(event) => handleCardKeyDown(event, lot)}
-                  className="flex cursor-pointer flex-col overflow-hidden rounded-xl border border-gold/30 bg-cream/85 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:border-gold hover:shadow-xl active:scale-[0.98]"
+                  className="flex cursor-pointer scroll-mt-28 flex-col overflow-hidden rounded-xl border border-gold/30 bg-cream/85 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:border-gold hover:shadow-xl active:scale-[0.98]"
                 >
                   <div className="flex items-center justify-between border-b border-burgundy/10 px-5 py-3">
                     <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-burgundy/70">
@@ -210,34 +223,33 @@ export default function Catalog() {
                       </span>
                     </div>
 
-                    <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-burgundy/10 pt-3 text-[11px]">
-                      <div>
-                        <dt className="text-burgundy/55">Высота</dt>
-                        <dd className="font-medium text-burgundy">{lot.altitudeMasl} MASL</dd>
-                      </div>
-                      <div>
-                        <dt className="text-burgundy/55">Обработка</dt>
-                        <dd className="font-medium text-burgundy">{lot.process}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-burgundy/55">Сорт</dt>
-                        <dd className="truncate font-medium text-burgundy">{lot.variety}</dd>
-                      </div>
-                      <div>
-                        <dt className="text-burgundy/55">Ферма</dt>
-                        <dd className="truncate font-medium text-burgundy">{lot.farm}</dd>
-                      </div>
-                    </dl>
+                    {entry && (
+                      <span className="mt-3 inline-flex items-center border border-gold bg-gold/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-gold-dark">
+                        Точка входа · Попробовать несколько характеров
+                      </span>
+                    )}
 
-                    <p className="mt-3 text-xs italic text-burgundy/75 line-clamp-2">
-                      {lot.sensory.join(", ")}
+                    {lot.cupNote && (
+                      <p className="mt-3 font-display text-base italic leading-snug text-burgundy line-clamp-3">
+                        «{lot.cupNote}»
+                      </p>
+                    )}
+
+                    <p className="mt-3 text-xs leading-relaxed text-burgundy/75 line-clamp-2">
+                      {getWhoLikesIt(lot)}
                     </p>
 
-                    <p className="mt-2 font-display text-sm italic leading-snug text-burgundy line-clamp-2">
-                      «{lot.cupNote}»
+                    {brewHighlight && (
+                      <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.06em] text-burgundy/60">
+                        Как готовить: {brewHighlight.label} · {brewHighlight.spec.ratio}, {brewHighlight.spec.tempC}°C
+                      </p>
+                    )}
+
+                    <p className="mt-3 line-clamp-1 border-t border-burgundy/10 pt-3 text-[10px] uppercase tracking-[0.06em] text-burgundy/45">
+                      {lot.altitudeMasl} MASL · {lot.process} · {lot.variety}
                     </p>
 
-                    <p className="mt-3 text-[10px] uppercase tracking-[0.06em] text-burgundy/50">
+                    <p className="mt-1.5 text-[10px] uppercase tracking-[0.06em] text-burgundy/45">
                       Только цельное зерно
                     </p>
                   </div>
@@ -255,7 +267,8 @@ export default function Catalog() {
                     </button>
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

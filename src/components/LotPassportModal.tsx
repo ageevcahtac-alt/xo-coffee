@@ -6,6 +6,11 @@ import WholeBeanNotice from "@/src/components/WholeBeanNotice";
 import FlavorProfileChart from "@/src/components/FlavorProfileChart";
 import { useCart } from "@/src/context/CartContext";
 import { formatPrice } from "@/src/lib/format";
+import {
+  getBrewHighlight,
+  getWhoLikesIt,
+  isEntryProduct,
+} from "@/src/lib/lotPresentation";
 import type { Lot } from "@/src/types/lot";
 
 const BREW_LABELS = {
@@ -72,6 +77,9 @@ function LotPassportContent({
 }) {
   const { addItem, flyToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const entry = isEntryProduct(lot);
+  const whoLikesIt = getWhoLikesIt(lot);
+  const brewHighlight = getBrewHighlight(lot);
 
   const handleAdd = (event: MouseEvent<HTMLButtonElement>) => {
     flyToCart(event.currentTarget.getBoundingClientRect());
@@ -172,35 +180,66 @@ function LotPassportContent({
           )}
 
           <div className="flex-1 space-y-8 overflow-y-auto px-6 py-6">
-            <div className="flex flex-wrap gap-2">
-              {lot.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="border border-gold/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-gold-dark"
-                >
-                  {tag}
+            {/* Level 1: plain-language summary — read this, then scroll for the full Passport. */}
+            <section className="rounded-xl border border-gold/30 bg-cream-dark/60 p-5">
+              {entry && (
+                <span className="mb-3 inline-flex items-center border border-gold bg-gold/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-gold-dark">
+                  Точка входа · Попробовать несколько характеров
                 </span>
-              ))}
-            </div>
+              )}
+              {lot.cupNote && (
+                <p className="font-display text-lg italic leading-relaxed text-burgundy">
+                  «{lot.cupNote}»
+                </p>
+              )}
+              <p className="mt-4 text-sm leading-relaxed text-burgundy/80">
+                <span className="font-semibold text-burgundy">
+                  Кому понравится:{" "}
+                </span>
+                {whoLikesIt}
+              </p>
+              {brewHighlight && (
+                <p className="mt-2 text-sm leading-relaxed text-burgundy/80">
+                  <span className="font-semibold text-burgundy">
+                    Как приготовить:{" "}
+                  </span>
+                  {brewHighlight.label} · {brewHighlight.spec.ratio}, {brewHighlight.spec.tempC}°C
+                  {brewHighlight.note ? ` — ${brewHighlight.note}` : ""} (полный
+                  рецепт ниже).
+                </p>
+              )}
+            </section>
 
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
-                Сенсорный профиль
-              </h3>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {lot.sensory.map((note) => (
+            {lot.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {lot.tags.map((tag) => (
                   <span
-                    key={note}
-                    className="bg-cream-dark px-3 py-1.5 text-sm font-medium text-burgundy"
+                    key={tag}
+                    className="border border-gold/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-gold-dark"
                   >
-                    {note}
+                    {tag}
                   </span>
                 ))}
               </div>
-              <p className="mt-3 font-display text-base italic leading-relaxed text-burgundy/85">
-                «{lot.cupNote}»
-              </p>
-            </section>
+            )}
+
+            {lot.sensory.length > 0 && (
+              <section>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
+                  Ноты в чашке
+                </h3>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {lot.sensory.map((note) => (
+                    <span
+                      key={note}
+                      className="bg-cream-dark px-3 py-1.5 text-sm font-medium text-burgundy"
+                    >
+                      {note}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <section>
               <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">

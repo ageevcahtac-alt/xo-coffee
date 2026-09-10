@@ -5,19 +5,19 @@ export default function Hero() {
         <div className="relative flex flex-col items-start px-5 py-12 sm:px-8 sm:py-16 md:px-10 lg:px-14 lg:py-20">
           <span className="mb-4 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.35em] text-gold">
             <span className="h-px w-8 bg-gold" />
-            Концепция обжарки
+            Метод обжарки Pure Roast
           </span>
 
-          <h1 className="font-display text-5xl font-semibold leading-[0.95] tracking-tight sm:text-6xl lg:text-8xl">
-            PURE
+          <h1 className="font-display max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+            У каждого зерна — своя точка раскрытия.
             <br />
-            ROAST
+            Мы её находим.
           </h1>
 
           <p className="mt-6 max-w-xl text-base leading-relaxed text-cream/80 sm:text-lg">
-            Мы обжариваем ровно настолько, чтобы раскрыть зерно — и ни секундой
-            дольше. Никакой горечи вместо вкуса, никакой обжарки вместо
-            терруара. Только то, что вложила земля.
+            Мы не подгоняем разные лоты под один шаблон обжарки. Для каждого
+            ищем момент, в котором раскрываются его сладость, кислотность и
+            характер происхождения — и останавливаемся именно там.
           </p>
 
           <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:gap-4">
@@ -28,10 +28,10 @@ export default function Hero() {
               Смотреть каталог
             </a>
             <a
-              href="#approach"
+              href="#degustation"
               className="flex h-12 items-center justify-center border border-cream/40 px-8 text-sm font-semibold uppercase tracking-[0.15em] text-cream transition-all duration-300 hover:-translate-y-1.5 hover:border-gold hover:text-gold hover:shadow-xl active:scale-95 sm:h-14 sm:px-10"
             >
-              В чём подход
+              Не знаю, что выбрать
             </a>
           </div>
         </div>
