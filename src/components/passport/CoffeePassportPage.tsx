@@ -162,6 +162,12 @@ export default function CoffeePassportPage({ orderNumber }: { orderNumber: strin
 
         <div className="mt-8 flex flex-wrap gap-3 border-t border-cream/10 pt-6">
           <Link
+            href="/passport"
+            className="flex h-11 items-center justify-center border border-gold/50 px-5 text-xs font-semibold uppercase tracking-[0.1em] text-gold transition-all active:scale-95 hover:bg-gold hover:text-burgundy"
+          >
+            Мой кофе
+          </Link>
+          <Link
             href="/#catalog"
             className="flex h-11 items-center justify-center border border-cream/30 px-5 text-xs font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:border-gold hover:text-gold"
           >

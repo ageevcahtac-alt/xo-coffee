@@ -178,8 +178,8 @@ export function getAllTastingRecords(): TastingRecord[] {
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-const LIKED_OVERALL_THRESHOLD = 4;
-const DISLIKED_OVERALL_THRESHOLD = 2;
+export const LIKED_OVERALL_THRESHOLD = 4;
+export const DISLIKED_OVERALL_THRESHOLD = 2;
 
 /**
  * Derives a liked/disliked lot signal from saved tasting overall ratings —
