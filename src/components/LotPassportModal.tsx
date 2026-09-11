@@ -488,12 +488,12 @@ function LotPassportContent({
             <WholeBeanNotice />
           </div>
 
-          <div className="flex items-center justify-between gap-4 border-t border-charcoal/15 px-6 py-5">
-            <span className="font-display text-xl font-semibold text-burgundy">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t border-charcoal/15 px-6 py-5">
+            <span className="shrink-0 whitespace-nowrap font-display text-xl font-semibold text-burgundy">
               {formatPrice(lot.price * quantity)}
             </span>
 
-            <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center gap-3">
               <div className="flex items-center border border-charcoal/20">
                 <button
                   type="button"
@@ -519,7 +519,7 @@ function LotPassportContent({
               <button
                 type="button"
                 onClick={handleAdd}
-                className="border border-gold/40 bg-burgundy px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
+                className="whitespace-nowrap border border-gold/40 bg-burgundy px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
               >
                 В корзину
               </button>

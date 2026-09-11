@@ -252,14 +252,14 @@ export default function PaymentStep({
 
             {method === "card" && (
               <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="border border-gold/40 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-gold-dark">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="whitespace-nowrap border border-gold/40 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-gold-dark">
                     SberPay
                   </span>
-                  <span className="border border-gold/40 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-gold-dark">
+                  <span className="whitespace-nowrap border border-gold/40 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-gold-dark">
                     T-Pay
                   </span>
-                  <span className="border border-charcoal/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal/50">
+                  <span className="whitespace-nowrap border border-charcoal/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal/50">
                     Тестовый режим
                   </span>
                 </div>

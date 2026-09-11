@@ -152,22 +152,22 @@ export default function MyCoffeePage() {
                         {brewHighlight.label} · {brewHighlight.spec.ratio}, {brewHighlight.spec.tempC}°C
                       </p>
                     )}
-                    <div className="mt-3 flex items-center justify-between gap-2">
-                      <span className="font-display text-base font-semibold text-burgundy">
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-3">
+                      <span className="shrink-0 whitespace-nowrap font-display text-base font-semibold text-burgundy">
                         {formatPrice(result.lot.price)}
                       </span>
-                      <div className="flex gap-2">
+                      <div className="flex shrink-0 gap-2">
                         <button
                           type="button"
                           onClick={(event) => handleAdd(event, result.lot)}
-                          className="flex h-10 items-center justify-center border border-gold/40 bg-burgundy px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
+                          className="flex h-10 items-center justify-center whitespace-nowrap border border-gold/40 bg-burgundy px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
                         >
                           В корзину
                         </button>
                         <button
                           type="button"
                           onClick={() => setPassportLotId(result.lot.id)}
-                          className="flex h-10 items-center justify-center border border-burgundy/30 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-burgundy transition-all active:scale-95 hover:bg-burgundy/10"
+                          className="flex h-10 items-center justify-center whitespace-nowrap border border-burgundy/30 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-burgundy transition-all active:scale-95 hover:bg-burgundy/10"
                         >
                           Паспорт
                         </button>
