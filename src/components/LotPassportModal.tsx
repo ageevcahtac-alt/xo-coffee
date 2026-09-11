@@ -517,7 +517,7 @@ function LotPassportContent({
               <button
                 type="button"
                 onClick={handleAdd}
-                className="border border-burgundy px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-burgundy transition-all active:scale-95 hover:bg-burgundy hover:text-cream"
+                className="border border-gold/40 bg-burgundy px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
               >
                 В корзину
               </button>

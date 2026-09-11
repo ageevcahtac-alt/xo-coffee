@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
+import { useDialogFocus } from "@/src/hooks/useDialogFocus";
 
 type ModalProps = {
   isOpen: boolean;
@@ -10,6 +11,8 @@ type ModalProps = {
 };
 
 export default function Modal({ isOpen, onClose, ariaLabel, children }: ModalProps) {
+  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen);
+
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (event: KeyboardEvent) => {
@@ -39,10 +42,12 @@ export default function Modal({ isOpen, onClose, ariaLabel, children }: ModalPro
       />
 
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
-        className={`relative flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-2xl bg-cream text-charcoal shadow-2xl transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:max-h-[85vh] sm:max-w-2xl sm:rounded-2xl ${
+        tabIndex={-1}
+        className={`relative flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-2xl bg-cream text-charcoal shadow-2xl outline-none transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] sm:max-h-[85vh] sm:max-w-2xl sm:rounded-2xl ${
           isOpen
             ? "translate-y-0 opacity-100 sm:scale-100"
             : "translate-y-full opacity-0 sm:translate-y-4 sm:scale-95"

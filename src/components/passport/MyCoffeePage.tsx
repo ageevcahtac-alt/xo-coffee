@@ -296,6 +296,7 @@ export default function MyCoffeePage() {
         onClose={() => setPassportLotId(null)}
         onPrev={() => {}}
         onNext={() => {}}
+        onSelectLot={setPassportLotId}
         hasMultiple={false}
         position={null}
       />

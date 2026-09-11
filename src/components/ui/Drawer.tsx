@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
+import { useDialogFocus } from "@/src/hooks/useDialogFocus";
 
 type DrawerProps = {
   isOpen: boolean;
@@ -19,6 +20,8 @@ export default function Drawer({
   widthClassName = "max-w-md",
   children,
 }: DrawerProps) {
+  const dialogRef = useDialogFocus<HTMLElement>(isOpen);
+
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (event: KeyboardEvent) => {
@@ -48,10 +51,12 @@ export default function Drawer({
       />
 
       <aside
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
-        className={`fixed top-0 ${sidePosition} z-[70] flex h-full w-full ${widthClassName} flex-col bg-cream text-charcoal shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        tabIndex={-1}
+        className={`fixed top-0 ${sidePosition} z-[70] flex h-full w-full ${widthClassName} flex-col bg-cream text-charcoal shadow-2xl outline-none transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           isOpen ? "translate-x-0" : closedTransform
         }`}
       >
