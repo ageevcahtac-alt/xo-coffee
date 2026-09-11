@@ -41,7 +41,7 @@ export default function Footer() {
               <ul className="mt-5 space-y-3 text-sm text-cream/75">
                 <li>hello@xocoffee.ru</li>
                 <li>+7 (900) 000-00-00</li>
-                <li>Москва, обжарочный цех</li>
+                <li>Всеволожск, обжарочный цех</li>
               </ul>
             </div>
           </div>

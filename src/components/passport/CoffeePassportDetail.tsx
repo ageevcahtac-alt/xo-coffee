@@ -412,7 +412,7 @@ export default function CoffeePassportDetail({
           onClick={onOpenLotPassport}
           className="mt-4 flex h-11 items-center justify-center border border-burgundy px-6 text-xs font-semibold uppercase tracking-[0.12em] text-burgundy transition-all active:scale-95 hover:bg-burgundy hover:text-cream"
         >
-          Открыть полный Lot Passport
+          Открыть полный паспорт зерна
         </button>
       </section>
     </div>

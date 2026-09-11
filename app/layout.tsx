@@ -23,7 +23,7 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "XO COFFEE — Pure Roast",
   description:
-    "XO COFFEE Pure Roast — светлая обжарка, которая не прячет вкус зерна. Мы боремся за вкус.",
+    "XO COFFEE Pure Roast — обжарка, которая раскрывает характер зерна, а не подгоняет его под один шаблон. Мы боремся за вкус.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
