@@ -2,6 +2,10 @@ export type PaymentMethodCode = "sbp" | "card" | "invoice";
 export type FulfillmentMethod = "delivery" | "pickup";
 
 export type OrderPayloadItem = {
+  /** Canonical Lot identity (see src/types/lot.ts's Lot.id) — kept intact
+   *  through checkout so a purchased item can always be traced back to the
+   *  specific Lot it came from, not just its display name at time of sale. */
+  lotId: string;
   name: string;
   quantity: number;
   price: number;

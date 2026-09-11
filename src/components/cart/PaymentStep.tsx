@@ -139,6 +139,7 @@ export default function PaymentStep({
         company,
       },
       items: items.map((item) => ({
+        lotId: item.id,
         name: item.name,
         quantity: item.quantity,
         price: item.price,

@@ -22,6 +22,7 @@ import {
   getLikedDislikedLotIds,
   getTastingRecordsForLot,
 } from "@/src/lib/coffeePassport";
+import { getCoffeePassportUrl } from "@/src/lib/coffeePassportLink";
 import { LOTS } from "@/src/data/lots";
 import type { Lot } from "@/src/types/lot";
 
@@ -139,6 +140,10 @@ function LotPassportContent({
   // no server/client mismatch risk.
   const similarLots = getSimilarLots(lot, LOTS, 3, getLikedDislikedLotIds());
   const myTastings = getTastingRecordsForLot(lot.id);
+  // null until the external Coffee Passport platform's URL template is
+  // configured — see src/lib/coffeePassportLink.ts. No link renders until
+  // then; this is not a placeholder link to a guessed destination.
+  const coffeePassportUrl = getCoffeePassportUrl(lot.id);
 
   const handleAdd = (event: MouseEvent<HTMLButtonElement>) => {
     flyToCart(event.currentTarget.getBoundingClientRect());
@@ -304,6 +309,17 @@ function LotPassportContent({
                 </p>
               )}
             </section>
+
+            {coffeePassportUrl && (
+              <a
+                href={coffeePassportUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-sm font-semibold text-burgundy underline-offset-2 hover:underline"
+              >
+                Coffee Passport этого лота →
+              </a>
+            )}
 
             {lot.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
