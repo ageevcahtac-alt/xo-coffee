@@ -40,8 +40,10 @@ export function averageProfile(lots: Lot[]): FlavorProfile {
   const count = withProfile.length || 1;
   const sums: FlavorProfile = { acidity: 0, sweetness: 0, body: 0, aroma: 0, finish: 0 };
   for (const lot of withProfile) {
+    const profile = lot.flavorProfile;
+    if (!profile) continue;
     for (const axis of FLAVOR_AXES) {
-      sums[axis] += lot.flavorProfile[axis] ?? 5;
+      sums[axis] += profile[axis] ?? 5;
     }
   }
   for (const axis of FLAVOR_AXES) {

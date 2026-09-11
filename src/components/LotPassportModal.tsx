@@ -383,13 +383,14 @@ function LotPassportContent({
             )}
 
             {(() => {
-              // Defensive: the Lot type declares all three brew methods as
-              // required, but nothing here should crash if real data ever
-              // ships with one missing — skip that method's card instead of
-              // rendering an invented ratio/temp/time.
+              // Defensive: brew, and each method within it, is optional —
+              // skip a missing method's card instead of rendering an
+              // invented ratio/temp/time.
+              const brew = lot.brew;
+              if (!brew) return null;
               const brewMethods = (
                 Object.keys(BREW_LABELS) as (keyof typeof BREW_LABELS)[]
-              ).filter((method) => lot.brew?.[method]);
+              ).filter((method) => brew[method]);
               if (brewMethods.length === 0) return null;
               return (
                 <section>
@@ -398,7 +399,8 @@ function LotPassportContent({
                   </h3>
                   <div className="mt-3 grid gap-3 sm:grid-cols-3">
                     {brewMethods.map((method) => {
-                      const spec = lot.brew[method];
+                      const spec = brew[method];
+                      if (!spec) return null;
                       return (
                         <div
                           key={method}

@@ -24,6 +24,12 @@ const RATING_MIN = 1;
 const RATING_MAX = 5;
 const NOTE_MAX_LENGTH = 2000;
 
+const VALID_BREW_METHODS = new Set<BrewMethodKey>(["v60", "immersion", "espresso", "other"]);
+
+function isValidBrewMethod(value: unknown): value is BrewMethodKey {
+  return typeof value === "string" && VALID_BREW_METHODS.has(value as BrewMethodKey);
+}
+
 function readArray(key: string): unknown[] {
   if (typeof window === "undefined") return [];
   try {
@@ -105,7 +111,7 @@ function isValidTastingRecord(value: unknown): value is TastingRecord {
     !isNonEmptyString(record.id) ||
     !isNonEmptyString(record.orderNumber) ||
     !isNonEmptyString(record.lotId) ||
-    !isNonEmptyString(record.brewMethod) ||
+    !isValidBrewMethod(record.brewMethod) ||
     !isValidDate(record.createdAt) ||
     typeof record.note !== "string" ||
     !isValidMyCupRating(record.rating)

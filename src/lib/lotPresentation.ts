@@ -59,14 +59,16 @@ export function getWhoLikesIt(lot: Lot, characterReason?: string | null): string
   return "Если любите сбалансированный кофе, где кислотность, сладость и тело уравновешены.";
 }
 
-const BREW_METHOD_LABELS: Record<keyof Lot["brew"], string> = {
+type BrewMethod = keyof NonNullable<Lot["brew"]>;
+
+const BREW_METHOD_LABELS: Record<BrewMethod, string> = {
   v60: "V60",
   immersion: "Иммерсия",
   espresso: "Эспрессо",
 };
 
 export type BrewHighlight = {
-  method: keyof Lot["brew"];
+  method: BrewMethod;
   label: string;
   spec: BrewSpec;
   note?: string;
@@ -77,27 +79,29 @@ export type BrewHighlight = {
  * set of recipes stays available in the Passport.
  */
 export function getBrewHighlight(lot: Lot): BrewHighlight | null {
-  if (!lot.brew) return null;
+  // Narrowed into a local: TS forgets `lot.brew`'s non-undefined narrowing
+  // across the isEntryProduct(lot) call below, since it can't prove a
+  // property access wasn't mutated by an intervening function call.
+  const brew = lot.brew;
+  if (!brew) return null;
 
-  if (isEntryProduct(lot) && lot.brew.v60) {
+  if (isEntryProduct(lot) && brew.v60) {
     return {
       method: "v60",
       label: BREW_METHOD_LABELS.v60,
-      spec: lot.brew.v60,
+      spec: brew.v60,
       note: "Один рецепт на все три лота — удобно сравнивать",
     };
   }
 
-  const preferredMethod: keyof Lot["brew"] =
-    lot.category === "espresso" ? "espresso" : "v60";
+  const preferredMethod: BrewMethod = lot.category === "espresso" ? "espresso" : "v60";
 
-  const spec = lot.brew[preferredMethod] ?? lot.brew.v60 ?? lot.brew.espresso ?? lot.brew.immersion;
+  const spec = brew[preferredMethod] ?? brew.v60 ?? brew.espresso ?? brew.immersion;
   if (!spec) return null;
 
-  const method = lot.brew[preferredMethod]
+  const method = brew[preferredMethod]
     ? preferredMethod
-    : (Object.keys(lot.brew) as (keyof Lot["brew"])[]).find((key) => lot.brew[key] === spec) ??
-      preferredMethod;
+    : (Object.keys(brew) as BrewMethod[]).find((key) => brew[key] === spec) ?? preferredMethod;
 
   return {
     method,

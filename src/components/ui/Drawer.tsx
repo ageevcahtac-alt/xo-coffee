@@ -20,21 +20,16 @@ export default function Drawer({
   widthClassName = "max-w-md",
   children,
 }: DrawerProps) {
-  const dialogRef = useDialogFocus<HTMLElement>(isOpen);
+  const dialogRef = useDialogFocus<HTMLElement>(isOpen, onClose);
 
   useEffect(() => {
     if (!isOpen) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = previousOverflow;
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   const sidePosition = side === "right" ? "right-0" : "left-0";
   const closedTransform =

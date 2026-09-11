@@ -11,21 +11,16 @@ type ModalProps = {
 };
 
 export default function Modal({ isOpen, onClose, ariaLabel, children }: ModalProps) {
-  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen);
+  const dialogRef = useDialogFocus<HTMLDivElement>(isOpen, onClose);
 
   useEffect(() => {
     if (!isOpen) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = previousOverflow;
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   return (
     <div

@@ -27,7 +27,7 @@ export type OrderRecord = {
   items: OrderRecordItem[];
 };
 
-export type BrewMethodKey = keyof Lot["brew"] | "other";
+export type BrewMethodKey = keyof NonNullable<Lot["brew"]> | "other";
 
 export type MyCupRating = {
   acidity: number;

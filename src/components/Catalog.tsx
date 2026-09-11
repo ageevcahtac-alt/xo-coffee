@@ -291,6 +291,15 @@ export default function Catalog() {
                 // in for a single character" reasoning as elsewhere — no
                 // direction tag for the tasting set.
                 const characterDirection = entry ? null : getBestFlavorDirection(lot);
+                // Only join fields that actually exist — same rule as
+                // CoffeePassportDetail's referenceParts, never render a
+                // stray "· ·" or an "undefined" fragment for a partial lot.
+                const specParts: string[] = [];
+                if (typeof lot.altitudeMasl === "number" && Number.isFinite(lot.altitudeMasl)) {
+                  specParts.push(`${lot.altitudeMasl} MASL`);
+                }
+                if (lot.process) specParts.push(lot.process);
+                if (lot.variety) specParts.push(lot.variety);
                 return (
                 <article
                   key={lot.id}
@@ -363,9 +372,11 @@ export default function Catalog() {
                       </p>
                     )}
 
-                    <p className="mt-3 line-clamp-1 border-t border-burgundy/10 pt-3 text-[10px] uppercase tracking-[0.06em] text-burgundy/45">
-                      {lot.altitudeMasl} MASL · {lot.process} · {lot.variety}
-                    </p>
+                    {specParts.length > 0 && (
+                      <p className="mt-3 line-clamp-1 border-t border-burgundy/10 pt-3 text-[10px] uppercase tracking-[0.06em] text-burgundy/45">
+                        {specParts.join(" · ")}
+                      </p>
+                    )}
 
                     <p className="mt-1.5 text-[10px] uppercase tracking-[0.06em] text-burgundy/45">
                       Только цельное зерно

@@ -142,7 +142,11 @@ function noveltyBonus(
   if (novelty === "new") {
     if (taste < NEW_RELEVANCE_FLOOR) return 0;
     if (lot.id === topPick.id) return 0;
-    return profileDistance(profile, topPick.flavorProfile) / MAX_PROFILE_DISTANCE;
+    // No profile on the top pick means there's no honest distance to
+    // measure "new" against — same "no signal, no bonus" rule as above.
+    const topProfile = topPick.flavorProfile;
+    if (!topProfile) return 0;
+    return profileDistance(profile, topProfile) / MAX_PROFILE_DISTANCE;
   }
 
   // "unusual": how far this lot sits from the catalog's average profile,

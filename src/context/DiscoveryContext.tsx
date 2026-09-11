@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
 type DiscoveryContextValue = {
   isOpen: boolean;
@@ -16,17 +16,19 @@ const DiscoveryContext = createContext<DiscoveryContextValue | null>(null);
 export function DiscoveryProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  return (
-    <DiscoveryContext.Provider
-      value={{
-        isOpen,
-        openDiscovery: () => setIsOpen(true),
-        closeDiscovery: () => setIsOpen(false),
-      }}
-    >
-      {children}
-    </DiscoveryContext.Provider>
+  // Stable across renders: useDialogFocus's Escape handling depends on
+  // onClose's identity (see CartContext for the full reasoning), so an
+  // unstable closeDiscovery would retrigger that effect on every unrelated
+  // DiscoveryProvider re-render.
+  const openDiscovery = useCallback(() => setIsOpen(true), []);
+  const closeDiscovery = useCallback(() => setIsOpen(false), []);
+
+  const value = useMemo(
+    () => ({ isOpen, openDiscovery, closeDiscovery }),
+    [isOpen, openDiscovery, closeDiscovery],
   );
+
+  return <DiscoveryContext.Provider value={value}>{children}</DiscoveryContext.Provider>;
 }
 
 export function useDiscovery() {
