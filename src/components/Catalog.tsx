@@ -162,36 +162,36 @@ export default function Catalog() {
 
   return (
     <section id="catalog" className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
-      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-gold/20 bg-backdrop/35 p-5 shadow-2xl backdrop-blur-[10px] sm:p-8 md:rounded-3xl md:p-12 lg:p-16">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-2xl sm:p-8 md:rounded-3xl md:p-12 lg:p-16">
         <div className="mb-8 max-w-2xl sm:mb-10">
-          <span className="text-xs font-semibold uppercase tracking-[0.35em] text-gold">
+          <span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
             Каталог
           </span>
-          <h2 className="mt-4 font-display text-3xl font-semibold text-cream sm:text-4xl md:text-5xl">
+          <h2 className="mt-4 font-display text-3xl font-semibold text-burgundy sm:text-4xl md:text-5xl">
             Лоты с паспортом зерна
           </h2>
-          <p className="mt-4 leading-relaxed text-cream/70">
+          <p className="mt-4 leading-relaxed text-text/70">
             Нажмите на лот, чтобы открыть полный паспорт: происхождение,
             сенсорный профиль и рекомендации по завариванию.
           </p>
         </div>
 
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border border-gold/25 bg-cream/10 px-5 py-4 sm:mb-10">
-          <p className="text-sm text-cream/80">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border border-border bg-cream-dark px-5 py-4 sm:mb-10">
+          <p className="text-sm text-text/75">
             Не знаете, что выбрать?{" "}
-            <span className="text-cream/60">Подберём за 1 минуту.</span>
+            <span className="text-text/55">Подберём за 1 минуту.</span>
           </p>
           <button
             type="button"
             onClick={openDiscovery}
-            className="flex h-11 shrink-0 items-center justify-center border border-gold/50 px-5 text-xs font-semibold uppercase tracking-[0.1em] text-gold transition-all active:scale-95 hover:bg-gold hover:text-burgundy"
+            className="flex h-11 shrink-0 items-center justify-center border border-border px-5 text-xs font-semibold uppercase tracking-[0.1em] text-burgundy transition-all active:scale-95 hover:border-accent hover:bg-accent-surface"
           >
             Подобрать кофе
           </button>
         </div>
 
         <div className="mb-8 sm:mb-10">
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">
             Какой характер кофе вы ищете?
           </span>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -199,10 +199,10 @@ export default function Catalog() {
               type="button"
               aria-pressed={activeFlavor === null}
               onClick={() => setActiveFlavor(null)}
-              className={`min-h-11 border px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] backdrop-blur-md transition-all duration-150 active:scale-95 ${
+              className={`min-h-11 border px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] transition-all duration-150 active:scale-95 ${
                 activeFlavor === null
-                  ? "tab-active-glow border-gold"
-                  : "border-white/15 bg-white/15 text-cream/80 hover:border-gold/50 hover:bg-white/20 hover:text-gold"
+                  ? "tab-active"
+                  : "border-border bg-cream-dark text-text/70 hover:border-accent/40 hover:bg-accent-surface hover:text-burgundy"
               }`}
             >
               Все характеры
@@ -213,10 +213,10 @@ export default function Catalog() {
                 type="button"
                 aria-pressed={activeFlavor === direction}
                 onClick={() => selectFlavor(direction)}
-                className={`min-h-11 border px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] backdrop-blur-md transition-all duration-150 active:scale-95 ${
+                className={`min-h-11 border px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] transition-all duration-150 active:scale-95 ${
                   activeFlavor === direction
-                    ? "tab-active-glow border-gold"
-                    : "border-white/15 bg-white/15 text-cream/80 hover:border-gold/50 hover:bg-white/20 hover:text-gold"
+                    ? "tab-active"
+                    : "border-border bg-cream-dark text-text/70 hover:border-accent/40 hover:bg-accent-surface hover:text-burgundy"
                 }`}
               >
                 {FLAVOR_DIRECTION_PROFILES[direction].label}
@@ -224,7 +224,7 @@ export default function Catalog() {
             ))}
           </div>
           {activeFlavor && (
-            <p className="mt-3 text-xs text-cream/60">
+            <p className="mt-3 text-xs text-text/55">
               Каталог ниже отсортирован по близости к «
               {FLAVOR_DIRECTION_PROFILES[activeFlavor].label}» — остальные лоты никуда
               не делись, просто ниже в списке.
@@ -239,10 +239,10 @@ export default function Catalog() {
                 key={category.id}
                 type="button"
                 onClick={() => selectSection(category.id)}
-                className={`min-h-11 border px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] backdrop-blur-md transition-all duration-150 active:scale-95 ${
+                className={`min-h-11 border px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] transition-all duration-150 active:scale-95 ${
                   activeSection === category.id
-                    ? "tab-active-glow border-gold"
-                    : "border-white/15 bg-white/15 text-cream/80 hover:border-gold/50 hover:bg-white/20 hover:text-gold"
+                    ? "tab-active"
+                    : "border-border bg-cream-dark text-text/70 hover:border-accent/40 hover:bg-accent-surface hover:text-burgundy"
                 }`}
               >
                 {category.label}
@@ -251,16 +251,16 @@ export default function Catalog() {
           </div>
 
           {activeSection === "region" && (
-            <div className="mt-4 flex flex-wrap gap-2 border-l-2 border-gold/50 pl-4">
+            <div className="mt-4 flex flex-wrap gap-2 border-l-2 border-gold/40 pl-4">
               {REGION_COUNTRIES.map((country) => (
                 <button
                   key={country}
                   type="button"
                   onClick={() => selectCountry(country)}
-                  className={`min-h-11 border px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.08em] backdrop-blur-md transition-all duration-150 active:scale-95 ${
+                  className={`min-h-11 border px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.08em] transition-all duration-150 active:scale-95 ${
                     activeCountry === country
-                      ? "tab-active-glow border-gold"
-                      : "border-white/15 bg-white/15 text-cream/70 hover:border-gold/50 hover:bg-white/20 hover:text-gold"
+                      ? "tab-active"
+                      : "border-border bg-cream-dark text-text/65 hover:border-accent/40 hover:bg-accent-surface hover:text-burgundy"
                   }`}
                 >
                   {country}
@@ -274,11 +274,11 @@ export default function Catalog() {
           className={`transition-all duration-300 ease-in-out ${gridTransition.className}`}
         >
           {orderedLots.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-gold/30 bg-cream/85 px-8 py-16 text-center backdrop-blur-md">
+            <div className="rounded-xl border border-dashed border-border bg-cream-dark px-8 py-16 text-center">
               <p className="font-display text-xl font-semibold text-burgundy">
                 Скоро в каталоге
               </p>
-              <p className="mt-2 text-sm text-charcoal/60">
+              <p className="mt-2 text-sm text-text/60">
                 Мы готовим эту витрину — загляните чуть позже.
               </p>
             </div>
@@ -308,13 +308,13 @@ export default function Catalog() {
                   tabIndex={0}
                   onClick={() => openLot(lot)}
                   onKeyDown={(event) => handleCardKeyDown(event, lot)}
-                  className="flex cursor-pointer scroll-mt-28 flex-col overflow-hidden rounded-xl border border-gold/30 bg-cream/85 backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:border-gold hover:shadow-xl active:scale-[0.98]"
+                  className="flex cursor-pointer scroll-mt-28 flex-col overflow-hidden rounded-xl border border-border bg-surface transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:border-accent/40 hover:shadow-xl active:scale-[0.98]"
                 >
-                  <div className="flex items-center justify-between border-b border-burgundy/10 px-5 py-3">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-burgundy/70">
+                  <div className="flex items-center justify-between border-b border-border px-5 py-3">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text/50">
                       {lot.name}
                     </span>
-                    <span className="border border-gold/40 bg-cream px-2 py-0.5 text-[11px] font-bold uppercase tracking-[0.12em] text-burgundy">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-burgundy/40">
                       Паспорт
                     </span>
                   </div>
@@ -325,14 +325,14 @@ export default function Catalog() {
                         <h3 className="font-display text-xl font-semibold text-burgundy">
                           {lot.country}
                         </h3>
-                        <p className="text-xs uppercase tracking-[0.1em] text-burgundy/70">
+                        <p className="text-xs uppercase tracking-[0.1em] text-text/55">
                           {lot.region}
                         </p>
                       </div>
                       {typeof lot.qScore === "number" && (
                         <span
                           aria-label={`Оценка Q-грейдера: ${lot.qScore} из 100`}
-                          className="shrink-0 border border-gold/40 bg-cream px-2 py-0.5 text-[11px] font-bold text-burgundy"
+                          className="shrink-0 border border-border px-2 py-0.5 text-[11px] font-bold text-text/70"
                         >
                           {lot.qScore} Q
                         </span>
@@ -352,12 +352,17 @@ export default function Catalog() {
                     )}
 
                     {lot.cupNote && (
-                      <p className="mt-3 font-display text-base italic leading-snug text-burgundy line-clamp-3">
+                      <p className="mt-3 font-display text-base italic leading-snug text-burgundy line-clamp-2">
                         «{lot.cupNote}»
                       </p>
                     )}
 
-                    <p className="mt-3 text-xs leading-relaxed text-burgundy/75 line-clamp-2">
+                    {/* Secondary detail — kept, but visually one notch quieter
+                        than the cup note above it, so the card leads with one
+                        strong flavor statement rather than two competing
+                        ones (P26/P27: card decompression, content unchanged
+                        from what LotPassportModal already repeats in full). */}
+                    <p className="mt-2 text-xs leading-relaxed text-text/60 line-clamp-2">
                       {getWhoLikesIt(
                         lot,
                         characterDirection
@@ -366,31 +371,31 @@ export default function Catalog() {
                       )}
                     </p>
 
-                    {brewHighlight && (
-                      <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.06em] text-burgundy/60">
-                        Как готовить: {brewHighlight.label} · {brewHighlight.spec.ratio}, {brewHighlight.spec.tempC}°C
-                      </p>
-                    )}
-
-                    {specParts.length > 0 && (
-                      <p className="mt-3 line-clamp-1 border-t border-burgundy/10 pt-3 text-[10px] uppercase tracking-[0.06em] text-burgundy/45">
-                        {specParts.join(" · ")}
-                      </p>
-                    )}
-
-                    <p className="mt-1.5 text-[10px] uppercase tracking-[0.06em] text-burgundy/45">
-                      Только цельное зерно
+                    {/* Brew tip, origin specs, and the whole-bean fact were
+                        three separate lines before P27 — same information,
+                        one quiet line now, so the card stops stacking
+                        near-identical-looking metadata captions. */}
+                    <p className="mt-3 line-clamp-1 border-t border-border pt-3 text-[10px] uppercase tracking-[0.06em] text-text/40">
+                      {[
+                        brewHighlight
+                          ? `${brewHighlight.label} ${brewHighlight.spec.ratio}, ${brewHighlight.spec.tempC}°C`
+                          : null,
+                        ...specParts,
+                        "Только цельное зерно",
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-burgundy/10 px-4 py-3 sm:px-5 sm:py-4">
+                  <div className="flex items-center justify-between border-t border-border px-4 py-3 sm:px-5 sm:py-4">
                     <span className="font-display text-lg font-semibold text-burgundy">
                       {formatPrice(lot.price)}
                     </span>
                     <button
                       type="button"
                       onClick={(event) => handleAddToCart(event, lot)}
-                      className="flex h-11 items-center justify-center border border-gold/40 bg-burgundy px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
+                      className="flex h-11 items-center justify-center bg-accent px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
                     >
                       В корзину
                     </button>

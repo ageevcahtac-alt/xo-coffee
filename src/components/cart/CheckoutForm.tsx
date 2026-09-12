@@ -171,7 +171,7 @@ export default function CheckoutForm({
                 className={inputClass}
               />
               {phoneError && (
-                <p className="mt-1.5 text-xs text-red-700">
+                <p className="mt-1.5 text-xs text-error">
                   Введите номер полностью: +7 (9XX) XXX-XX-XX
                 </p>
               )}

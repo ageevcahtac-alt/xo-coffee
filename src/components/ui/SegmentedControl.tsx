@@ -21,7 +21,7 @@ export default function SegmentedControl<T extends string>({
     <div className="relative flex border border-charcoal/20 bg-cream-dark p-1">
       <div
         aria-hidden
-        className="tab-active-glow absolute inset-y-1 rounded-sm transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        className="tab-active absolute inset-y-1 rounded-sm transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
         style={{
           width: `calc(${width}% - 4px)`,
           left: `calc(${index * width}% + 2px)`,

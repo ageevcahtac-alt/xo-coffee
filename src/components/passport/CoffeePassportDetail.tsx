@@ -72,8 +72,8 @@ function RatingScale({
             onClick={() => onChange(n)}
             className={`flex h-11 flex-1 items-center justify-center border text-sm font-semibold transition-all active:scale-95 ${
               n <= value
-                ? "border-gold bg-gold text-burgundy"
-                : "border-charcoal/20 bg-cream-dark text-charcoal/40 hover:border-gold/50"
+                ? "border-accent bg-accent text-cream"
+                : "border-charcoal/20 bg-cream-dark text-charcoal/40 hover:border-accent/40"
             }`}
           >
             {n}
@@ -191,7 +191,7 @@ export default function CoffeePassportDetail({
   return (
     <div className="space-y-6">
       {/* Level 1 — what you bought, how to try it, what to expect */}
-      <section className="rounded-xl border border-gold/30 bg-cream-dark/60 p-5">
+      <section className="rounded-xl border border-border bg-cream-dark/60 p-5">
         <span className="text-xs font-semibold uppercase tracking-[0.15em] text-gold-dark">
           Что вы купили
         </span>
@@ -231,8 +231,8 @@ export default function CoffeePassportDetail({
                   onClick={() => setBrewMethod(method)}
                   className={`min-h-11 border px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] transition-all active:scale-95 ${
                     brewMethod === method
-                      ? "border-gold bg-burgundy text-cream"
-                      : "border-charcoal/20 bg-cream-dark text-charcoal/70 hover:border-gold/50"
+                      ? "border-accent bg-accent text-cream"
+                      : "border-charcoal/20 bg-cream-dark text-charcoal/70 hover:border-accent/40"
                   }`}
                 >
                   {BREW_METHOD_LABELS[method]}
@@ -291,8 +291,8 @@ export default function CoffeePassportDetail({
                   onClick={() => setComponent(character)}
                   className={`min-h-11 border px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] transition-all active:scale-95 ${
                     component === character
-                      ? "border-gold bg-burgundy text-cream"
-                      : "border-charcoal/20 bg-cream text-charcoal/70 hover:border-gold/50"
+                      ? "border-accent bg-accent text-cream"
+                      : "border-charcoal/20 bg-cream text-charcoal/70 hover:border-accent/40"
                   }`}
                 >
                   {character}
@@ -398,7 +398,7 @@ export default function CoffeePassportDetail({
           Профиль лота
         </h3>
         {lot.flavorProfile ? (
-          <div className="mt-3 rounded-2xl border border-gold/20 bg-cream-dark/60 p-4 shadow-sm sm:p-6">
+          <div className="mt-3 rounded-2xl border border-border bg-cream-dark/60 p-4 shadow-sm sm:p-6">
             <FlavorProfileChart profile={lot.flavorProfile} />
           </div>
         ) : (

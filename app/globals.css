@@ -3,17 +3,43 @@
 :root {
   --color-burgundy: #3b1119;
   --color-burgundy-dark: #260b10;
+  /* P27 — very light burgundy-tinted surface (not a new hue: a ~96%-cream
+     tint of --color-burgundy), for the rare case a panel needs to read as
+     "accent family" without the weight of a full dark fill. */
+  --color-burgundy-light: #f3e8e9;
   --color-backdrop: #0f080a;
   --color-cream: #fbf8f1;
   --color-cream-dark: #f4efe6;
   --color-gold: #d4af37;
   --color-gold-dark: #a9872c;
   --color-charcoal: #222222;
+
+  /* P27 — semantic layer (see P26_VISUAL_AND_COLOR_DIRECTION_AUDIT.md and
+     P27_VISUAL_SYSTEM_IMPLEMENTATION.md). Named for role, not hue, so the
+     palette can be rebalanced later from this one place instead of hunting
+     down every raw-token usage. Reach for these for anything this phase
+     found systemically inconsistent — the single CTA color, the default
+     border, and the new status colors. Stable brand-identity color usage
+     (section backgrounds, the gold accent) keeps referencing the raw
+     tokens above on purpose: those were never inconsistent, only
+     overused/misbalanced — see the report for which is which. */
+  --color-background: var(--color-cream);
+  --color-surface: #ffffff;
+  --color-surface-accent: var(--color-burgundy-dark);
+  --color-text: var(--color-charcoal);
+  --color-border: rgb(34 34 34 / 0.12);
+  --color-accent: var(--color-burgundy);
+  --color-accent-hover: var(--color-burgundy-dark);
+  --color-accent-surface: var(--color-burgundy-light);
+  --color-success: #4b6355;
+  --color-warning: #b8752e;
+  --color-error: #b91c1c;
 }
 
 @theme inline {
   --color-burgundy: var(--color-burgundy);
   --color-burgundy-dark: var(--color-burgundy-dark);
+  --color-burgundy-light: var(--color-burgundy-light);
   --color-backdrop: var(--color-backdrop);
   --color-cream: var(--color-cream);
   --color-cream-dark: var(--color-cream-dark);
@@ -21,12 +47,25 @@
   --color-gold-dark: var(--color-gold-dark);
   --color-charcoal: var(--color-charcoal);
 
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-surface-accent: var(--color-surface-accent);
+  --color-text: var(--color-text);
+  --color-border: var(--color-border);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-surface: var(--color-accent-surface);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-error: var(--color-error);
+
   --font-display: var(--font-playfair);
   --font-sans: var(--font-manrope);
 }
 
 body {
-  color: var(--color-charcoal);
+  background: var(--color-background);
+  color: var(--color-text);
 }
 
 @keyframes fadeInUp {
@@ -40,27 +79,14 @@ body {
   }
 }
 
-@keyframes shimmerSheen {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 200% 50%;
-  }
-}
-
-/* Shared visual standard for every active tab/button on the site */
-.tab-active-glow {
-  color: var(--color-gold);
-  text-shadow: 0 1px 3px rgba(15, 8, 10, 0.7);
-  background-image: linear-gradient(
-    110deg,
-    var(--color-burgundy),
-    var(--color-gold),
-    var(--color-burgundy)
-  );
-  background-size: 200% 100%;
-  animation: shimmerSheen 3s linear infinite;
+/* Shared visual standard for every active tab/filter on the site.
+ * P27: replaces the previous animated gold shimmer (P26 flagged gold as
+ * overused — a constantly moving glow on every active state is the
+ * opposite of "dozed premium accent"). Now a plain, static accent fill. */
+.tab-active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-cream);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -4,7 +4,7 @@ import { NAV_LINKS } from "@/src/lib/nav";
 export default function Footer() {
   return (
     <footer className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
-      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-gold/20 bg-backdrop/35 text-cream shadow-2xl backdrop-blur-[10px] md:rounded-3xl">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-cream/10 bg-surface-accent text-cream shadow-2xl md:rounded-3xl">
         <div className="px-5 py-10 sm:px-8 sm:py-12 md:px-10 lg:py-16">
           <div className="grid gap-10 sm:gap-12 md:grid-cols-3">
             <div>

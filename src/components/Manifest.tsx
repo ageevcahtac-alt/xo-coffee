@@ -16,7 +16,7 @@ const PRINCIPLES = [
 export default function Manifest() {
   return (
     <section id="manifest" className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
-      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-gold/20 bg-backdrop/35 text-cream shadow-2xl backdrop-blur-[10px] md:rounded-3xl">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-cream/10 bg-surface-accent text-cream shadow-2xl md:rounded-3xl">
         <div className="relative mx-auto max-w-5xl px-5 py-12 text-center sm:px-8 sm:py-16 md:px-10 lg:py-20">
           <span className="text-xs font-semibold uppercase tracking-[0.35em] text-gold">
             Манифест
@@ -36,7 +36,7 @@ export default function Manifest() {
             {PRINCIPLES.map((principle) => (
               <div
                 key={principle.title}
-                className="rounded-xl border border-gold/30 bg-burgundy-dark p-6 text-left text-cream shadow-sm transition-all duration-300 ease-out hover:-translate-y-2.5 hover:border-gold/50 hover:bg-burgundy hover:shadow-2xl sm:p-8"
+                className="rounded-xl border border-cream/15 bg-burgundy p-6 text-left text-cream shadow-sm transition-all duration-300 ease-out hover:-translate-y-2.5 hover:border-gold/40 hover:shadow-2xl sm:p-8"
               >
                 <h3 className="font-display text-lg font-semibold text-gold">
                   {principle.title}

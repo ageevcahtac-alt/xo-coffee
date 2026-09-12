@@ -39,17 +39,17 @@ const PROCESS_STEPS = [
 export default function Approach() {
   return (
     <section id="approach" className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
-      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-gold/20 bg-backdrop/35 p-5 shadow-2xl backdrop-blur-[10px] sm:p-8 md:rounded-3xl md:p-12 lg:p-16">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-2xl sm:p-8 md:rounded-3xl md:p-12 lg:p-16">
         <div className="mb-8 max-w-2xl sm:mb-10">
-          <span className="text-xs font-semibold uppercase tracking-[0.35em] text-gold">
+          <span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
             Подход
           </span>
-          <h2 className="mt-4 font-display text-3xl font-semibold text-cream sm:text-4xl md:text-5xl">
+          <h2 className="mt-4 font-display text-3xl font-semibold text-burgundy sm:text-4xl md:text-5xl">
             Мы не против тёмной обжарки.
             <br />
             Мы против обжарки по шаблону.
           </h2>
-          <p className="mt-4 leading-relaxed text-cream/70">
+          <p className="mt-4 leading-relaxed text-text/70">
             Один профиль нельзя одинаково хорошо применить ко всем лотам. Pure
             Roast — это то, как мы ищем профиль для каждого лота отдельно, а
             не единая «правильная» степень обжарки.
@@ -60,7 +60,7 @@ export default function Approach() {
           {PROCESS_STEPS.map((step) => (
             <div
               key={step.n}
-              className="rounded-xl border border-gold/30 bg-cream/85 p-5 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl sm:p-6"
+              className="rounded-xl border border-border bg-cream-dark/60 p-5 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-accent/30 hover:shadow-xl sm:p-6"
             >
               <span className="font-display text-sm font-semibold text-gold-dark">
                 {step.n}
@@ -68,14 +68,14 @@ export default function Approach() {
               <h3 className="mt-2 font-display text-lg font-semibold text-burgundy">
                 {step.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-burgundy/75">
+              <p className="mt-2 text-sm leading-relaxed text-text/70">
                 {step.text}
               </p>
             </div>
           ))}
         </div>
 
-        <p className="mt-8 max-w-2xl font-display text-lg italic leading-relaxed text-cream/90 sm:mt-10 sm:text-xl">
+        <p className="mt-8 max-w-2xl font-display text-lg italic leading-relaxed text-burgundy sm:mt-10 sm:text-xl">
           «Мы не выбираем степень обжарки заранее. Мы ищем точку, в которой
           конкретный лот раскрывается лучше всего».
         </p>

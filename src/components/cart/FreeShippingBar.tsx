@@ -6,7 +6,7 @@ export default function FreeShippingBar({ subtotal }: { subtotal: number }) {
   const progress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
 
   return (
-    <div className="border border-gold/30 bg-cream-dark px-4 py-3">
+    <div className="border border-border bg-cream-dark px-4 py-3">
       <p className="text-xs leading-relaxed text-charcoal/75">
         {reached ? (
           <>

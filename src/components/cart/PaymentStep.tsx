@@ -212,8 +212,8 @@ export default function PaymentStep({
                   onClick={() => setMethod(option.value)}
                   className={`flex w-full items-center gap-3 border px-4 py-3 text-left transition-all duration-150 active:scale-[0.98] ${
                     selected
-                      ? "border-gold bg-cream-dark shadow-md"
-                      : "border-charcoal/15 hover:border-gold/50"
+                      ? "border-accent bg-cream-dark shadow-md"
+                      : "border-charcoal/15 hover:border-accent/40"
                   }`}
                 >
                   <span
@@ -254,10 +254,10 @@ export default function PaymentStep({
             {method === "card" && (
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="whitespace-nowrap border border-gold/40 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-gold-dark">
+                  <span className="whitespace-nowrap border border-charcoal/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal/60">
                     SberPay
                   </span>
-                  <span className="whitespace-nowrap border border-gold/40 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-gold-dark">
+                  <span className="whitespace-nowrap border border-charcoal/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal/60">
                     T-Pay
                   </span>
                   <span className="whitespace-nowrap border border-charcoal/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal/50">

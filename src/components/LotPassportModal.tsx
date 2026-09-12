@@ -172,7 +172,7 @@ function LotPassportContent({
                 {typeof lot.qScore === "number" && (
                   <span
                     aria-label={`Оценка Q-грейдера: ${lot.qScore} из 100`}
-                    className="shrink-0 border border-gold px-2 py-0.5 text-[11px] font-bold text-gold-dark"
+                    className="shrink-0 border border-border px-2 py-0.5 text-[11px] font-bold text-text/70"
                   >
                     {lot.qScore} Q
                   </span>
@@ -250,7 +250,7 @@ function LotPassportContent({
 
           <div className="flex-1 space-y-8 overflow-y-auto px-6 py-6">
             {/* Level 1: plain-language summary — read this, then scroll for the full Passport. */}
-            <section className="rounded-xl border border-gold/30 bg-cream-dark/60 p-5">
+            <section className="rounded-xl border border-border bg-cream-dark/60 p-5">
               {entry && (
                 <span className="mb-3 inline-flex items-center border border-gold bg-gold/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-gold-dark">
                   Точка входа · Попробовать несколько характеров
@@ -326,7 +326,7 @@ function LotPassportContent({
                 {lot.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="border border-gold/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-gold-dark"
+                    className="border border-border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-text/65"
                   >
                     {tag}
                   </span>
@@ -357,7 +357,7 @@ function LotPassportContent({
                 <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
                   Вкусовая диаграмма
                 </h3>
-                <div className="mt-4 rounded-2xl border border-gold/20 bg-cream-dark/60 p-4 shadow-sm backdrop-blur-md sm:p-6">
+                <div className="mt-4 rounded-2xl border border-border bg-cream-dark/60 p-4 shadow-sm sm:p-6">
                   <FlavorProfileChart profile={lot.flavorProfile} />
                 </div>
               </section>
@@ -491,7 +491,7 @@ function LotPassportContent({
                         key={similarLot.id}
                         type="button"
                         onClick={() => onSelectLot(similarLot.id)}
-                        className="block w-full border border-charcoal/15 bg-cream-dark p-4 text-left transition-all active:scale-[0.99] hover:border-gold/50 hover:bg-cream"
+                        className="block w-full border border-border bg-cream-dark p-4 text-left transition-all active:scale-[0.99] hover:border-accent/40 hover:bg-cream"
                       >
                         {cardBody}
                       </button>
@@ -535,7 +535,7 @@ function LotPassportContent({
               <button
                 type="button"
                 onClick={handleAdd}
-                className="whitespace-nowrap border border-gold/40 bg-burgundy px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
+                className="whitespace-nowrap bg-accent px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
               >
                 В корзину
               </button>

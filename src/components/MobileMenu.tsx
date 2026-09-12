@@ -39,7 +39,7 @@ export default function MobileMenu({
             key={link.href}
             href={link.href}
             onClick={onClose}
-            className="rounded-lg border border-charcoal/10 bg-cream-dark px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.12em] text-charcoal/80 shadow-lg transition-all duration-150 active:scale-95 active:border-burgundy active:bg-burgundy active:text-cream hover:border-gold hover:text-burgundy hover:shadow-xl"
+            className="rounded-lg border border-charcoal/10 bg-cream-dark px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.12em] text-charcoal/80 shadow-lg transition-all duration-150 active:scale-95 active:border-burgundy active:bg-burgundy active:text-cream hover:border-accent hover:text-burgundy hover:shadow-xl"
           >
             {link.label}
           </Link>

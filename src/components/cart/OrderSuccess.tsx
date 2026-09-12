@@ -13,7 +13,7 @@ export default function OrderSuccess({
 }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8 py-10 text-center">
-      <span className="flex h-16 w-16 items-center justify-center rounded-full border border-gold text-gold">
+      <span className="flex h-16 w-16 items-center justify-center rounded-full border border-success text-success">
         <svg
           width="26"
           height="26"
@@ -68,7 +68,7 @@ export default function OrderSuccess({
       </p>
 
       {order.items.length > 0 && (
-        <div className="mt-6 w-full max-w-xs border border-gold/40 bg-cream-dark px-5 py-4 text-left">
+        <div className="mt-6 w-full max-w-xs border border-border bg-cream-dark px-5 py-4 text-left">
           <p className="font-display text-sm font-semibold text-burgundy">
             Coffee Passport
           </p>

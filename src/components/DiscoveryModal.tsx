@@ -39,8 +39,8 @@ function AnswerButton({
       aria-pressed={selected}
       className={`min-h-14 w-full rounded-lg border px-5 py-3.5 text-left text-sm font-medium transition-all duration-150 active:scale-[0.98] ${
         selected
-          ? "border-gold bg-burgundy text-cream"
-          : "border-charcoal/15 bg-cream-dark text-charcoal/80 hover:border-gold/50 hover:bg-cream"
+          ? "border-accent bg-accent text-cream"
+          : "border-charcoal/15 bg-cream-dark text-charcoal/80 hover:border-accent/40 hover:bg-cream"
       }`}
     >
       {label}
@@ -198,7 +198,7 @@ export default function DiscoveryModal() {
               return (
                 <div
                   key={result.lot.id}
-                  className="rounded-xl border border-gold/30 bg-cream-dark/60 p-5"
+                  className="rounded-xl border border-border bg-cream-dark/60 p-5"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -237,7 +237,7 @@ export default function DiscoveryModal() {
                     <button
                       type="button"
                       onClick={(event) => handleAdd(event, result.lot)}
-                      className="flex h-11 items-center justify-center border border-gold/40 bg-burgundy px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
+                      className="flex h-11 items-center justify-center bg-accent px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
                     >
                       В корзину
                     </button>

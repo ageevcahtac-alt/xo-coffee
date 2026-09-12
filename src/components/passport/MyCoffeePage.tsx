@@ -91,32 +91,32 @@ export default function MyCoffeePage() {
 
   return (
     <section className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
-      <div className="mx-auto max-w-4xl overflow-hidden rounded-2xl border border-gold/20 bg-backdrop/35 p-5 text-cream shadow-2xl backdrop-blur-[10px] sm:p-8 md:rounded-3xl md:p-12">
-        <span className="text-xs font-semibold uppercase tracking-[0.35em] text-gold">
+      <div className="mx-auto max-w-4xl overflow-hidden rounded-2xl border border-border bg-surface p-5 text-text shadow-2xl sm:p-8 md:rounded-3xl md:p-12">
+        <span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
           Мой кофе
         </span>
-        <h1 className="mt-4 font-display text-3xl font-semibold sm:text-4xl">
+        <h1 className="mt-4 font-display text-3xl font-semibold text-burgundy sm:text-4xl">
           Мы помним, что вы уже пробовали
         </h1>
-        <p className="mt-3 max-w-xl leading-relaxed text-cream/70">
+        <p className="mt-3 max-w-xl leading-relaxed text-text/70">
           {getTasteSummary(context)}
         </p>
-        {brewHabit && <p className="mt-1 text-sm text-cream/60">{brewHabit}</p>}
-        <p className="mt-3 text-xs text-cream/40">
+        {brewHabit && <p className="mt-1 text-sm text-text/60">{brewHabit}</p>}
+        <p className="mt-3 text-xs text-text/40">
           История дегустаций хранится локально, в этом браузере — без аккаунта
           и синхронизации между устройствами.
         </p>
 
         {context.tastingCount > 0 && (
-          <div className="mt-6 flex flex-wrap gap-6 text-sm text-cream/70">
+          <div className="mt-6 flex flex-wrap gap-6 text-sm text-text/70">
             <span>
-              <strong className="font-display text-xl text-cream">
+              <strong className="font-display text-xl text-burgundy">
                 {context.distinctLotsCount}
               </strong>{" "}
               {context.distinctLotsCount === 1 ? "лот попробован" : "лотов попробовано"}
             </span>
             <span>
-              <strong className="font-display text-xl text-cream">
+              <strong className="font-display text-xl text-burgundy">
                 {context.tastingCount}
               </strong>{" "}
               {context.tastingCount === 1 ? "дегустация" : "дегустаций"}
@@ -127,7 +127,7 @@ export default function MyCoffeePage() {
         {/* Personal recommendations — a thin layer over the existing Discovery engine */}
         {hydrated && recommendations.length > 0 && (
           <div className="mt-10">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">
               Попробовать дальше
             </span>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -136,7 +136,7 @@ export default function MyCoffeePage() {
                 return (
                   <div
                     key={result.lot.id}
-                    className="flex flex-col rounded-xl border border-gold/30 bg-cream/90 p-5 text-charcoal"
+                    className="flex flex-col rounded-xl border border-border bg-cream-dark/60 p-5 text-text"
                   >
                     <h3 className="font-display text-lg font-semibold text-burgundy">
                       {result.lot.country}
@@ -160,14 +160,14 @@ export default function MyCoffeePage() {
                         <button
                           type="button"
                           onClick={(event) => handleAdd(event, result.lot)}
-                          className="flex h-10 items-center justify-center whitespace-nowrap border border-gold/40 bg-burgundy px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
+                          className="flex h-10 items-center justify-center whitespace-nowrap bg-accent px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
                         >
                           В корзину
                         </button>
                         <button
                           type="button"
                           onClick={() => setPassportLotId(result.lot.id)}
-                          className="flex h-10 items-center justify-center whitespace-nowrap border border-burgundy/30 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-burgundy transition-all active:scale-95 hover:bg-burgundy/10"
+                          className="flex h-10 items-center justify-center whitespace-nowrap border border-border px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-burgundy transition-all active:scale-95 hover:border-accent hover:bg-accent-surface"
                         >
                           Паспорт
                         </button>
@@ -183,7 +183,7 @@ export default function MyCoffeePage() {
         {/* My lots — which ones, liked/disliked, how many times */}
         {hydrated && tastedLots.length > 0 && (
           <div className="mt-10">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">
               Лоты, которые вы пробовали
             </span>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -192,23 +192,23 @@ export default function MyCoffeePage() {
                   key={lot.id}
                   type="button"
                   onClick={() => setPassportLotId(lot.id)}
-                  className="flex items-center justify-between gap-3 border border-white/15 bg-white/10 px-4 py-3 text-left transition-all active:scale-[0.99] hover:border-gold/50 hover:bg-white/15"
+                  className="flex items-center justify-between gap-3 border border-border bg-cream-dark/60 px-4 py-3 text-left transition-all active:scale-[0.99] hover:border-accent/40 hover:bg-cream-dark"
                 >
                   <span className="min-w-0">
-                    <span className="block truncate font-display text-base font-semibold text-cream">
+                    <span className="block truncate font-display text-base font-semibold text-burgundy">
                       {lot.country}
                     </span>
-                    <span className="block text-xs uppercase tracking-[0.08em] text-cream/50">
+                    <span className="block text-xs uppercase tracking-[0.08em] text-text/55">
                       {lot.region} · {count === 1 ? "1 дегустация" : `${count} дегустаций`}
                     </span>
                   </span>
                   {liked && (
-                    <span className="shrink-0 border border-gold/50 bg-gold/15 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-gold">
+                    <span className="shrink-0 border border-gold/50 bg-gold/15 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-gold-dark">
                       Понравилось
                     </span>
                   )}
                   {!liked && disliked && (
-                    <span className="shrink-0 border border-cream/20 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-cream/50">
+                    <span className="shrink-0 border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-text/50">
                       Не ваше
                     </span>
                   )}
@@ -221,7 +221,7 @@ export default function MyCoffeePage() {
         {/* Recent tastings — chronological detail: date, brew, ratings, note */}
         {hydrated && context.recentTastings.length > 0 && (
           <div className="mt-10">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">
               Последние дегустации
             </span>
             <div className="mt-4 space-y-3">
@@ -230,28 +230,28 @@ export default function MyCoffeePage() {
                 return (
                   <div
                     key={record.id}
-                    className="border border-white/15 bg-white/10 p-4 text-sm text-cream/80"
+                    className="border border-border bg-cream-dark/60 p-4 text-sm text-text/75"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="font-display text-base font-semibold text-cream">
+                      <span className="font-display text-base font-semibold text-burgundy">
                         {lot ? lot.country : "Лот больше не в каталоге"}
                         {record.component ? ` · ${record.component}` : ""}
                       </span>
-                      <span className="text-xs uppercase tracking-[0.08em] text-cream/50">
+                      <span className="text-xs uppercase tracking-[0.08em] text-text/50">
                         {formatTastingDate(record.createdAt)} ·{" "}
                         {BREW_METHOD_LABELS[record.brewMethod] ?? record.brewMethod}
                       </span>
                     </div>
-                    <p className="mt-2 text-xs text-cream/60">
+                    <p className="mt-2 text-xs text-text/60">
                       Кислотность {record.rating.acidity} · Сладость {record.rating.sweetness} ·
                       Тело {record.rating.body} · Понравилось {record.rating.overall}/5
                     </p>
                     {record.note && (
-                      <p className="mt-2 leading-relaxed text-cream/75">«{record.note}»</p>
+                      <p className="mt-2 leading-relaxed text-text/75">«{record.note}»</p>
                     )}
                     <Link
                       href={`/passport/${record.orderNumber}`}
-                      className="mt-2 inline-block text-xs font-semibold uppercase tracking-[0.08em] text-gold transition-colors hover:text-gold-dark"
+                      className="mt-2 inline-block text-xs font-semibold uppercase tracking-[0.08em] text-burgundy transition-colors hover:text-gold-dark"
                     >
                       Открыть Coffee Passport заказа №{record.orderNumber}
                     </Link>
@@ -263,27 +263,27 @@ export default function MyCoffeePage() {
         )}
 
         {hydrated && context.tastingCount === 0 && (
-          <div className="mt-10 rounded-xl border border-dashed border-gold/30 bg-cream/10 px-6 py-10 text-center">
-            <p className="font-display text-lg font-semibold text-cream">
+          <div className="mt-10 rounded-xl border border-dashed border-border bg-cream-dark/60 px-6 py-10 text-center">
+            <p className="font-display text-lg font-semibold text-burgundy">
               Пока здесь пусто
             </p>
-            <p className="mt-2 text-sm text-cream/60">
+            <p className="mt-2 text-sm text-text/60">
               Купите лот и откройте его Coffee Passport, чтобы сохранить первое впечатление.
             </p>
           </div>
         )}
 
-        <div className="mt-10 flex flex-wrap gap-3 border-t border-cream/10 pt-6">
+        <div className="mt-10 flex flex-wrap gap-3 border-t border-border pt-6">
           <Link
             href="/#catalog"
-            className="flex h-11 items-center justify-center border border-cream/30 px-5 text-xs font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:border-gold hover:text-gold"
+            className="flex h-11 items-center justify-center border border-border px-5 text-xs font-semibold uppercase tracking-[0.1em] text-text/70 transition-all active:scale-95 hover:border-accent hover:text-burgundy"
           >
             В каталог
           </Link>
           <button
             type="button"
             onClick={openDiscovery}
-            className="flex h-11 items-center justify-center border border-cream/30 px-5 text-xs font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:border-gold hover:text-gold"
+            className="flex h-11 items-center justify-center border border-border px-5 text-xs font-semibold uppercase tracking-[0.1em] text-text/70 transition-all active:scale-95 hover:border-accent hover:text-burgundy"
           >
             Подобрать кофе
           </button>

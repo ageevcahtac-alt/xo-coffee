@@ -6,7 +6,6 @@ import { DiscoveryProvider } from "@/src/context/DiscoveryContext";
 import CartDrawer from "@/src/components/CartDrawer";
 import DiscoveryModal from "@/src/components/DiscoveryModal";
 import FlyToCartLayer from "@/src/components/FlyToCartLayer";
-import FixedBackdrop from "@/src/components/FixedBackdrop";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -32,8 +31,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ru"
       className={`${playfair.variable} ${manrope.variable} h-full w-full max-w-full overflow-x-hidden antialiased`}
     >
-      <body className="flex min-h-full w-full max-w-full flex-col overflow-x-hidden text-charcoal font-sans">
-        <FixedBackdrop />
+      <body className="flex min-h-full w-full max-w-full flex-col overflow-x-hidden bg-background text-text font-sans">
         <CartProvider>
           <DiscoveryProvider>
             {children}
