@@ -1,3 +1,28 @@
+-- ==============================================================================
+-- DEPRECATED — DO NOT APPLY TO XO STORE. Superseded by P21/P22.
+--
+-- P21 (P21_XO_STORE_DATA_ARCHITECTURE_AUDIT.md) and P22
+-- (P22_XO_STORE_COMMERCIAL_DATA_LAYER_IMPLEMENTATION.md) established that
+-- this file must never be run against the XO Store database: it models a
+-- full second Canonical Lot system (organizations -> coffees -> green_lots
+-- -> lots -> roast_batches -> reference_*_profiles) inside the Store repo,
+-- which is exactly the "shadow Canonical Lot" architecture those audits
+-- rule out. Coffee Passport is the only owner of Canonical Lot data —
+-- confirmed by P20 to already implement this same shape on its own side
+-- (public.lots.roaster_id, roaster.slug = "roaster-xo",
+-- listCanonicalLotsForRoaster()).
+--
+-- XO Store's actual commercial schema lives in
+-- supabase/migrations/20260912120000_store_products_foundation.sql — a
+-- separate, independent `products` table with no organizations/coffees/lots
+-- of its own, referencing a future Canonical Lot only by the opaque,
+-- immutable `passport_public_id` text value.
+--
+-- Left in place, unmodified below, by explicit instruction: not deleted, not
+-- rewritten, git history preserved. It was never applied (see original
+-- status note immediately below, still accurate) and must stay that way.
+-- ==============================================================================
+
 -- P14 — Coffee Passport architecture foundation
 --
 -- Status: DESIGNED, NOT APPLIED. There is no live Supabase project connected
