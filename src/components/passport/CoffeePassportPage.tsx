@@ -68,7 +68,7 @@ export default function CoffeePassportPage({ orderNumber }: { orderNumber: strin
   if (state === "not-found") {
     return (
       <section className="px-4 py-10 sm:px-6 sm:py-14 md:px-8">
-        <div className="mx-auto max-w-xl rounded-2xl border border-border bg-surface p-8 text-center text-text shadow-2xl">
+        <div className="mx-auto max-w-xl rounded-2xl border border-border bg-surface p-8 text-center text-text shadow-sm">
           <h1 className="font-display text-2xl font-semibold text-burgundy">
             Не нашли этот Coffee Passport
           </h1>
@@ -90,7 +90,7 @@ export default function CoffeePassportPage({ orderNumber }: { orderNumber: strin
 
   return (
     <section className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
-      <div className="mx-auto max-w-4xl overflow-hidden rounded-2xl border border-border bg-surface p-5 text-text shadow-2xl sm:p-8 md:rounded-3xl md:p-12">
+      <div className="mx-auto max-w-4xl overflow-hidden rounded-2xl border border-border bg-surface p-5 text-text shadow-sm sm:p-8 md:rounded-3xl md:p-12">
         <span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
           Coffee Passport
         </span>

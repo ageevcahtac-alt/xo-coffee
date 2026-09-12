@@ -7,7 +7,7 @@ export default function Hero() {
 
   return (
     <section id="top" className="px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-10">
-      <div className="relative mx-auto max-w-7xl overflow-hidden rounded-2xl border border-border bg-surface text-text shadow-2xl md:rounded-3xl">
+      <div className="relative mx-auto max-w-7xl overflow-hidden rounded-2xl border border-border bg-surface text-text shadow-sm md:rounded-3xl">
         <div className="relative flex flex-col items-start px-5 py-12 sm:px-8 sm:py-16 md:px-10 lg:px-14 lg:py-20">
           <span className="mb-4 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
             <span className="h-px w-8 bg-gold" />

@@ -162,7 +162,7 @@ export default function Catalog() {
 
   return (
     <section id="catalog" className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
-      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-2xl sm:p-8 md:rounded-3xl md:p-12 lg:p-16">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-8 md:rounded-3xl md:p-12 lg:p-16">
         <div className="mb-8 max-w-2xl sm:mb-10">
           <span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
             Каталог
@@ -179,7 +179,7 @@ export default function Catalog() {
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border border-border bg-cream-dark px-5 py-4 sm:mb-10">
           <p className="text-sm text-text/75">
             Не знаете, что выбрать?{" "}
-            <span className="text-text/55">Подберём за 1 минуту.</span>
+            <span className="text-text/65">Подберём за 1 минуту.</span>
           </p>
           <button
             type="button"
@@ -224,7 +224,7 @@ export default function Catalog() {
             ))}
           </div>
           {activeFlavor && (
-            <p className="mt-3 text-xs text-text/55">
+            <p className="mt-3 text-xs text-text/65">
               Каталог ниже отсортирован по близости к «
               {FLAVOR_DIRECTION_PROFILES[activeFlavor].label}» — остальные лоты никуда
               не делись, просто ниже в списке.
@@ -311,10 +311,10 @@ export default function Catalog() {
                   className="flex cursor-pointer scroll-mt-28 flex-col overflow-hidden rounded-xl border border-border bg-surface transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:-translate-y-2 hover:border-accent/40 hover:shadow-xl active:scale-[0.98]"
                 >
                   <div className="flex items-center justify-between border-b border-border px-5 py-3">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text/50">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text/65">
                       {lot.name}
                     </span>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-burgundy/40">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text/65">
                       Паспорт
                     </span>
                   </div>
@@ -325,7 +325,7 @@ export default function Catalog() {
                         <h3 className="font-display text-xl font-semibold text-burgundy">
                           {lot.country}
                         </h3>
-                        <p className="text-xs uppercase tracking-[0.1em] text-text/55">
+                        <p className="text-xs uppercase tracking-[0.1em] text-text/65">
                           {lot.region}
                         </p>
                       </div>
@@ -375,7 +375,7 @@ export default function Catalog() {
                         three separate lines before P27 — same information,
                         one quiet line now, so the card stops stacking
                         near-identical-looking metadata captions. */}
-                    <p className="mt-3 line-clamp-1 border-t border-border pt-3 text-[10px] uppercase tracking-[0.06em] text-text/40">
+                    <p className="mt-3 line-clamp-1 border-t border-border pt-3 text-[10px] uppercase tracking-[0.06em] text-text/60">
                       {[
                         brewHighlight
                           ? `${brewHighlight.label} ${brewHighlight.spec.ratio}, ${brewHighlight.spec.tempC}°C`

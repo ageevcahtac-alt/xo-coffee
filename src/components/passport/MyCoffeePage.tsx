@@ -91,7 +91,7 @@ export default function MyCoffeePage() {
 
   return (
     <section className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
-      <div className="mx-auto max-w-4xl overflow-hidden rounded-2xl border border-border bg-surface p-5 text-text shadow-2xl sm:p-8 md:rounded-3xl md:p-12">
+      <div className="mx-auto max-w-4xl overflow-hidden rounded-2xl border border-border bg-surface p-5 text-text shadow-sm sm:p-8 md:rounded-3xl md:p-12">
         <span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
           Мой кофе
         </span>
@@ -102,7 +102,7 @@ export default function MyCoffeePage() {
           {getTasteSummary(context)}
         </p>
         {brewHabit && <p className="mt-1 text-sm text-text/60">{brewHabit}</p>}
-        <p className="mt-3 text-xs text-text/40">
+        <p className="mt-3 text-xs text-text/65">
           История дегустаций хранится локально, в этом браузере — без аккаунта
           и синхронизации между устройствами.
         </p>
@@ -198,7 +198,7 @@ export default function MyCoffeePage() {
                     <span className="block truncate font-display text-base font-semibold text-burgundy">
                       {lot.country}
                     </span>
-                    <span className="block text-xs uppercase tracking-[0.08em] text-text/55">
+                    <span className="block text-xs uppercase tracking-[0.08em] text-text/65">
                       {lot.region} · {count === 1 ? "1 дегустация" : `${count} дегустаций`}
                     </span>
                   </span>
@@ -208,7 +208,7 @@ export default function MyCoffeePage() {
                     </span>
                   )}
                   {!liked && disliked && (
-                    <span className="shrink-0 border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-text/50">
+                    <span className="shrink-0 border border-border px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-text/65">
                       Не ваше
                     </span>
                   )}
@@ -237,7 +237,7 @@ export default function MyCoffeePage() {
                         {lot ? lot.country : "Лот больше не в каталоге"}
                         {record.component ? ` · ${record.component}` : ""}
                       </span>
-                      <span className="text-xs uppercase tracking-[0.08em] text-text/50">
+                      <span className="text-xs uppercase tracking-[0.08em] text-text/65">
                         {formatTastingDate(record.createdAt)} ·{" "}
                         {BREW_METHOD_LABELS[record.brewMethod] ?? record.brewMethod}
                       </span>
