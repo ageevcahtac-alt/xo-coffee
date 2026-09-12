@@ -21,12 +21,15 @@ export default function CartDrawer() {
     null,
   );
 
+  // Closing mid-checkout (the header ✕, Escape, or the backdrop — all wired
+  // to the same onClose) must not discard a contact/delivery form the buyer
+  // already filled in. Only the visible step resets to "cart"; contactInfo
+  // is intentionally left in place so reopening and continuing to checkout
+  // resumes pre-filled instead of forcing a full re-entry. It's cleared
+  // explicitly on an actual completed order (handleCloseAfterSuccess).
   useEffect(() => {
     if (!isOpen) {
-      const timeout = setTimeout(() => {
-        setStep("cart");
-        setContactInfo(null);
-      }, 400);
+      const timeout = setTimeout(() => setStep("cart"), 400);
       return () => clearTimeout(timeout);
     }
   }, [isOpen]);

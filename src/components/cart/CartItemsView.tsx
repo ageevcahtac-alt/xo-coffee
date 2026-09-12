@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCart } from "@/src/context/CartContext";
 import { formatPrice } from "@/src/lib/format";
 import WholeBeanNotice from "@/src/components/WholeBeanNotice";
@@ -10,15 +11,24 @@ export default function CartItemsView({
 }: {
   onCheckout: () => void;
 }) {
-  const { items, removeItem, setQuantity, totalPrice } = useCart();
+  const { items, removeItem, setQuantity, totalPrice, closeCart } = useCart();
 
   return (
     <>
       <div className="flex-1 overflow-y-auto px-6 py-6">
         {items.length === 0 ? (
-          <p className="text-sm text-charcoal/65">
-            Корзина пуста. Выберите лот в каталоге.
-          </p>
+          <div className="space-y-4">
+            <p className="text-sm text-charcoal/65">
+              Корзина пуста. Выберите лот в каталоге.
+            </p>
+            <Link
+              href="/#catalog"
+              onClick={closeCart}
+              className="inline-flex h-11 items-center justify-center border border-border px-5 text-xs font-semibold uppercase tracking-[0.1em] text-burgundy transition-all active:scale-95 hover:border-accent hover:bg-accent-surface"
+            >
+              Перейти в каталог
+            </Link>
+          </div>
         ) : (
           <>
             <ul className="space-y-6">
