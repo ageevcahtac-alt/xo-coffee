@@ -33,7 +33,7 @@ export default function SegmentedControl<T extends string>({
           type="button"
           onClick={() => onChange(option.value)}
           className={`relative z-10 flex min-h-11 flex-1 items-center justify-center px-2 py-2.5 text-xs font-semibold uppercase tracking-[0.06em] transition-colors active:scale-[0.97] ${
-            option.value === value ? "text-cream" : "text-charcoal/60"
+            option.value === value ? "text-cream" : "text-charcoal/65"
           }`}
         >
           {option.label}

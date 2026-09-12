@@ -111,7 +111,7 @@ export default function FlavorProfileChart({
               {...{ xmlns: "http://www.w3.org/1999/xhtml" }}
               className="flex h-full w-full flex-col items-center justify-center text-center leading-tight"
             >
-              <span className="text-[9px] uppercase tracking-[0.04em] text-charcoal/55">
+              <span className="text-[9px] uppercase tracking-[0.04em] text-charcoal/65">
                 {axis.label}
               </span>
               <span className="text-[10px] font-semibold text-burgundy">

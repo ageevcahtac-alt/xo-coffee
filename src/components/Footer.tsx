@@ -46,7 +46,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="mt-10 flex flex-col gap-4 border-t border-cream/10 pt-8 text-xs text-cream/40 sm:mt-16 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-10 flex flex-col gap-4 border-t border-cream/10 pt-8 text-xs text-cream/50 sm:mt-16 sm:flex-row sm:items-center sm:justify-between">
             <span>© {new Date().getFullYear()} XO COFFEE. Все права защищены.</span>
             <span className="uppercase tracking-[0.2em]">Pure Roast</span>
           </div>

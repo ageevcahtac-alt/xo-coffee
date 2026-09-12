@@ -141,14 +141,14 @@ export default function MyCoffeePage() {
                     <h3 className="font-display text-lg font-semibold text-burgundy">
                       {result.lot.country}
                     </h3>
-                    <p className="text-xs uppercase tracking-[0.08em] text-burgundy/60">
+                    <p className="text-xs uppercase tracking-[0.08em] text-burgundy/65">
                       {result.lot.region}
                     </p>
                     <p className="mt-2 flex-1 text-sm leading-relaxed text-burgundy/80">
                       {result.reason}
                     </p>
                     {brewHighlight && (
-                      <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.06em] text-burgundy/55">
+                      <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.06em] text-burgundy/65">
                         {brewHighlight.label} · {brewHighlight.spec.ratio}, {brewHighlight.spec.tempC}°C
                       </p>
                     )}

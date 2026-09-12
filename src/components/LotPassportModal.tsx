@@ -178,7 +178,7 @@ function LotPassportContent({
                   </span>
                 )}
               </div>
-              <p className="text-sm uppercase tracking-[0.1em] text-charcoal/50">
+              <p className="text-sm uppercase tracking-[0.1em] text-charcoal/65">
                 {lot.region}
               </p>
             </div>
@@ -243,7 +243,7 @@ function LotPassportContent({
           </div>
 
           {position && position.total > 1 && (
-            <div className="border-b border-charcoal/10 px-6 py-2 text-center text-[11px] uppercase tracking-[0.15em] text-charcoal/40">
+            <div className="border-b border-charcoal/10 px-6 py-2 text-center text-[11px] uppercase tracking-[0.15em] text-charcoal/65">
               Лот {position.index + 1} из {position.total}
             </div>
           )}
@@ -276,7 +276,7 @@ function LotPassportContent({
                 <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-burgundy/70">
                   {factChips.map((chip) => (
                     <span key={chip.label}>
-                      <span className="text-burgundy/50">{chip.label}: </span>
+                      <span className="text-burgundy/65">{chip.label}: </span>
                       {chip.value}
                     </span>
                   ))}
@@ -371,13 +371,13 @@ function LotPassportContent({
                 <dl className="mt-3 divide-y divide-charcoal/10 border-y border-charcoal/10 text-sm">
                   {techRows.map((row) => (
                     <div key={row.label} className="flex justify-between py-2.5">
-                      <dt className="text-charcoal/50">{row.label}</dt>
+                      <dt className="text-charcoal/65">{row.label}</dt>
                       <dd className="text-right font-medium">{row.value}</dd>
                     </div>
                   ))}
                 </dl>
                 {typeof lot.qScore === "number" && (
-                  <p className="mt-2 text-xs leading-relaxed text-charcoal/50">
+                  <p className="mt-2 text-xs leading-relaxed text-charcoal/65">
                     Q-грейд — независимая оценка качества зелёного кофе по
                     100-балльной шкале: от 80 баллов начинается уровень
                     спешелти. Это не рейтинг XO COFFEE и не про личный вкус —
@@ -427,15 +427,15 @@ function LotPassportContent({
                           </p>
                           <dl className="mt-3 space-y-1.5 text-xs">
                             <div className="flex justify-between">
-                              <dt className="text-charcoal/50">Пропорция</dt>
+                              <dt className="text-charcoal/65">Пропорция</dt>
                               <dd className="font-medium">{spec.ratio}</dd>
                             </div>
                             <div className="flex justify-between">
-                              <dt className="text-charcoal/50">Температура</dt>
+                              <dt className="text-charcoal/65">Температура</dt>
                               <dd className="font-medium">{spec.tempC}°C</dd>
                             </div>
                             <div className="flex justify-between">
-                              <dt className="text-charcoal/50">Время</dt>
+                              <dt className="text-charcoal/65">Время</dt>
                               <dd className="font-medium">{spec.timeLabel}</dd>
                             </div>
                           </dl>
@@ -461,7 +461,7 @@ function LotPassportContent({
                             <p className="font-display text-base font-semibold text-burgundy">
                               {similarLot.country}
                             </p>
-                            <p className="text-xs uppercase tracking-[0.08em] text-charcoal/50">
+                            <p className="text-xs uppercase tracking-[0.08em] text-charcoal/65">
                               {similarLot.region}
                             </p>
                           </div>

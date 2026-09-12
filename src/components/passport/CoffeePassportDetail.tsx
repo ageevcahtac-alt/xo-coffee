@@ -60,7 +60,7 @@ function RatingScale({
     <div>
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-burgundy">{label}</span>
-        <span className="text-xs text-burgundy/50">{value} / 5</span>
+        <span className="text-xs text-burgundy/65">{value} / 5</span>
       </div>
       <div className="mt-2 flex gap-2" role="group" aria-label={label}>
         {[1, 2, 3, 4, 5].map((n) => (
@@ -73,7 +73,7 @@ function RatingScale({
             className={`flex h-11 flex-1 items-center justify-center border text-sm font-semibold transition-all active:scale-95 ${
               n <= value
                 ? "border-accent bg-accent text-cream"
-                : "border-charcoal/20 bg-cream-dark text-charcoal/40 hover:border-accent/40"
+                : "border-charcoal/20 bg-cream-dark text-charcoal/65 hover:border-accent/40"
             }`}
           >
             {n}
@@ -198,7 +198,7 @@ export default function CoffeePassportDetail({
         <h3 className="mt-1 font-display text-xl font-semibold text-burgundy">
           {lot.country}
         </h3>
-        <p className="text-xs uppercase tracking-[0.1em] text-burgundy/60">
+        <p className="text-xs uppercase tracking-[0.1em] text-burgundy/65">
           {lot.region} · {lot.name}
         </p>
         {lot.cupNote && (
@@ -242,27 +242,27 @@ export default function CoffeePassportDetail({
             {brewMethod !== "other" && lot.brew?.[brewMethod] && (
               <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs text-charcoal/70">
                 <div className="flex gap-1.5">
-                  <dt className="text-charcoal/45">Пропорция</dt>
+                  <dt className="text-charcoal/65">Пропорция</dt>
                   <dd className="font-medium">{lot.brew[brewMethod].ratio}</dd>
                 </div>
                 <div className="flex gap-1.5">
-                  <dt className="text-charcoal/45">Температура</dt>
+                  <dt className="text-charcoal/65">Температура</dt>
                   <dd className="font-medium">{lot.brew[brewMethod].tempC}°C</dd>
                 </div>
                 <div className="flex gap-1.5">
-                  <dt className="text-charcoal/45">Время</dt>
+                  <dt className="text-charcoal/65">Время</dt>
                   <dd className="font-medium">{lot.brew[brewMethod].timeLabel}</dd>
                 </div>
               </dl>
             )}
             {brewMethod === "other" && (
-              <p className="mt-3 text-sm text-charcoal/60">
+              <p className="mt-3 text-sm text-charcoal/65">
                 Попробуйте привычным для вас способом и оцените чашку.
               </p>
             )}
           </>
         ) : (
-          <p className="mt-3 text-sm text-charcoal/60">
+          <p className="mt-3 text-sm text-charcoal/65">
             Попробуйте привычным для вас способом и оцените чашку.
           </p>
         )}
@@ -273,7 +273,7 @@ export default function CoffeePassportDetail({
         <h3 className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
           Моя чашка
         </h3>
-        <p className="mt-2 text-sm leading-relaxed text-charcoal/60">
+        <p className="mt-2 text-sm leading-relaxed text-charcoal/65">
           Ваше личное впечатление — оно не обязано совпадать с профилем лота.
         </p>
 
@@ -321,7 +321,7 @@ export default function CoffeePassportDetail({
             placeholder="Опишите чашку своими словами — необязательно официальными терминами"
             rows={3}
             maxLength={2000}
-            className="mt-2 w-full border border-charcoal/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-charcoal/40 outline-none transition-colors focus:border-burgundy"
+            className="mt-2 w-full border border-charcoal/20 bg-cream px-4 py-3 text-sm text-charcoal placeholder:text-charcoal/55 outline-none transition-colors focus:border-burgundy"
           />
         </label>
 
@@ -363,7 +363,7 @@ export default function CoffeePassportDetail({
                 className="border border-charcoal/15 bg-cream-dark/40 p-4 text-sm"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-xs uppercase tracking-[0.08em] text-charcoal/50">
+                  <span className="text-xs uppercase tracking-[0.08em] text-charcoal/65">
                     {formatTastingDate(record.createdAt)} ·{" "}
                     {BREW_METHOD_LABELS[record.brewMethod]}
                     {record.component ? ` · ${record.component}` : ""}
@@ -376,7 +376,7 @@ export default function CoffeePassportDetail({
                     Изменить
                   </button>
                 </div>
-                <p className="mt-2 text-xs text-charcoal/60">
+                <p className="mt-2 text-xs text-charcoal/65">
                   Кислотность {record.rating.acidity} · Сладость{" "}
                   {record.rating.sweetness} · Тело {record.rating.body} · Понравилось{" "}
                   {record.rating.overall}/5
@@ -402,10 +402,10 @@ export default function CoffeePassportDetail({
             <FlavorProfileChart profile={lot.flavorProfile} />
           </div>
         ) : (
-          <p className="mt-3 text-sm text-charcoal/60">Профиль пока не описан.</p>
+          <p className="mt-3 text-sm text-charcoal/65">Профиль пока не описан.</p>
         )}
         {referenceParts.length > 0 && (
-          <p className="mt-3 text-xs text-charcoal/60">{referenceParts.join(" · ")}</p>
+          <p className="mt-3 text-xs text-charcoal/65">{referenceParts.join(" · ")}</p>
         )}
         <button
           type="button"

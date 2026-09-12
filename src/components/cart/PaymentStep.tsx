@@ -179,7 +179,7 @@ export default function PaymentStep({
   };
 
   const inputClass =
-    "w-full border border-charcoal/20 bg-cream-dark px-4 py-3 text-sm text-charcoal placeholder:text-charcoal/40 outline-none transition-colors focus:border-burgundy";
+    "w-full border border-charcoal/20 bg-cream-dark px-4 py-3 text-sm text-charcoal placeholder:text-charcoal/55 outline-none transition-colors focus:border-burgundy";
 
   return (
     <form
@@ -190,7 +190,7 @@ export default function PaymentStep({
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-charcoal/60 transition-transform active:scale-95 hover:text-burgundy"
+          className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-charcoal/65 transition-transform active:scale-95 hover:text-burgundy"
         >
           ← Назад к доставке
         </button>
@@ -207,8 +207,7 @@ export default function PaymentStep({
                 <button
                   key={option.value}
                   type="button"
-                  role="radio"
-                  aria-checked={selected}
+                  aria-pressed={selected}
                   onClick={() => setMethod(option.value)}
                   className={`flex w-full items-center gap-3 border px-4 py-3 text-left transition-all duration-150 active:scale-[0.98] ${
                     selected
@@ -229,7 +228,7 @@ export default function PaymentStep({
                     <span className="block text-sm font-semibold text-charcoal">
                       {option.label}
                     </span>
-                    <span className="block text-xs text-charcoal/50">
+                    <span className="block text-xs text-charcoal/65">
                       {option.hint}
                     </span>
                   </span>
@@ -254,17 +253,17 @@ export default function PaymentStep({
             {method === "card" && (
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="whitespace-nowrap border border-charcoal/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal/60">
+                  <span className="whitespace-nowrap border border-charcoal/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal/65">
                     SberPay
                   </span>
-                  <span className="whitespace-nowrap border border-charcoal/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal/60">
+                  <span className="whitespace-nowrap border border-charcoal/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal/65">
                     T-Pay
                   </span>
-                  <span className="whitespace-nowrap border border-charcoal/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal/50">
+                  <span className="whitespace-nowrap border border-charcoal/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal/65">
                     Тестовый режим
                   </span>
                 </div>
-                <p className="text-xs text-charcoal/50">
+                <p className="text-xs text-charcoal/65">
                   Поля заполнены тестовой картой — реальное списание не
                   выполняется.
                 </p>
@@ -272,11 +271,13 @@ export default function PaymentStep({
                   required
                   type="text"
                   inputMode="numeric"
+                  autoComplete="cc-number"
                   value={cardNumber}
                   onChange={(event) =>
                     setCardNumber(formatCardNumber(event.target.value))
                   }
                   placeholder="0000 0000 0000 0000"
+                  aria-label="Номер карты"
                   maxLength={19}
                   className={inputClass}
                 />
@@ -285,11 +286,13 @@ export default function PaymentStep({
                     required
                     type="text"
                     inputMode="numeric"
+                    autoComplete="cc-exp"
                     value={cardExpiry}
                     onChange={(event) =>
                       setCardExpiry(formatCardExpiry(event.target.value))
                     }
                     placeholder="ММ/ГГ"
+                    aria-label="Срок действия карты, ММ/ГГ"
                     maxLength={5}
                     className={inputClass}
                   />
@@ -297,11 +300,13 @@ export default function PaymentStep({
                     required
                     type="text"
                     inputMode="numeric"
+                    autoComplete="cc-csc"
                     value={cardCvc}
                     onChange={(event) =>
                       setCardCvc(event.target.value.replace(/\D/g, "").slice(0, 3))
                     }
                     placeholder="CVC"
+                    aria-label="CVC-код карты"
                     maxLength={3}
                     className={inputClass}
                   />
@@ -314,9 +319,11 @@ export default function PaymentStep({
                 <input
                   required
                   type="text"
+                  autoComplete="organization"
                   value={companyName}
                   onChange={(event) => setCompanyName(event.target.value)}
                   placeholder="Название компании"
+                  aria-label="Название компании"
                   className={inputClass}
                 />
                 <input
@@ -328,10 +335,11 @@ export default function PaymentStep({
                     setInn(event.target.value.replace(/\D/g, "").slice(0, 12))
                   }
                   placeholder="ИНН"
+                  aria-label="ИНН компании"
                   maxLength={12}
                   className={inputClass}
                 />
-                <p className="text-xs leading-relaxed text-charcoal/60">
+                <p className="text-xs leading-relaxed text-charcoal/65">
                   Счёт с реквизитами придёт на {contact.email || "указанный email"}
                   .
                 </p>

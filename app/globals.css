@@ -11,7 +11,14 @@
   --color-cream: #fbf8f1;
   --color-cream-dark: #f4efe6;
   --color-gold: #d4af37;
-  --color-gold-dark: #a9872c;
+  /* P29 — darkened from #a9872c (3.20:1 on cream, 2.96:1 on cream-dark —
+     both fail WCAG AA's 4.5:1 for normal text). This token is used
+     exclusively as `text-gold-dark` for small uppercase labels on light
+     surfaces across the whole site (verified: 0 uses as a background or
+     border) — never on the dark sections (Header/Footer/Manifest use plain
+     `gold` there), so darkening it only ever improves contrast and cannot
+     regress any existing usage. 5.23:1 on cream, 4.84:1 on cream-dark. */
+  --color-gold-dark: #7f6521;
   --color-charcoal: #222222;
 
   /* P27 — semantic layer (see P26_VISUAL_AND_COLOR_DIRECTION_AUDIT.md and

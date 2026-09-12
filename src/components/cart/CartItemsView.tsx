@@ -16,7 +16,7 @@ export default function CartItemsView({
     <>
       <div className="flex-1 overflow-y-auto px-6 py-6">
         {items.length === 0 ? (
-          <p className="text-sm text-charcoal/60">
+          <p className="text-sm text-charcoal/65">
             Корзина пуста. Выберите лот в каталоге.
           </p>
         ) : (
@@ -31,7 +31,7 @@ export default function CartItemsView({
                     <p className="font-display text-base font-semibold text-burgundy">
                       {item.name}
                     </p>
-                    <p className="text-xs uppercase tracking-[0.1em] text-charcoal/50">
+                    <p className="text-xs uppercase tracking-[0.1em] text-charcoal/65">
                       {item.country} · цельное зерно
                     </p>
 
@@ -64,7 +64,7 @@ export default function CartItemsView({
                       <button
                         type="button"
                         onClick={() => removeItem(item.id)}
-                        className="text-xs uppercase tracking-[0.1em] text-charcoal/50 underline-offset-2 transition-colors hover:text-burgundy hover:underline"
+                        className="text-xs uppercase tracking-[0.1em] text-charcoal/65 underline-offset-2 transition-colors hover:text-burgundy hover:underline"
                       >
                         Удалить
                       </button>
@@ -88,7 +88,7 @@ export default function CartItemsView({
 
       <div className="border-t border-charcoal/15 px-6 py-6">
         <div className="mb-5 flex items-center justify-between">
-          <span className="text-sm uppercase tracking-[0.1em] text-charcoal/60">
+          <span className="text-sm uppercase tracking-[0.1em] text-charcoal/65">
             Итого
           </span>
           <span className="font-display text-xl font-semibold text-burgundy">

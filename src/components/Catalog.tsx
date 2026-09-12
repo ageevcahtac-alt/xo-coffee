@@ -143,6 +143,12 @@ export default function Catalog() {
   };
 
   const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>, lot: Lot) => {
+    // Keydown bubbles from the nested "В корзину" button up to this
+    // card-level listener independently of the button's own click — without
+    // this guard, pressing Enter/Space while focused on that button both
+    // activates it AND opens the Lot Passport modal. Ignore anything that
+    // didn't originate on the card itself (event.currentTarget).
+    if (event.target !== event.currentTarget) return;
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       openLot(lot);

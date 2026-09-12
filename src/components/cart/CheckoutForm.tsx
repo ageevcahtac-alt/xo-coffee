@@ -128,7 +128,7 @@ export default function CheckoutForm({
   };
 
   const inputClass =
-    "w-full border border-charcoal/20 bg-cream-dark px-4 py-3 text-sm text-charcoal placeholder:text-charcoal/40 outline-none transition-colors focus:border-burgundy";
+    "w-full border border-charcoal/20 bg-cream-dark px-4 py-3 text-sm text-charcoal placeholder:text-charcoal/55 outline-none transition-colors focus:border-burgundy";
 
   return (
     <form
@@ -139,7 +139,7 @@ export default function CheckoutForm({
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-charcoal/60 transition-transform active:scale-95 hover:text-burgundy"
+          className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-charcoal/65 transition-transform active:scale-95 hover:text-burgundy"
         >
           ← Назад в корзину
         </button>
@@ -153,8 +153,10 @@ export default function CheckoutForm({
               required
               name="name"
               type="text"
+              autoComplete="name"
               defaultValue={initialValues?.name}
               placeholder="Имя"
+              aria-label="Имя"
               className={inputClass}
             />
             <div>
@@ -163,15 +165,19 @@ export default function CheckoutForm({
                 name="phone"
                 type="tel"
                 inputMode="numeric"
+                autoComplete="tel"
                 value={phone}
                 onFocus={handlePhoneFocus}
                 onChange={handlePhoneChange}
                 placeholder="+7 (9XX) XXX-XX-XX"
+                aria-label="Телефон"
+                aria-invalid={phoneError ? true : undefined}
+                aria-describedby={phoneError ? "phone-error" : undefined}
                 maxLength={18}
                 className={inputClass}
               />
               {phoneError && (
-                <p className="mt-1.5 text-xs text-error">
+                <p id="phone-error" className="mt-1.5 text-xs text-error">
                   Введите номер полностью: +7 (9XX) XXX-XX-XX
                 </p>
               )}
@@ -180,8 +186,10 @@ export default function CheckoutForm({
               required
               name="email"
               type="email"
+              autoComplete="email"
               defaultValue={initialValues?.email}
               placeholder="Email — для чека и трек-номера"
+              aria-label="Email"
               className={inputClass}
             />
           </div>
@@ -224,11 +232,12 @@ export default function CheckoutForm({
             </div>
           ) : (
             <div key="pickup" className="mt-4 animate-[fadeInUp_0.25s_ease-out]">
-              <label className="mb-1.5 block text-xs text-charcoal/50">
+              <label htmlFor="pickupPoint" className="mb-1.5 block text-xs text-charcoal/65">
                 Точка самовывоза
               </label>
               <select
                 required
+                id="pickupPoint"
                 name="pickupPoint"
                 value={pickupPoint}
                 onChange={(event) => setPickupPoint(event.target.value)}
@@ -253,7 +262,7 @@ export default function CheckoutForm({
               <li key={item.id} className="flex justify-between gap-4">
                 <span className="text-charcoal/70">
                   {item.name} × {item.quantity}{" "}
-                  <span className="text-charcoal/40">(цельное зерно)</span>
+                  <span className="text-charcoal/65">(цельное зерно)</span>
                 </span>
                 <span className="font-medium text-charcoal">
                   {formatPrice(item.price * item.quantity)}

@@ -12,7 +12,10 @@ export default function OrderSuccess({
   onClose: () => void;
 }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8 py-10 text-center">
+    <div
+      role="status"
+      className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8 py-10 text-center"
+    >
       <span className="flex h-16 w-16 items-center justify-center rounded-full border border-success text-success">
         <svg
           width="26"
@@ -38,11 +41,11 @@ export default function OrderSuccess({
 
       <div className="mt-6 w-full max-w-xs space-y-2 border border-charcoal/15 bg-cream-dark px-5 py-4 text-left text-sm">
         <div className="flex justify-between">
-          <span className="text-charcoal/50">Получатель</span>
+          <span className="text-charcoal/65">Получатель</span>
           <span className="font-medium">{order.name}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-charcoal/50">Получение</span>
+          <span className="text-charcoal/65">Получение</span>
           <span className="font-medium">
             {order.fulfillment === "pickup"
               ? "Самовывоз"
@@ -50,20 +53,20 @@ export default function OrderSuccess({
           </span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="shrink-0 text-charcoal/50">
+          <span className="shrink-0 text-charcoal/65">
             {order.fulfillment === "pickup" ? "Точка" : "Адрес"}
           </span>
           <span className="text-right font-medium">{order.address}</span>
         </div>
         <div className="flex justify-between gap-4">
-          <span className="shrink-0 text-charcoal/50">Оплата</span>
+          <span className="shrink-0 text-charcoal/65">Оплата</span>
           <span className="text-right font-medium">
             {PAYMENT_LABELS[order.paymentMethod]}
           </span>
         </div>
       </div>
 
-      <p className="mt-6 text-xs uppercase tracking-[0.1em] text-charcoal/50">
+      <p className="mt-6 text-xs uppercase tracking-[0.1em] text-charcoal/65">
         Чек и трек-номер придут на {order.email}
       </p>
 
