@@ -283,12 +283,20 @@ function LotPassportContent({
                   ))}
                 </div>
               )}
-              <p className="mt-3 text-sm leading-relaxed text-burgundy/80">
-                <span className="font-semibold text-burgundy">
-                  Кому понравится:{" "}
-                </span>
-                {whoLikesIt}
-              </p>
+              {lot.description ? (
+                <p className="mt-3 text-sm leading-relaxed text-burgundy/80">
+                  {lot.description}
+                </p>
+              ) : (
+                (lot.flavorProfile || entry) && (
+                  <p className="mt-3 text-sm leading-relaxed text-burgundy/80">
+                    <span className="font-semibold text-burgundy">
+                      Кому понравится:{" "}
+                    </span>
+                    {whoLikesIt}
+                  </p>
+                )
+              )}
               {myTastings.length > 0 && (
                 <p className="mt-2 text-sm leading-relaxed text-burgundy/80">
                   <span className="font-semibold text-burgundy">

@@ -383,15 +383,17 @@ export default function Catalog() {
                         strong flavor statement rather than two competing
                         ones (P26/P27: card decompression, content unchanged
                         from what LotPassportModal already repeats in full). */}
-                    <p className="mt-2 text-xs leading-relaxed text-text/60 line-clamp-2">
-                      {lot.description ??
-                        getWhoLikesIt(
-                          lot,
-                          characterDirection
-                            ? FLAVOR_DIRECTION_PROFILES[characterDirection].reason
-                            : null,
-                        )}
-                    </p>
+                    {(lot.description || lot.flavorProfile || entry) && (
+                      <p className="mt-2 text-xs leading-relaxed text-text/60 line-clamp-2">
+                        {lot.description ??
+                          getWhoLikesIt(
+                            lot,
+                            characterDirection
+                              ? FLAVOR_DIRECTION_PROFILES[characterDirection].reason
+                              : null,
+                          )}
+                      </p>
+                    )}
 
                     {/* Brew tip, origin specs, and the whole-bean fact were
                         three separate lines before P27 — same information,

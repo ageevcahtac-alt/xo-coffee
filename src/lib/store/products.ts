@@ -1,4 +1,9 @@
 /**
+ * DEPRECATED SCAFFOLD (P22/P25) — not imported by any route, component or the
+ * storefront catalog. Admin Panel now owns product management and publishing;
+ * the Store reads it via src/lib/store/catalog.ts. Do not build on this file or
+ * on public.products; kept only as history until it is removed deliberately.
+ *
  * SERVER-ONLY. Never import from a "use client" file.
  *
  * Store Product domain layer — the one place that is allowed to (a) read/
