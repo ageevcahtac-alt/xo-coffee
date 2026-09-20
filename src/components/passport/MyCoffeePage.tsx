@@ -5,7 +5,7 @@ import Link from "next/link";
 import LotPassportModal from "@/src/components/LotPassportModal";
 import { useCart } from "@/src/context/CartContext";
 import { useDiscovery } from "@/src/context/DiscoveryContext";
-import { LOTS } from "@/src/data/lots";
+import { useCatalog } from "@/src/context/CatalogContext";
 import { formatPrice } from "@/src/lib/format";
 import { getBrewHighlight } from "@/src/lib/lotPresentation";
 import { getAllTastingRecords, getTastingRecordsForLot } from "@/src/lib/coffeePassport";
@@ -42,6 +42,7 @@ function formatTastingDate(iso: string) {
 export default function MyCoffeePage() {
   const { addItem, flyToCart } = useCart();
   const { openDiscovery } = useDiscovery();
+  const { lots: LOTS } = useCatalog();
   const [hydrated, setHydrated] = useState(false);
   const [tastings, setTastings] = useState<TastingRecord[]>([]);
   const [passportLotId, setPassportLotId] = useState<string | null>(null);
@@ -58,12 +59,12 @@ export default function MyCoffeePage() {
 
   const context: PersonalTasteContext = useMemo(
     () => buildPersonalTasteContext(LOTS, tastings),
-    [tastings],
+    [LOTS, tastings],
   );
 
   const recommendations: DiscoveryResult[] = useMemo(
     () => (hydrated ? getPersonalRecommendations(LOTS, context) : []),
-    [hydrated, context],
+    [hydrated, context, LOTS],
   );
 
   const tastedLots = useMemo(
@@ -77,7 +78,7 @@ export default function MyCoffeePage() {
           liked: context.likedLotIds.includes(lot.id),
           disliked: context.dislikedLotIds.includes(lot.id),
         })),
-    [context],
+    [context, LOTS],
   );
 
   const passportLot = passportLotId ? (LOTS.find((lot) => lot.id === passportLotId) ?? null) : null;
@@ -139,7 +140,7 @@ export default function MyCoffeePage() {
                     className="flex flex-col rounded-xl border border-border bg-cream-dark/60 p-5 text-text"
                   >
                     <h3 className="font-display text-lg font-semibold text-burgundy">
-                      {result.lot.country}
+                      {result.lot.country || result.lot.name}
                     </h3>
                     <p className="text-xs uppercase tracking-[0.08em] text-burgundy/65">
                       {result.lot.region}
@@ -196,10 +197,10 @@ export default function MyCoffeePage() {
                 >
                   <span className="min-w-0">
                     <span className="block truncate font-display text-base font-semibold text-burgundy">
-                      {lot.country}
+                      {lot.country || lot.name}
                     </span>
                     <span className="block text-xs uppercase tracking-[0.08em] text-text/65">
-                      {lot.region} · {count === 1 ? "1 дегустация" : `${count} дегустаций`}
+                      {lot.region ? `${lot.region} · ` : ""}{count === 1 ? "1 дегустация" : `${count} дегустаций`}
                     </span>
                   </span>
                   {liked && (
@@ -234,7 +235,7 @@ export default function MyCoffeePage() {
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span className="font-display text-base font-semibold text-burgundy">
-                        {lot ? lot.country : "Лот больше не в каталоге"}
+                        {lot ? lot.country || lot.name : "Лот больше не в каталоге"}
                         {record.component ? ` · ${record.component}` : ""}
                       </span>
                       <span className="text-xs uppercase tracking-[0.08em] text-text/65">

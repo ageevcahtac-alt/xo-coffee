@@ -23,7 +23,7 @@ import {
   getTastingRecordsForLot,
 } from "@/src/lib/coffeePassport";
 import { getCoffeePassportUrl } from "@/src/lib/coffeePassportLink";
-import { LOTS } from "@/src/data/lots";
+import { useCatalog } from "@/src/context/CatalogContext";
 import type { Lot } from "@/src/types/lot";
 
 const BREW_LABELS = {
@@ -98,6 +98,7 @@ function LotPassportContent({
   position: { index: number; total: number } | null;
 }) {
   const { addItem, flyToCart } = useCart();
+  const { lots: LOTS } = useCatalog();
   const [quantity, setQuantity] = useState(1);
   const entry = isEntryProduct(lot);
   const brewHighlight = getBrewHighlight(lot);
@@ -167,7 +168,7 @@ function LotPassportContent({
               </span>
               <div className="mt-1 flex items-center gap-2">
                 <h2 className="font-display text-2xl font-semibold text-burgundy">
-                  {lot.country}
+                  {lot.country || lot.name}
                 </h2>
                 {typeof lot.qScore === "number" && (
                   <span
@@ -459,7 +460,7 @@ function LotPassportContent({
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <p className="font-display text-base font-semibold text-burgundy">
-                              {similarLot.country}
+                              {similarLot.country || similarLot.name}
                             </p>
                             <p className="text-xs uppercase tracking-[0.08em] text-charcoal/65">
                               {similarLot.region}

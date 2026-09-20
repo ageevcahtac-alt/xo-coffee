@@ -5,7 +5,7 @@ import Modal from "@/src/components/ui/Modal";
 import LotPassportModal from "@/src/components/LotPassportModal";
 import { useDiscovery } from "@/src/context/DiscoveryContext";
 import { useCart } from "@/src/context/CartContext";
-import { LOTS } from "@/src/data/lots";
+import { useCatalog } from "@/src/context/CatalogContext";
 import { formatPrice } from "@/src/lib/format";
 import { getBrewHighlight } from "@/src/lib/lotPresentation";
 import { getLikedDislikedLotIds } from "@/src/lib/coffeePassport";
@@ -51,6 +51,7 @@ function AnswerButton({
 export default function DiscoveryModal() {
   const { isOpen, closeDiscovery } = useDiscovery();
   const { addItem, flyToCart } = useCart();
+  const { lots: LOTS } = useCatalog();
 
   const [step, setStep] = useState(0);
   const [taste, setTaste] = useState<TasteAnswer | null>(null);
@@ -65,7 +66,7 @@ export default function DiscoveryModal() {
     // actually tasted something.
     const history = getLikedDislikedLotIds();
     return getDiscoveryRecommendations(LOTS, { taste, brew, novelty }, 3, history);
-  }, [taste, brew, novelty]);
+  }, [taste, brew, novelty, LOTS]);
 
   const restart = () => {
     setStep(0);
@@ -206,7 +207,7 @@ export default function DiscoveryModal() {
                         {result.lot.name}
                       </span>
                       <h3 className="font-display text-lg font-semibold text-burgundy">
-                        {result.lot.country}
+                        {result.lot.country || result.lot.name}
                       </h3>
                       <p className="text-xs uppercase tracking-[0.1em] text-burgundy/65">
                         {result.lot.region}

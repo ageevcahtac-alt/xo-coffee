@@ -11,7 +11,7 @@ import {
   type RegionCountry,
   type TopCategoryId,
 } from "@/src/data/categories";
-import { LOTS } from "@/src/data/lots";
+import { useCatalog } from "@/src/context/CatalogContext";
 import type { Lot } from "@/src/types/lot";
 import {
   getBrewHighlight,
@@ -30,6 +30,7 @@ import { getLikedDislikedLotIds } from "@/src/lib/coffeePassport";
 
 export default function Catalog() {
   const { addItem, flyToCart } = useCart();
+  const { lots, status: catalogStatus } = useCatalog();
   const { openDiscovery } = useDiscovery();
   const [activeSection, setActiveSection] = useState<TopCategoryId>("all");
   const [activeCountry, setActiveCountry] = useState<RegionCountry | null>(
@@ -66,15 +67,15 @@ export default function Catalog() {
     });
   };
 
-  const regionLots = LOTS.filter((lot) =>
+  const regionLots = lots.filter((lot) =>
     REGION_COUNTRIES.includes(lot.country as RegionCountry),
   );
 
   const visibleLots =
     activeSection === "all"
-      ? LOTS
+      ? lots
       : activeSection === "specialty-set"
-        ? LOTS.filter((lot) => lot.category === "specialty-set")
+        ? lots.filter((lot) => lot.category === "specialty-set")
         : activeSection === "region"
           ? activeCountry
             ? regionLots.filter((lot) => lot.country === activeCountry)
@@ -87,7 +88,7 @@ export default function Catalog() {
 
   // Only the first entry-product card gets the #degustation anchor id, so
   // adding a second specialty-set lot later can't create a duplicate DOM id.
-  const firstEntryLotId = LOTS.find((lot) => isEntryProduct(lot))?.id ?? null;
+  const firstEntryLotId = lots.find((lot) => isEntryProduct(lot))?.id ?? null;
 
   // Keep activeIndex alive through the closing animation (Modal fades out
   // over ~400ms) so the displayed lot doesn't disappear mid-transition.
@@ -138,7 +139,7 @@ export default function Catalog() {
       setActiveCountry(null);
       setActiveFlavor(null);
     });
-    const indexInAll = LOTS.findIndex((l) => l.id === lotId);
+    const indexInAll = lots.findIndex((l) => l.id === lotId);
     lotTransition.runTransition(() => setActiveIndex(indexInAll === -1 ? null : indexInAll));
   };
 
@@ -279,7 +280,19 @@ export default function Catalog() {
         <div
           className={`transition-all duration-300 ease-in-out ${gridTransition.className}`}
         >
-          {orderedLots.length === 0 ? (
+          {catalogStatus === "unavailable" ? (
+            <div
+              role="status"
+              className="rounded-xl border border-dashed border-border bg-cream-dark px-8 py-16 text-center"
+            >
+              <p className="font-display text-xl font-semibold text-burgundy">
+                Каталог временно недоступен
+              </p>
+              <p className="mt-2 text-sm text-text/60">
+                Мы уже разбираемся — обновите страницу через несколько минут.
+              </p>
+            </div>
+          ) : orderedLots.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border bg-cream-dark px-8 py-16 text-center">
               <p className="font-display text-xl font-semibold text-burgundy">
                 Скоро в каталоге
@@ -329,11 +342,13 @@ export default function Catalog() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <h3 className="font-display text-xl font-semibold text-burgundy">
-                          {lot.country}
+                          {lot.country || lot.name}
                         </h3>
-                        <p className="text-xs uppercase tracking-[0.1em] text-text/65">
-                          {lot.region}
-                        </p>
+                        {lot.region && (
+                          <p className="text-xs uppercase tracking-[0.1em] text-text/65">
+                            {lot.region}
+                          </p>
+                        )}
                       </div>
                       {typeof lot.qScore === "number" && (
                         <span
@@ -369,12 +384,13 @@ export default function Catalog() {
                         ones (P26/P27: card decompression, content unchanged
                         from what LotPassportModal already repeats in full). */}
                     <p className="mt-2 text-xs leading-relaxed text-text/60 line-clamp-2">
-                      {getWhoLikesIt(
-                        lot,
-                        characterDirection
-                          ? FLAVOR_DIRECTION_PROFILES[characterDirection].reason
-                          : null,
-                      )}
+                      {lot.description ??
+                        getWhoLikesIt(
+                          lot,
+                          characterDirection
+                            ? FLAVOR_DIRECTION_PROFILES[characterDirection].reason
+                            : null,
+                        )}
                     </p>
 
                     {/* Brew tip, origin specs, and the whole-bean fact were

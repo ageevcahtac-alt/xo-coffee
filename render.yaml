@@ -19,3 +19,7 @@ services:
         sync: false
       - key: COFFEE_PASSPORT_INTEGRATION_SECRET
         sync: false
+      - key: ADMIN_INTEGRATION_URL
+        sync: false
+      - key: ADMIN_INTEGRATION_SECRET
+        sync: false

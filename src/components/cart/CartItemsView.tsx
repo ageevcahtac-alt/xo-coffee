@@ -42,7 +42,7 @@ export default function CartItemsView({
                       {item.name}
                     </p>
                     <p className="text-xs uppercase tracking-[0.1em] text-charcoal/65">
-                      {item.country} · цельное зерно
+                      {item.country ? `${item.country} · ` : ""}цельное зерно
                     </p>
 
                     <div className="mt-3 flex items-center gap-3">

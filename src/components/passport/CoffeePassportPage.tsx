@@ -6,7 +6,7 @@ import LotPassportModal from "@/src/components/LotPassportModal";
 import CoffeePassportDetail from "@/src/components/passport/CoffeePassportDetail";
 import { useDiscovery } from "@/src/context/DiscoveryContext";
 import { getOrderRecord } from "@/src/lib/coffeePassport";
-import { LOTS } from "@/src/data/lots";
+import { useCatalog } from "@/src/context/CatalogContext";
 import type { OrderRecord } from "@/src/types/coffeePassport";
 import type { Lot } from "@/src/types/lot";
 
@@ -14,6 +14,7 @@ type LoadState = "loading" | "not-found" | "ready";
 
 export default function CoffeePassportPage({ orderNumber }: { orderNumber: string }) {
   const { openDiscovery } = useDiscovery();
+  const { lots: LOTS } = useCatalog();
   const [state, setState] = useState<LoadState>("loading");
   const [order, setOrder] = useState<OrderRecord | null>(null);
   const [selectedLotId, setSelectedLotId] = useState<string | null>(null);
@@ -34,7 +35,7 @@ export default function CoffeePassportPage({ orderNumber }: { orderNumber: strin
     );
     setSelectedLotId(firstResolvable?.lotId ?? null);
     setState("ready");
-  }, [orderNumber]);
+  }, [orderNumber, LOTS]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const resolvedItems = useMemo(() => {
@@ -43,7 +44,7 @@ export default function CoffeePassportPage({ orderNumber }: { orderNumber: strin
       item,
       lot: LOTS.find((lot) => lot.id === item.lotId) ?? null,
     }));
-  }, [order]);
+  }, [order, LOTS]);
 
   const resolvedLots = useMemo(
     () => resolvedItems.map(({ lot }) => lot).filter((lot): lot is Lot => lot !== null),

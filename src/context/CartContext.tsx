@@ -10,6 +10,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useCatalog } from "@/src/context/CatalogContext";
+import { reconcileCartItems } from "@/src/lib/cartReconcile";
 
 export type CartItem = {
   id: string;
@@ -76,6 +78,7 @@ function isValidCartItem(value: unknown): value is CartItem {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { status: catalogStatus, lots: catalogLots } = useCatalog();
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -109,6 +112,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setHydrated(true);
   }, []);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  // Only against a successfully loaded catalog — an Admin outage must never
+  // wipe a customer's cart.
+  useEffect(() => {
+    if (!hydrated || catalogStatus !== "ok") return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setItems((prev) => reconcileCartItems(prev, catalogLots));
+  }, [hydrated, catalogStatus, catalogLots]);
 
   useEffect(() => {
     if (!hydrated) return;

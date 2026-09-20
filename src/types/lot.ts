@@ -31,6 +31,12 @@ export type FlavorProfile = {
 export type Lot = {
   id: string;
   name: string;
+  /** Present on catalog entries sourced from Admin (see
+   *  src/lib/store/catalog.ts); absent on the legacy static demo lots. */
+  slug?: string;
+  description?: string;
+  /** Opaque Coffee Passport reference — never dereferenced by the catalog. */
+  passportPublicId?: string;
   category: LotCategory;
   tags: string[];
   country: string;

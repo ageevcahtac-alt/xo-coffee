@@ -196,10 +196,10 @@ export default function CoffeePassportDetail({
           Что вы купили
         </span>
         <h3 className="mt-1 font-display text-xl font-semibold text-burgundy">
-          {lot.country}
+          {lot.country || lot.name}
         </h3>
         <p className="text-xs uppercase tracking-[0.1em] text-burgundy/65">
-          {lot.region} · {lot.name}
+          {lot.region ? `${lot.region} · ${lot.name}` : lot.name}
         </p>
         {lot.cupNote && (
           <p className="mt-3 font-display text-base italic leading-relaxed text-burgundy">
