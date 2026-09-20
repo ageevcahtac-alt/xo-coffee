@@ -118,6 +118,18 @@ describe("getCatalog", () => {
 describe("Admin products through the legacy cart and checkout", () => {
   const lot = mapAdminProductToLot(product);
 
+  function stubAdminCatalog() {
+    vi.stubEnv("ADMIN_INTEGRATION_URL", "https://admin.example.test/products");
+    vi.stubEnv("ADMIN_INTEGRATION_SECRET", SECRET);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(jsonResponse({ products: [product] })));
+  }
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
   it("reconcile drops unpublished lines and refreshes price/name from the catalog", () => {
     const items: CartItem[] = [
       { id: lot.id, name: "Old name", country: "", price: 999, quantity: 2 },
@@ -135,7 +147,35 @@ describe("Admin products through the legacy cart and checkout", () => {
     expect(reconcileCartItems(items, [lot])).toBe(items);
   });
 
+  it("/api/order flags an order whose price differs from the Admin catalog, without rejecting it", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.stubEnv("TELEGRAM_BOT_TOKEN", "");
+    vi.stubEnv("TELEGRAM_CHAT_ID", "");
+    stubAdminCatalog();
+    const response = await postOrder(
+      new Request("http://localhost/api/order", {
+        method: "POST",
+        body: JSON.stringify({
+          orderNumber: "XO-TEST-2",
+          name: "Test",
+          phone: "+70000000000",
+          email: "t@example.test",
+          delivery: { method: "pickup", carrier: "", address: "" },
+          payment: { method: "sbp" },
+          items: [
+            { lotId: product.id, name: product.name, quantity: 1, price: 1, packaging: "whole-bean" },
+          ],
+          total: 1,
+        }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(String(log.mock.calls[0]?.[0])).toContain("расхождение с каталогом");
+    vi.unstubAllEnvs();
+  });
+
   it("/api/order accepts an order built from an Admin product", async () => {
+    stubAdminCatalog();
     vi.spyOn(console, "log").mockImplementation(() => {});
     vi.stubEnv("TELEGRAM_BOT_TOKEN", "");
     vi.stubEnv("TELEGRAM_CHAT_ID", "");

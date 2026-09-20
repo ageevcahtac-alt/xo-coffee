@@ -13,8 +13,6 @@ services:
         sync: false
       - key: TELEGRAM_CHAT_ID
         sync: false
-      - key: ADMIN_PASSWORD
-        sync: false
       - key: COFFEE_PASSPORT_INTEGRATION_URL
         sync: false
       - key: COFFEE_PASSPORT_INTEGRATION_SECRET

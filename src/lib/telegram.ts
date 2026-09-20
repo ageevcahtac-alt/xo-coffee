@@ -17,7 +17,7 @@ function escapeHtml(value: string) {
     .replace(/>/g, "&gt;");
 }
 
-function buildOrderMessage(order: OrderPayload) {
+function buildOrderMessage(order: OrderPayload, warnings: string[]) {
   const paymentLabel = PAYMENT_METHOD_LABELS[order.payment.method];
   const locationLine =
     order.delivery.method === "pickup"
@@ -44,14 +44,21 @@ function buildOrderMessage(order: OrderPayload) {
     ),
     DIVIDER,
     `💰 <b>ИТОГО К ОПЛАТЕ: ${formatPrice(order.total)}</b>`,
+    ...(warnings.length > 0
+      ? [
+          DIVIDER,
+          "⚠️ <b>Проверьте заказ — расхождение с каталогом:</b>",
+          ...warnings.map((warning) => `• ${escapeHtml(warning)}`),
+        ]
+      : []),
   ];
   return lines.join("\n");
 }
 
-export async function sendOrderToTelegram(order: OrderPayload) {
+export async function sendOrderToTelegram(order: OrderPayload, warnings: string[] = []) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
-  const text = buildOrderMessage(order);
+  const text = buildOrderMessage(order, warnings);
 
   if (!token || !chatId) {
     console.log(
