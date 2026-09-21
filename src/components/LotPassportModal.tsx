@@ -150,7 +150,7 @@ function LotPassportContent({
   // null until the external Coffee Passport platform's URL template is
   // configured — see src/lib/coffeePassportLink.ts. No link renders until
   // then; this is not a placeholder link to a guessed destination.
-  const coffeePassportUrl = getCoffeePassportUrl(lot.id);
+  const coffeePassportUrl = getCoffeePassportUrl(lot);
 
   const handleAdd = (event: MouseEvent<HTMLButtonElement>) => {
     if (!variant) return;

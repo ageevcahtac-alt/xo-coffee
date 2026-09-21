@@ -4,6 +4,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { useCart } from "@/src/context/CartContext";
 import { formatPrice } from "@/src/lib/format";
 import { getDeliveryFee } from "@/src/lib/shop";
+import { mergeOrderItemsByLot } from "@/src/lib/coffeePassport";
 import { submitOrder } from "@/src/lib/checkout/submitOrder";
 import { createSubmitLock } from "@/src/lib/checkout/submitLock";
 import {
@@ -179,11 +180,14 @@ export default function PaymentStep({
           orderNumber,
           paymentMethod: method,
           company,
-          items: items.map((item) => ({
-            lotId: item.productId,
-            name: item.name,
-            quantity: item.quantity,
-          })),
+          // One Passport entry per coffee, whatever packagings were bought.
+          items: mergeOrderItemsByLot(
+            items.map((item) => ({
+              lotId: item.productId,
+              name: item.name,
+              quantity: item.quantity,
+            })),
+          ),
         });
       } finally {
         setSubmitting(false);

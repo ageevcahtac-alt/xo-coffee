@@ -135,8 +135,28 @@ export function createTastingId(lotId: string): string {
   return `${lotId}-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`;
 }
 
-export function saveOrderRecord(record: OrderRecord): void {
-  if (!isValidOrderRecord(record)) return;
+/**
+ * One entry per Canonical Lot. A cart line is a packaging (variant), so an
+ * order of 250 g + 1 kg of the same coffee arrives here as two items with the
+ * same `lotId`; for the Passport that is ONE coffee, with the quantities
+ * summed. The variant is commercial data (cart / Admin order) and is
+ * deliberately not part of this record.
+ */
+export function mergeOrderItemsByLot(items: OrderRecordItem[]): OrderRecordItem[] {
+  const merged = new Map<string, OrderRecordItem>();
+  for (const item of items) {
+    const existing = merged.get(item.lotId);
+    merged.set(
+      item.lotId,
+      existing ? { ...existing, quantity: existing.quantity + item.quantity } : { ...item },
+    );
+  }
+  return [...merged.values()];
+}
+
+export function saveOrderRecord(input: OrderRecord): void {
+  if (!isValidOrderRecord(input)) return;
+  const record = { ...input, items: mergeOrderItemsByLot(input.items) };
   const existing = readArray(ORDERS_KEY).filter(isValidOrderRecord);
   const withoutDuplicate = existing.filter(
     (order) => order.orderNumber !== record.orderNumber,
@@ -147,7 +167,9 @@ export function saveOrderRecord(record: OrderRecord): void {
 export function getOrderRecord(orderNumber: string): OrderRecord | null {
   if (!isNonEmptyString(orderNumber)) return null;
   const all = readArray(ORDERS_KEY).filter(isValidOrderRecord);
-  return all.find((order) => order.orderNumber === orderNumber) ?? null;
+  const found = all.find((order) => order.orderNumber === orderNumber);
+  // Orders saved before packaging variants may hold one lot several times.
+  return found ? { ...found, items: mergeOrderItemsByLot(found.items) } : null;
 }
 
 export function saveTastingRecord(record: TastingRecord): void {

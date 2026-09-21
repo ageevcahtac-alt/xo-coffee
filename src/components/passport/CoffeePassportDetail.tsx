@@ -7,6 +7,7 @@ import {
   getTastingRecordsForLot,
   saveTastingRecord,
 } from "@/src/lib/coffeePassport";
+import { getPassportContinuation } from "@/src/lib/passportContinuation";
 import { getWhoLikesIt, isEntryProduct } from "@/src/lib/lotPresentation";
 import { FLAVOR_DIRECTION_PROFILES, getBestFlavorDirection } from "@/src/lib/flavorMatch";
 import type { BrewMethodKey, MyCupRating, TastingRecord } from "@/src/types/coffeePassport";
@@ -121,12 +122,15 @@ export default function CoffeePassportDetail({
   const [rating, setRating] = useState<MyCupRating>(BLANK_RATING);
   const [note, setNote] = useState("");
   const [savedFlash, setSavedFlash] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
+  const continuation = getPassportContinuation(lot);
 
   // localStorage is only available client-side — load after mount, same
   // reasoning as CartContext, to avoid a server/client hydration mismatch.
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setRecords(getTastingRecordsForLot(lot.id));
+    setJustSaved(false);
     setHydrated(true);
     setEditingId(null);
     setBrewMethod(firstAvailableBrewMethod(lot));
@@ -176,6 +180,7 @@ export default function CoffeePassportDetail({
     setRecords(getTastingRecordsForLot(lot.id));
     setEditingId(id);
     setSavedFlash(true);
+    setJustSaved(true);
   };
 
   const setRatingAxis = (key: keyof MyCupRating, value: number) =>
@@ -349,6 +354,33 @@ export default function CoffeePassportDetail({
           )}
         </div>
       </section>
+
+      {/* Next step once the first tasting is saved — never a dead end */}
+      {justSaved && continuation && (
+        <section
+          role="status"
+          className="border border-accent/40 bg-accent-surface p-5"
+        >
+          <h3 className="font-display text-lg font-semibold text-burgundy">
+            {continuation.headline}
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-charcoal/75">{continuation.body}</p>
+          <p className="mt-3 text-sm leading-relaxed text-charcoal/75">
+            Войдите или зарегистрируйтесь в Coffee Passport, чтобы:
+          </p>
+          <ul className="mt-1 list-disc pl-5 text-sm text-charcoal/75">
+            {continuation.benefits.map((benefit) => (
+              <li key={benefit}>{benefit}</li>
+            ))}
+          </ul>
+          <a
+            href={continuation.href}
+            className="mt-4 flex h-11 items-center justify-center bg-burgundy px-6 text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark sm:inline-flex"
+          >
+            {continuation.ctaLabel}
+          </a>
+        </section>
+      )}
 
       {/* Tasting history for this lot */}
       {hydrated && records.length > 0 && (
