@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCart } from "@/src/context/CartContext";
 import { formatPrice } from "@/src/lib/format";
+import { formatWeight } from "@/src/lib/variants";
 import WholeBeanNotice from "@/src/components/WholeBeanNotice";
 import FreeShippingBar from "@/src/components/cart/FreeShippingBar";
 
@@ -34,7 +35,7 @@ export default function CartItemsView({
             <ul className="space-y-6">
               {items.map((item) => (
                 <li
-                  key={item.id}
+                  key={item.variantId}
                   className="flex gap-4 border-b border-charcoal/10 pb-6"
                 >
                   <div className="flex-1">
@@ -42,7 +43,7 @@ export default function CartItemsView({
                       {item.name}
                     </p>
                     <p className="text-xs uppercase tracking-[0.1em] text-charcoal/65">
-                      {item.country ? `${item.country} · ` : ""}цельное зерно
+                      {item.country ? `${item.country} · ` : ""}{formatWeight(item.weightGrams)} · цельное зерно
                     </p>
 
                     <div className="mt-3 flex items-center gap-3">
@@ -51,7 +52,7 @@ export default function CartItemsView({
                           type="button"
                           aria-label="Уменьшить количество"
                           onClick={() =>
-                            setQuantity(item.id, item.quantity - 1)
+                            setQuantity(item.variantId, item.quantity - 1)
                           }
                           className="flex h-11 w-11 items-center justify-center text-charcoal/70 transition-transform active:scale-90 hover:text-burgundy"
                         >
@@ -64,7 +65,7 @@ export default function CartItemsView({
                           type="button"
                           aria-label="Увеличить количество"
                           onClick={() =>
-                            setQuantity(item.id, item.quantity + 1)
+                            setQuantity(item.variantId, item.quantity + 1)
                           }
                           className="flex h-11 w-11 items-center justify-center text-charcoal/70 transition-transform active:scale-90 hover:text-burgundy"
                         >
@@ -73,7 +74,7 @@ export default function CartItemsView({
                       </div>
                       <button
                         type="button"
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(item.variantId)}
                         className="text-xs uppercase tracking-[0.1em] text-charcoal/65 underline-offset-2 transition-colors hover:text-burgundy hover:underline"
                       >
                         Удалить

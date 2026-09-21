@@ -3,6 +3,7 @@
 import { useState, type ChangeEvent, type FocusEvent, type FormEvent } from "react";
 import { useCart } from "@/src/context/CartContext";
 import { formatPrice } from "@/src/lib/format";
+import { formatWeight } from "@/src/lib/variants";
 import { getDeliveryFee } from "@/src/lib/shop";
 import FreeShippingBar from "@/src/components/cart/FreeShippingBar";
 import SegmentedControl from "@/src/components/ui/SegmentedControl";
@@ -259,10 +260,10 @@ export default function CheckoutForm({
           </h3>
           <ul className="mt-4 space-y-2 text-sm">
             {items.map((item) => (
-              <li key={item.id} className="flex justify-between gap-4">
+              <li key={item.variantId} className="flex justify-between gap-4">
                 <span className="text-charcoal/70">
                   {item.name} × {item.quantity}{" "}
-                  <span className="text-charcoal/65">(цельное зерно)</span>
+                  <span className="text-charcoal/65">({formatWeight(item.weightGrams)}, цельное зерно)</span>
                 </span>
                 <span className="font-medium text-charcoal">
                   {formatPrice(item.price * item.quantity)}

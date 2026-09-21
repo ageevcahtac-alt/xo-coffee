@@ -13,6 +13,13 @@
 
 /** The exact Admin wire contract, snake_case kept verbatim (see
  *  coffeePassportClient.ts for why external contracts are not remapped). */
+export type AdminStoreVariant = {
+  id: string;
+  weight_grams: number;
+  price: number;
+  available_for_order: boolean;
+};
+
 export type AdminStoreProduct = {
   id: string;
   slug: string;
@@ -21,6 +28,8 @@ export type AdminStoreProduct = {
   price: number;
   passport_public_id: string | null;
   updated_at: string;
+  /** Absent on feeds that predate packaging variants. */
+  variants?: AdminStoreVariant[];
 };
 
 export type AdminStoreProductsError =
@@ -56,6 +65,21 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function isValidVariant(value: unknown): value is AdminStoreVariant {
+  if (!value || typeof value !== "object") return false;
+  const variant = value as Record<string, unknown>;
+  return (
+    isNonEmptyString(variant.id) &&
+    typeof variant.weight_grams === "number" &&
+    Number.isFinite(variant.weight_grams) &&
+    variant.weight_grams > 0 &&
+    typeof variant.price === "number" &&
+    Number.isFinite(variant.price) &&
+    variant.price >= 0 &&
+    typeof variant.available_for_order === "boolean"
+  );
+}
+
 function isValidProduct(value: unknown): value is AdminStoreProduct {
   if (!value || typeof value !== "object") return false;
   const product = value as Record<string, unknown>;
@@ -69,8 +93,26 @@ function isValidProduct(value: unknown): value is AdminStoreProduct {
     product.price >= 0 &&
     (product.passport_public_id === null ||
       typeof product.passport_public_id === "string") &&
-    isNonEmptyString(product.updated_at)
+    isNonEmptyString(product.updated_at) &&
+    (product.variants === undefined ||
+      (Array.isArray(product.variants) && product.variants.every(isValidVariant)))
   );
+}
+
+/** Copies variants field by field, so anything else Admin might send (in
+ *  particular a stock figure) never enters Store memory, props or the
+ *  browser. */
+function sanitizeProduct(product: AdminStoreProduct): AdminStoreProduct {
+  if (product.variants === undefined) return product;
+  return {
+    ...product,
+    variants: product.variants.map((variant) => ({
+      id: variant.id,
+      weight_grams: variant.weight_grams,
+      price: variant.price,
+      available_for_order: variant.available_for_order,
+    })),
+  };
 }
 
 /**
@@ -135,5 +177,90 @@ export async function fetchAdminPublishedProducts(): Promise<AdminStoreProductsR
     };
   }
 
-  return { ok: true, products };
+  return { ok: true, products: products.map(sanitizeProduct) };
+}
+
+// ---------------------------------------------------------------------------
+// Orders — `POST .../api/integrations/xo-store/orders`
+// ---------------------------------------------------------------------------
+
+/** The whole order body Store sends. Deliberately nothing but the variant and
+ *  the count: Admin looks up price, weight, lot and stock itself. */
+export type AdminOrderRequest = {
+  customer_name?: string;
+  customer_contact?: string;
+  items: { variant_id: string; quantity: number }[];
+};
+
+export type AdminOrderResult =
+  | { ok: true; orderId: string }
+  | {
+      ok: false;
+      /** `rejected`: Admin understood the order and refused it (unknown /
+       *  inactive variant, unpublished product) — retrying unchanged won't
+       *  help. Everything else is a transient or configuration failure. */
+      error: "not_configured" | "unauthorized" | "rejected" | "unavailable" | "invalid_contract";
+      /** Admin's own message for `rejected`; safe to log, not to show. */
+      detail?: string;
+    };
+
+/** The orders endpoint is a sibling of the products endpoint, so it is
+ *  derived from the one existing ADMIN_INTEGRATION_URL (`.../products`)
+ *  rather than introducing a second env var. Anything that doesn't end in
+ *  `/products` is treated as not configured — never guessed. */
+export function getAdminOrdersUrl(productsUrl: string | undefined): string | null {
+  if (!productsUrl) return null;
+  try {
+    const url = new URL(productsUrl);
+    if (!/\/products\/?$/.test(url.pathname)) return null;
+    url.pathname = url.pathname.replace(/\/products\/?$/, "/orders");
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+/** Creates the order in Admin. Never throws; a non-201 is never a success. */
+export async function placeAdminOrder(request: AdminOrderRequest): Promise<AdminOrderResult> {
+  const url = getAdminOrdersUrl(process.env.ADMIN_INTEGRATION_URL);
+  const secret = process.env.ADMIN_INTEGRATION_SECRET;
+  if (!url || !secret) return { ok: false, error: "not_configured" };
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      cache: "no-store",
+    });
+  } catch {
+    return { ok: false, error: "unavailable" };
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    return { ok: false, error: "unauthorized" };
+  }
+  if (response.status === 400 || response.status === 422) {
+    let detail: string | undefined;
+    try {
+      const body = (await response.json()) as { error?: unknown };
+      if (typeof body.error === "string") detail = body.error;
+    } catch {
+      // detail stays undefined
+    }
+    return { ok: false, error: "rejected", detail };
+  }
+  if (!response.ok) return { ok: false, error: "unavailable" };
+
+  try {
+    const body = (await response.json()) as { order_id?: unknown };
+    if (isNonEmptyString(body.order_id)) return { ok: true, orderId: body.order_id };
+  } catch {
+    // fall through
+  }
+  return { ok: false, error: "invalid_contract" };
 }

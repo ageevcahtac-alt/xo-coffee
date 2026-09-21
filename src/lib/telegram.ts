@@ -1,4 +1,5 @@
 import { formatPrice } from "@/src/lib/format";
+import { formatWeight } from "@/src/lib/variants";
 import type { OrderPayload, PaymentMethodCode } from "@/src/types/order";
 
 const PAYMENT_METHOD_LABELS: Record<PaymentMethodCode, string> = {
@@ -7,7 +8,6 @@ const PAYMENT_METHOD_LABELS: Record<PaymentMethodCode, string> = {
   invoice: "Счёт",
 };
 
-const STANDARD_BAG_WEIGHT = "250 г";
 const DIVIDER = "──────────────────";
 
 function escapeHtml(value: string) {
@@ -17,7 +17,7 @@ function escapeHtml(value: string) {
     .replace(/>/g, "&gt;");
 }
 
-function buildOrderMessage(order: OrderPayload, warnings: string[]) {
+function buildOrderMessage(order: OrderPayload, warnings: string[], adminOrderId?: string) {
   const paymentLabel = PAYMENT_METHOD_LABELS[order.payment.method];
   const locationLine =
     order.delivery.method === "pickup"
@@ -26,6 +26,7 @@ function buildOrderMessage(order: OrderPayload, warnings: string[]) {
 
   const lines = [
     `☕ <b>НОВЫЙ ЗАКАЗ #${order.orderNumber}</b>`,
+    ...(adminOrderId ? [`🧾 <b>Заказ в Admin:</b> ${escapeHtml(adminOrderId)}`] : []),
     DIVIDER,
     `👤 <b>Клиент:</b> ${escapeHtml(order.name)}`,
     `📞 <b>Телефон:</b> ${escapeHtml(order.phone)}`,
@@ -40,7 +41,7 @@ function buildOrderMessage(order: OrderPayload, warnings: string[]) {
     "🛒 <b>Состав заказа:</b>",
     ...order.items.map(
       (item) =>
-        `• ${escapeHtml(item.name)} (${STANDARD_BAG_WEIGHT}, зерно) × ${item.quantity} — ${formatPrice(item.price * item.quantity)}`,
+        `• ${escapeHtml(item.name)} (${formatWeight(item.weightGrams)}, зерно) × ${item.quantity} — ${formatPrice(item.price * item.quantity)}`,
     ),
     DIVIDER,
     `💰 <b>ИТОГО К ОПЛАТЕ: ${formatPrice(order.total)}</b>`,
@@ -55,10 +56,14 @@ function buildOrderMessage(order: OrderPayload, warnings: string[]) {
   return lines.join("\n");
 }
 
-export async function sendOrderToTelegram(order: OrderPayload, warnings: string[] = []) {
+export async function sendOrderToTelegram(
+  order: OrderPayload,
+  warnings: string[] = [],
+  adminOrderId?: string,
+) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
-  const text = buildOrderMessage(order, warnings);
+  const text = buildOrderMessage(order, warnings, adminOrderId);
 
   if (!token || !chatId) {
     console.log(

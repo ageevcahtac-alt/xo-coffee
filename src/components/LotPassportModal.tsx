@@ -5,7 +5,10 @@ import Modal from "@/src/components/ui/Modal";
 import WholeBeanNotice from "@/src/components/WholeBeanNotice";
 import FlavorProfileChart from "@/src/components/FlavorProfileChart";
 import { useCart } from "@/src/context/CartContext";
+import VariantPicker from "@/src/components/VariantPicker";
+import { buildCartItem } from "@/src/lib/cartItems";
 import { formatPrice } from "@/src/lib/format";
+import { getLotPriceLabel, getOrderableVariants, resolveVariant } from "@/src/lib/variants";
 import {
   getBrewHighlight,
   getLotFactChips,
@@ -100,6 +103,9 @@ function LotPassportContent({
   const { addItem, flyToCart } = useCart();
   const { lots: LOTS } = useCatalog();
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+  const variants = getOrderableVariants(lot);
+  const variant = resolveVariant(lot, selectedVariantId);
   const entry = isEntryProduct(lot);
   const brewHighlight = getBrewHighlight(lot);
   const factChips = getLotFactChips(lot);
@@ -147,16 +153,9 @@ function LotPassportContent({
   const coffeePassportUrl = getCoffeePassportUrl(lot.id);
 
   const handleAdd = (event: MouseEvent<HTMLButtonElement>) => {
+    if (!variant) return;
     flyToCart(event.currentTarget.getBoundingClientRect());
-    addItem(
-      {
-        id: lot.id,
-        name: lot.name,
-        country: lot.country,
-        price: lot.price,
-      },
-      quantity,
-    );
+    addItem(buildCartItem(lot, variant), quantity);
   };
 
   return (
@@ -475,7 +474,7 @@ function LotPassportContent({
                             </p>
                           </div>
                           <span className="shrink-0 font-display text-sm font-semibold text-burgundy">
-                            {formatPrice(similarLot.price)}
+                            {getLotPriceLabel(similarLot)}
                           </span>
                         </div>
                         <p className="mt-2 text-sm leading-relaxed text-charcoal/75">
@@ -513,9 +512,22 @@ function LotPassportContent({
             <WholeBeanNotice />
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t border-charcoal/15 px-6 py-5">
+          <div className="space-y-4 border-t border-charcoal/15 px-6 py-5">
+          {variants.length > 1 && variant && (
+            <VariantPicker
+              variants={variants}
+              selectedId={variant.id}
+              onSelect={setSelectedVariantId}
+              label={`Фасовка: ${lot.name}`}
+            />
+          )}
+          {!variant && (
+            <p className="text-sm text-charcoal/70">Фасовка скоро появится</p>
+          )}
+          {variant && (
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
             <span className="shrink-0 whitespace-nowrap font-display text-xl font-semibold text-burgundy">
-              {formatPrice(lot.price * quantity)}
+              {formatPrice(variant.price * quantity)}
             </span>
 
             <div className="flex shrink-0 items-center gap-3">
@@ -550,6 +562,8 @@ function LotPassportContent({
               </button>
             </div>
           </div>
+          )}
+        </div>
     </>
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState, type KeyboardEvent, type MouseEvent } from "react";
-import { useCart } from "@/src/context/CartContext";
-import { formatPrice } from "@/src/lib/format";
+import { useEffect, useState, type KeyboardEvent } from "react";
+import LotPurchaseControls from "@/src/components/LotPurchaseControls";
 import { useCrossfadeTransition } from "@/src/hooks/useCrossfadeTransition";
 import LotPassportModal from "@/src/components/LotPassportModal";
 import {
@@ -29,7 +28,6 @@ import {
 import { getLikedDislikedLotIds } from "@/src/lib/coffeePassport";
 
 export default function Catalog() {
-  const { addItem, flyToCart } = useCart();
   const { lots, status: catalogStatus } = useCatalog();
   const { openDiscovery } = useDiscovery();
   const [activeSection, setActiveSection] = useState<TopCategoryId>("all");
@@ -154,17 +152,6 @@ export default function Catalog() {
       event.preventDefault();
       openLot(lot);
     }
-  };
-
-  const handleAddToCart = (event: MouseEvent<HTMLButtonElement>, lot: Lot) => {
-    event.stopPropagation();
-    flyToCart(event.currentTarget.getBoundingClientRect());
-    addItem({
-      id: lot.id,
-      name: lot.name,
-      country: lot.country,
-      price: lot.price,
-    });
   };
 
   return (
@@ -412,17 +399,11 @@ export default function Catalog() {
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-border px-4 py-3 sm:px-5 sm:py-4">
-                    <span className="font-display text-lg font-semibold text-burgundy">
-                      {formatPrice(lot.price)}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={(event) => handleAddToCart(event, lot)}
-                      className="flex h-11 items-center justify-center bg-accent px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
-                    >
-                      В корзину
-                    </button>
+                  <div className="border-t border-border px-4 py-3 sm:px-5 sm:py-4">
+                    <LotPurchaseControls
+                      lot={lot}
+                      buttonClassName="flex h-11 items-center justify-center bg-accent px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
+                    />
                   </div>
                 </article>
                 );

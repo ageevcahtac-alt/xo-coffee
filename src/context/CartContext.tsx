@@ -12,14 +12,15 @@ import {
 } from "react";
 import { useCatalog } from "@/src/context/CatalogContext";
 import { reconcileCartItems } from "@/src/lib/cartReconcile";
+import {
+  MAX_LINE_QUANTITY,
+  addCartItem,
+  isValidCartItem,
+  setCartItemQuantity,
+  type CartItem,
+} from "@/src/lib/cartItems";
 
-export type CartItem = {
-  id: string;
-  name: string;
-  country: string;
-  price: number;
-  quantity: number;
-};
+export type { CartItem };
 
 type Flight = {
   id: number;
@@ -30,8 +31,8 @@ type CartContextValue = {
   items: CartItem[];
   isOpen: boolean;
   addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  removeItem: (id: string) => void;
-  setQuantity: (id: string, quantity: number) => void;
+  removeItem: (variantId: string) => void;
+  setQuantity: (variantId: string, quantity: number) => void;
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
@@ -47,35 +48,6 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "xo-coffee-cart";
-
-// A cart line nobody would actually want — well past anything the stepper
-// UI could produce by hand — but a sane ceiling to clamp corrupted or
-// hand-edited storage to, rather than trusting an arbitrary number into the
-// totals.
-const MAX_LINE_QUANTITY = 99;
-
-/**
- * Validates one cart item read back from localStorage. Same reasoning as
- * src/lib/coffeePassport.ts's readArray: a corrupted or hand-edited value
- * is dropped rather than trusted, so one bad line can't poison totalPrice/
- * totalCount with NaN or a negative number, or crash rendering.
- */
-function isValidCartItem(value: unknown): value is CartItem {
-  if (!value || typeof value !== "object") return false;
-  const item = value as Record<string, unknown>;
-  return (
-    typeof item.id === "string" &&
-    item.id.length > 0 &&
-    typeof item.name === "string" &&
-    typeof item.country === "string" &&
-    typeof item.price === "number" &&
-    Number.isFinite(item.price) &&
-    item.price >= 0 &&
-    typeof item.quantity === "number" &&
-    Number.isInteger(item.quantity) &&
-    item.quantity > 0
-  );
-}
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const { status: catalogStatus, lots: catalogLots } = useCatalog();
@@ -136,36 +108,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // identity — an unstable closeCart would otherwise retrigger that effect,
   // and lose queued focus work, on every unrelated CartProvider re-render.
   const addItem: CartContextValue["addItem"] = useCallback((item, quantity = 1) => {
-    setItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
-      if (existing) {
-        return prev.map((i) =>
-          i.id === item.id
-            ? { ...i, quantity: Math.min(i.quantity + quantity, MAX_LINE_QUANTITY) }
-            : i,
-        );
-      }
-      return [...prev, { ...item, quantity: Math.min(quantity, MAX_LINE_QUANTITY) }];
-    });
+    setItems((prev) => addCartItem(prev, item, quantity));
   }, []);
 
   const removeItem = useCallback(
-    (id: string) => setItems((prev) => prev.filter((i) => i.id !== id)),
+    (variantId: string) => setItems((prev) => prev.filter((i) => i.variantId !== variantId)),
     [],
   );
 
   const setQuantity = useCallback(
-    (id: string, quantity: number) =>
-      setItems((prev) =>
-        // Not `<= 0`: NaN fails every comparison, so a NaN quantity would
-        // otherwise fall through and get written into state instead of
-        // removing the line or being clamped.
-        !Number.isFinite(quantity) || quantity <= 0
-          ? prev.filter((i) => i.id !== id)
-          : prev.map((i) =>
-              i.id === id ? { ...i, quantity: Math.min(quantity, MAX_LINE_QUANTITY) } : i,
-            ),
-      ),
+    (variantId: string, quantity: number) =>
+      setItems((prev) => setCartItemQuantity(prev, variantId, quantity)),
     [],
   );
 

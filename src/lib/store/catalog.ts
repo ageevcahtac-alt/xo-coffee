@@ -38,6 +38,14 @@ export function mapAdminProductToLot(product: AdminStoreProduct): Lot {
       ? { passportPublicId: product.passport_public_id }
       : {}),
     price: product.price,
+    variants: (product.variants ?? [])
+      .map((variant) => ({
+        id: variant.id,
+        weightGrams: variant.weight_grams,
+        price: variant.price,
+        availableForOrder: variant.available_for_order,
+      }))
+      .sort((a, b) => a.weightGrams - b.weightGrams),
     category: "microlot",
     tags: [],
     country: "",

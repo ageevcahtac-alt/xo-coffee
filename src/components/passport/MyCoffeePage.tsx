@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState, type MouseEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import LotPassportModal from "@/src/components/LotPassportModal";
-import { useCart } from "@/src/context/CartContext";
+import LotPurchaseControls from "@/src/components/LotPurchaseControls";
 import { useDiscovery } from "@/src/context/DiscoveryContext";
 import { useCatalog } from "@/src/context/CatalogContext";
-import { formatPrice } from "@/src/lib/format";
 import { getBrewHighlight } from "@/src/lib/lotPresentation";
 import { getAllTastingRecords, getTastingRecordsForLot } from "@/src/lib/coffeePassport";
 import {
@@ -40,7 +39,6 @@ function formatTastingDate(iso: string) {
 }
 
 export default function MyCoffeePage() {
-  const { addItem, flyToCart } = useCart();
   const { openDiscovery } = useDiscovery();
   const { lots: LOTS } = useCatalog();
   const [hydrated, setHydrated] = useState(false);
@@ -82,11 +80,6 @@ export default function MyCoffeePage() {
   );
 
   const passportLot = passportLotId ? (LOTS.find((lot) => lot.id === passportLotId) ?? null) : null;
-
-  const handleAdd = (event: MouseEvent<HTMLButtonElement>, lot: Lot) => {
-    flyToCart(event.currentTarget.getBoundingClientRect());
-    addItem({ id: lot.id, name: lot.name, country: lot.country, price: lot.price });
-  };
 
   const brewHabit = getBrewHabitSummary(context);
 
@@ -153,18 +146,11 @@ export default function MyCoffeePage() {
                         {brewHighlight.label} · {brewHighlight.spec.ratio}, {brewHighlight.spec.tempC}°C
                       </p>
                     )}
-                    <div className="mt-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-3">
-                      <span className="shrink-0 whitespace-nowrap font-display text-base font-semibold text-burgundy">
-                        {formatPrice(result.lot.price)}
-                      </span>
-                      <div className="flex shrink-0 gap-2">
-                        <button
-                          type="button"
-                          onClick={(event) => handleAdd(event, result.lot)}
-                          className="flex h-10 items-center justify-center whitespace-nowrap bg-accent px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
-                        >
-                          В корзину
-                        </button>
+                    <div className="mt-3">
+                      <LotPurchaseControls
+                        lot={result.lot}
+                        buttonClassName="flex h-10 items-center justify-center whitespace-nowrap bg-accent px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
+                      >
                         <button
                           type="button"
                           onClick={() => setPassportLotId(result.lot.id)}
@@ -172,7 +158,7 @@ export default function MyCoffeePage() {
                         >
                           Паспорт
                         </button>
-                      </div>
+                      </LotPurchaseControls>
                     </div>
                   </div>
                 );

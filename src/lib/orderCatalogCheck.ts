@@ -1,29 +1,38 @@
 import { formatPrice } from "@/src/lib/format";
+import { formatWeight } from "@/src/lib/variants";
 import type { Lot } from "@/src/types/lot";
 import type { OrderPayloadItem } from "@/src/types/order";
 
 /**
  * Cross-checks an incoming order against the server-side catalog (Admin's
- * published products). The browser is not a trusted source for prices or
- * ids, but checkout must never be blocked by this check — orders are only
- * notified to Telegram and there is no order persistence to protect — so a
- * discrepancy becomes a visible warning line for whoever processes the order
- * instead of a rejection.
+ * published products, matched by packaging `variantId`). The browser is not a
+ * trusted source for prices or ids — Admin prices the order itself — so this
+ * only turns a discrepancy into a visible warning line for whoever processes
+ * the order; it never rejects anything.
  */
 export function findCatalogDiscrepancies(
   items: OrderPayloadItem[],
   lots: Lot[],
 ): string[] {
-  const byId = new Map(lots.map((lot) => [lot.id, lot]));
+  const byVariant = new Map(
+    lots.flatMap((lot) => (lot.variants ?? []).map((variant) => [variant.id, variant] as const)),
+  );
   const warnings: string[] = [];
 
   for (const item of items) {
-    const lot = byId.get(item.lotId);
-    if (!lot) {
-      warnings.push(`«${item.name}» — нет в опубликованном каталоге (снят с публикации или неизвестный id)`);
-    } else if (lot.price !== item.price) {
+    const variant = byVariant.get(item.variantId);
+    if (!variant) {
+      warnings.push(`«${item.name}» — фасовки нет в опубликованном каталоге (снята с публикации или неизвестный id)`);
+      continue;
+    }
+    if (variant.price !== item.price) {
       warnings.push(
-        `«${item.name}» — цена в заказе ${formatPrice(item.price)}, в каталоге ${formatPrice(lot.price)}`,
+        `«${item.name}» — цена в заказе ${formatPrice(item.price)}, в каталоге ${formatPrice(variant.price)}`,
+      );
+    }
+    if (variant.weightGrams !== item.weightGrams) {
+      warnings.push(
+        `«${item.name}» — фасовка в заказе ${formatWeight(item.weightGrams)}, в каталоге ${formatWeight(variant.weightGrams)}`,
       );
     }
   }

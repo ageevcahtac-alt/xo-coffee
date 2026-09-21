@@ -1,10 +1,15 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useCart } from "@/src/context/CartContext";
 import { formatPrice } from "@/src/lib/format";
 import { getDeliveryFee } from "@/src/lib/shop";
-import { generateOrderNumber } from "@/src/lib/orderNumber";
+import { submitOrder } from "@/src/lib/checkout/submitOrder";
+import { createSubmitLock } from "@/src/lib/checkout/submitLock";
+import {
+  clearPendingOrderNumber,
+  getPendingOrderNumber,
+} from "@/src/lib/checkout/pendingOrderNumber";
 import { CARRIER_LABELS, type ContactInfo } from "@/src/components/cart/CheckoutForm";
 import type { OrderPayload, PaymentMethodCode } from "@/src/types/order";
 import type { OrderRecordItem } from "@/src/types/coffeePassport";
@@ -105,7 +110,7 @@ export default function PaymentStep({
   onConfirm: (order: OrderDetails) => void;
 }) {
   const { items, totalPrice } = useCart();
-  const [orderNumber] = useState(generateOrderNumber);
+  const [orderNumber] = useState(getPendingOrderNumber);
   const [method, setMethod] = useState<PaymentMethod>("sbp");
   const [cardNumber, setCardNumber] = useState(TEST_CARD_NUMBER);
   const [cardExpiry, setCardExpiry] = useState(TEST_CARD_EXPIRY);
@@ -113,6 +118,8 @@ export default function PaymentStep({
   const [companyName, setCompanyName] = useState("");
   const [inn, setInn] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const submitLock = useRef(createSubmitLock());
 
   const deliveryFee =
     contact.fulfillment === "pickup" ? 0 : getDeliveryFee(totalPrice);
@@ -121,60 +128,66 @@ export default function PaymentStep({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const company =
-      method === "invoice" ? { name: companyName, inn } : undefined;
+    // Synchronous single-flight: a double click or second Enter never starts
+    // a second order while the first is still being created.
+    await submitLock.current.run(async () => {
+      const company =
+        method === "invoice" ? { name: companyName, inn } : undefined;
 
-    const payload: OrderPayload = {
-      orderNumber,
-      name: contact.name,
-      phone: contact.phone,
-      email: contact.email,
-      delivery: {
-        method: contact.fulfillment,
-        carrier: CARRIER_LABELS[contact.carrier],
-        address: contact.address,
-      },
-      payment: {
-        method,
-        company,
-      },
-      items: items.map((item) => ({
-        lotId: item.id,
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-        packaging: "whole-bean",
-      })),
-      total: grandTotal,
-    };
+      const payload: OrderPayload = {
+        orderNumber,
+        name: contact.name,
+        phone: contact.phone,
+        email: contact.email,
+        delivery: {
+          method: contact.fulfillment,
+          carrier: CARRIER_LABELS[contact.carrier],
+          address: contact.address,
+        },
+        payment: {
+          method,
+          company,
+        },
+        items: items.map((item) => ({
+          lotId: item.productId,
+          variantId: item.variantId,
+          name: item.name,
+          weightGrams: item.weightGrams,
+          quantity: item.quantity,
+          price: item.price,
+          packaging: "whole-bean",
+        })),
+        total: grandTotal,
+      };
 
-    setSubmitting(true);
-    try {
-      if (method === "card") {
-        // Sandbox mode: simulate acquiring latency without calling a real gateway.
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+      setSubmitting(true);
+      setSubmitError(null);
+      try {
+        if (method === "card") {
+          // Sandbox mode: simulate acquiring latency without calling a real gateway.
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+        }
+        const result = await submitOrder(payload);
+        if (!result.ok) {
+          // No success screen, cart untouched — the buyer can retry.
+          setSubmitError(result.message);
+          return;
+        }
+        clearPendingOrderNumber();
+        onConfirm({
+          ...contact,
+          orderNumber,
+          paymentMethod: method,
+          company,
+          items: items.map((item) => ({
+            lotId: item.productId,
+            name: item.name,
+            quantity: item.quantity,
+          })),
+        });
+      } finally {
+        setSubmitting(false);
       }
-      await fetch("/api/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    } catch (error) {
-      console.error("Не удалось отправить уведомление о заказе", error);
-    } finally {
-      setSubmitting(false);
-    }
-
-    onConfirm({
-      ...contact,
-      orderNumber,
-      paymentMethod: method,
-      company,
-      items: items.map((item) => ({
-        lotId: item.id,
-        name: item.name,
-        quantity: item.quantity,
-      })),
     });
   };
 
@@ -355,6 +368,11 @@ export default function PaymentStep({
       </div>
 
       <div className="border-t border-charcoal/15 px-6 py-6">
+        {submitError && (
+          <p role="alert" className="mb-4 text-sm text-error">
+            {submitError}
+          </p>
+        )}
         <button
           type="submit"
           disabled={submitting}

@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useState, type MouseEvent } from "react";
+import { useMemo, useState } from "react";
 import Modal from "@/src/components/ui/Modal";
 import LotPassportModal from "@/src/components/LotPassportModal";
 import { useDiscovery } from "@/src/context/DiscoveryContext";
-import { useCart } from "@/src/context/CartContext";
+import LotPurchaseControls from "@/src/components/LotPurchaseControls";
 import { useCatalog } from "@/src/context/CatalogContext";
-import { formatPrice } from "@/src/lib/format";
+import { getLotPriceLabel } from "@/src/lib/variants";
 import { getBrewHighlight } from "@/src/lib/lotPresentation";
 import { getLikedDislikedLotIds } from "@/src/lib/coffeePassport";
 import {
@@ -19,7 +19,6 @@ import {
   type NoveltyAnswer,
   type TasteAnswer,
 } from "@/src/lib/discovery";
-import type { Lot } from "@/src/types/lot";
 
 const TOTAL_QUESTIONS = 3;
 
@@ -50,7 +49,6 @@ function AnswerButton({
 
 export default function DiscoveryModal() {
   const { isOpen, closeDiscovery } = useDiscovery();
-  const { addItem, flyToCart } = useCart();
   const { lots: LOTS } = useCatalog();
 
   const [step, setStep] = useState(0);
@@ -90,11 +88,6 @@ export default function DiscoveryModal() {
   };
 
   const goBack = () => setStep((current) => Math.max(0, current - 1));
-
-  const handleAdd = (event: MouseEvent<HTMLButtonElement>, lot: Lot) => {
-    flyToCart(event.currentTarget.getBoundingClientRect());
-    addItem({ id: lot.id, name: lot.name, country: lot.country, price: lot.price });
-  };
 
   const showResults = step === 3 && recommendations.length > 0;
 
@@ -214,7 +207,7 @@ export default function DiscoveryModal() {
                       </p>
                     </div>
                     <span className="shrink-0 font-display text-lg font-semibold text-burgundy">
-                      {formatPrice(result.lot.price)}
+                      {getLotPriceLabel(result.lot)}
                     </span>
                   </div>
 
@@ -234,21 +227,20 @@ export default function DiscoveryModal() {
                     </p>
                   )}
 
-                  <div className="mt-4 flex flex-wrap items-center gap-2.5">
-                    <button
-                      type="button"
-                      onClick={(event) => handleAdd(event, result.lot)}
-                      className="flex h-11 items-center justify-center bg-accent px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
+                  <div className="mt-4">
+                    <LotPurchaseControls
+                      lot={result.lot}
+                      showPrice={false}
+                      buttonClassName="flex h-11 items-center justify-center bg-accent px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
                     >
-                      В корзину
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPassportIndex(index)}
-                      className="flex h-11 items-center justify-center border border-burgundy/30 px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-burgundy transition-all active:scale-95 hover:bg-burgundy/10"
-                    >
-                      Открыть паспорт
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => setPassportIndex(index)}
+                        className="flex h-11 items-center justify-center border border-burgundy/30 px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-burgundy transition-all active:scale-95 hover:bg-burgundy/10"
+                      >
+                        Открыть паспорт
+                      </button>
+                    </LotPurchaseControls>
                   </div>
                 </div>
               );
