@@ -123,7 +123,8 @@ export default function CoffeePassportDetail({
   const [note, setNote] = useState("");
   const [savedFlash, setSavedFlash] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
-  const continuation = getPassportContinuation(lot);
+  const [savedTasting, setSavedTasting] = useState<TastingRecord | null>(null);
+  const continuation = getPassportContinuation(lot, savedTasting);
 
   // localStorage is only available client-side — load after mount, same
   // reasoning as CartContext, to avoid a server/client hydration mismatch.
@@ -131,6 +132,7 @@ export default function CoffeePassportDetail({
   useEffect(() => {
     setRecords(getTastingRecordsForLot(lot.id));
     setJustSaved(false);
+    setSavedTasting(null);
     setHydrated(true);
     setEditingId(null);
     setBrewMethod(firstAvailableBrewMethod(lot));
@@ -181,6 +183,7 @@ export default function CoffeePassportDetail({
     setEditingId(id);
     setSavedFlash(true);
     setJustSaved(true);
+    setSavedTasting(record);
   };
 
   const setRatingAxis = (key: keyof MyCupRating, value: number) =>

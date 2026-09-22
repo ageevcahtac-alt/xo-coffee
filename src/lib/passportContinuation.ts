@@ -1,4 +1,6 @@
 import { getCoffeePassportUrl } from "@/src/lib/coffeePassportLink";
+import { buildTastingFragment } from "@/src/lib/passportHandoff";
+import type { TastingRecord } from "@/src/types/coffeePassport";
 import type { Lot } from "@/src/types/lot";
 
 export type PassportContinuation = {
@@ -19,9 +21,15 @@ export type PassportContinuation = {
  * sees why signing in there keeps their history. Null when the lot has no
  * `passportPublicId` — no link is invented.
  */
-export function getPassportContinuation(lot: Lot): PassportContinuation | null {
-  const href = getCoffeePassportUrl(lot);
-  if (!href) return null;
+export function getPassportContinuation(
+  lot: Lot,
+  tasting?: TastingRecord | null,
+): PassportContinuation | null {
+  const base = getCoffeePassportUrl(lot);
+  if (!base) return null;
+  // The just-saved rating rides along in the fragment; without one (or if the
+  // configured base already has a fragment) it is the plain Canonical Lot link.
+  const href = base.includes("#") ? base : base + buildTastingFragment(tasting);
   return {
     headline: "Первичная оценка сохранена",
     body: "Теперь можно продолжить исследовать этот кофе и свои заметки в Coffee Passport.",
