@@ -83,7 +83,7 @@ export default function OrderSuccess({
           <Link
             href={`/passport/${order.orderNumber}`}
             onClick={onClose}
-            className="mt-4 flex h-11 w-full items-center justify-center bg-burgundy text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
+            className="mt-4 flex h-11 w-full items-center justify-center bg-accent text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
           >
             Открыть Coffee Passport
           </Link>
@@ -93,7 +93,7 @@ export default function OrderSuccess({
       <button
         type="button"
         onClick={onClose}
-        className="mt-4 flex h-12 w-full max-w-xs items-center justify-center border border-burgundy px-8 text-sm font-semibold uppercase tracking-[0.15em] text-burgundy transition-all active:scale-95 hover:bg-burgundy hover:text-cream"
+        className="mt-4 flex h-12 w-full max-w-xs items-center justify-center border border-burgundy px-8 text-sm font-semibold uppercase tracking-[0.15em] text-burgundy transition-all active:scale-95 hover:bg-accent hover:text-cream"
       >
         Продолжить покупки
       </button>

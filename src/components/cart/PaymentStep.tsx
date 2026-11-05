@@ -238,7 +238,7 @@ export default function PaymentStep({
                     }`}
                   >
                     {selected && (
-                      <span className="h-2 w-2 rounded-full bg-burgundy" />
+                      <span className="h-2 w-2 rounded-full bg-accent" />
                     )}
                   </span>
                   <span>
@@ -380,7 +380,7 @@ export default function PaymentStep({
         <button
           type="submit"
           disabled={submitting}
-          className="flex h-14 w-full items-center justify-center bg-burgundy text-sm font-semibold uppercase tracking-[0.15em] text-cream transition-all active:scale-[0.98] hover:bg-burgundy-dark disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-14 w-full items-center justify-center bg-accent text-sm font-semibold uppercase tracking-[0.15em] text-cream transition-all active:scale-[0.98] hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting
             ? method === "card"

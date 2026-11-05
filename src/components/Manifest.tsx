@@ -36,7 +36,7 @@ export default function Manifest() {
             {PRINCIPLES.map((principle) => (
               <div
                 key={principle.title}
-                className="rounded-xl border border-cream/15 bg-burgundy p-6 text-left text-cream shadow-sm transition-all duration-300 ease-out hover:-translate-y-2.5 hover:border-gold/40 hover:shadow-2xl sm:p-8"
+                className="rounded-xl border border-cream/15 bg-accent p-6 text-left text-cream shadow-sm transition-all duration-300 ease-out hover:-translate-y-2.5 hover:border-gold/40 hover:shadow-2xl sm:p-8"
               >
                 <h3 className="font-display text-lg font-semibold text-gold">
                   {principle.title}
