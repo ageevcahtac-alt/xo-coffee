@@ -236,7 +236,7 @@ export default function DiscoveryModal() {
                       <button
                         type="button"
                         onClick={() => setPassportIndex(index)}
-                        className="flex h-11 items-center justify-center border border-burgundy/30 px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-burgundy transition-all active:scale-95 hover:bg-burgundy/10"
+                        className="flex h-11 items-center justify-center border border-burgundy/30 px-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-burgundy transition-all active:scale-95 hover:bg-accent/10"
                       >
                         Открыть паспорт
                       </button>
@@ -264,7 +264,7 @@ export default function DiscoveryModal() {
             <button
               type="button"
               onClick={restart}
-              className="border border-burgundy px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-burgundy transition-all active:scale-95 hover:bg-burgundy hover:text-cream"
+              className="border border-burgundy px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-burgundy transition-all active:scale-95 hover:bg-accent hover:text-cream"
             >
               Начать заново
             </button>

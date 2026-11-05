@@ -337,7 +337,7 @@ export default function CoffeePassportDetail({
           <button
             type="button"
             onClick={handleSave}
-            className="flex h-11 items-center justify-center bg-burgundy px-6 text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark"
+            className="flex h-11 items-center justify-center bg-accent px-6 text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
           >
             {editingId ? "Сохранить изменения" : "Сохранить дегустацию"}
           </button>
@@ -345,7 +345,7 @@ export default function CoffeePassportDetail({
             <button
               type="button"
               onClick={startNewTasting}
-              className="flex h-11 items-center justify-center border border-burgundy/30 px-4 text-xs font-semibold uppercase tracking-[0.1em] text-burgundy transition-all active:scale-95 hover:bg-burgundy/10"
+              className="flex h-11 items-center justify-center border border-burgundy/30 px-4 text-xs font-semibold uppercase tracking-[0.1em] text-burgundy transition-all active:scale-95 hover:bg-accent/10"
             >
               Добавить новую дегустацию
             </button>
@@ -378,7 +378,7 @@ export default function CoffeePassportDetail({
           </ul>
           <a
             href={continuation.href}
-            className="mt-4 flex h-11 items-center justify-center bg-burgundy px-6 text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-burgundy-dark sm:inline-flex"
+            className="mt-4 flex h-11 items-center justify-center bg-accent px-6 text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-accent-hover sm:inline-flex"
           >
             {continuation.ctaLabel}
           </a>
@@ -445,7 +445,7 @@ export default function CoffeePassportDetail({
         <button
           type="button"
           onClick={onOpenLotPassport}
-          className="mt-4 flex h-11 items-center justify-center border border-burgundy px-6 text-xs font-semibold uppercase tracking-[0.12em] text-burgundy transition-all active:scale-95 hover:bg-burgundy hover:text-cream"
+          className="mt-4 flex h-11 items-center justify-center border border-burgundy px-6 text-xs font-semibold uppercase tracking-[0.12em] text-burgundy transition-all active:scale-95 hover:bg-accent hover:text-cream"
         >
           Открыть полный паспорт зерна
         </button>

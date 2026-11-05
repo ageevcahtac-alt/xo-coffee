@@ -1,7 +1,7 @@
 export default function WholeBeanNotice({ compact = false }: { compact?: boolean }) {
   return (
     <div
-      className={`flex gap-3 border-l-2 border-gold bg-burgundy/[0.04] ${
+      className={`flex gap-3 border-l-2 border-gold bg-accent/[0.04] ${
         compact ? "px-4 py-3" : "px-5 py-4"
       }`}
     >

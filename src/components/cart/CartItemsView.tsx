@@ -110,7 +110,7 @@ export default function CartItemsView({
           type="button"
           disabled={items.length === 0}
           onClick={onCheckout}
-          className="flex h-14 w-full items-center justify-center bg-burgundy text-sm font-semibold uppercase tracking-[0.15em] text-cream transition-all active:scale-[0.98] hover:bg-burgundy-dark disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
+          className="flex h-14 w-full items-center justify-center bg-accent text-sm font-semibold uppercase tracking-[0.15em] text-cream transition-all active:scale-[0.98] hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
         >
           Перейти к оформлению
         </button>

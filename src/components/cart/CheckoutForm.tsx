@@ -300,7 +300,7 @@ export default function CheckoutForm({
       <div className="border-t border-charcoal/15 px-6 py-6">
         <button
           type="submit"
-          className="flex h-14 w-full items-center justify-center bg-burgundy text-sm font-semibold uppercase tracking-[0.15em] text-cream transition-all active:scale-[0.98] hover:bg-burgundy-dark"
+          className="flex h-14 w-full items-center justify-center bg-accent text-sm font-semibold uppercase tracking-[0.15em] text-cream transition-all active:scale-[0.98] hover:bg-accent-hover"
         >
           Далее: способ оплаты
         </button>
