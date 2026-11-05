@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# codex agent runs (scripts/codex-run.ps1)
+/.agents/runs/
+/.agents/health/last.json
