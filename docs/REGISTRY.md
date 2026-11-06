@@ -29,9 +29,9 @@ P27; актуальная палитра — P26 направление B «Refi
 **Проверки:** `npm test` 116/116 ✓ · `npm run lint` чисто ✓ · `npm run build` ✓ ·
 grep `bg-burgundy|bg-burgundy-dark|bg-maroon` по src/+app/ — 0 вхождений ✓
 
-**Ревью:** Codex (scripts/codex-run.ps1, MODE: review, песочница read-only) —
-`findings: none`, раунд 1 из 2. Отчёт: .agents/runs/maroon-bg-review/report-1.md
-(артефакт локальный, в git не коммитится).
+**Ревью:** Codex (scripts/codex-run.ps1, MODE: review, песочница read-only), 2
+раунда — в обоих `findings: none`. Отчёты: .agents/runs/maroon-bg-review/report-1.md,
+report-2.md (артефакты локальные, в git не коммитятся).
 
 **Контраст:** цвета не менялись — действуют результаты P28/P29 (cream на
 burgundy ≈ 11.5:1, выше WCAG AA 4.5:1).
