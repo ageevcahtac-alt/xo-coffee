@@ -1,6 +1,6 @@
 import { formatPrice } from "@/src/lib/format";
 import { formatWeight } from "@/src/lib/variants";
-import type { OrderPayload, PaymentMethodCode } from "@/src/types/order";
+import type { OrderPayload, OrderPayloadItem, PaymentMethodCode } from "@/src/types/order";
 
 const PAYMENT_METHOD_LABELS: Record<PaymentMethodCode, string> = {
   sbp: "СБП",
@@ -17,12 +17,40 @@ function escapeHtml(value: string) {
     .replace(/>/g, "&gt;");
 }
 
-function buildOrderMessage(order: OrderPayload, warnings: string[], adminOrderId?: string) {
-  const paymentLabel = PAYMENT_METHOD_LABELS[order.payment.method];
+/** One message line per ordered item. A full item renders exactly as before
+ *  ("• name (250 г, зерно) × 3 — 3 702 ₽"); a minimally-valid item (only
+ *  variantId + quantity — see /api/order's isValidPayload) never crashes and
+ *  carries no invented name, spec or price. */
+function formatItemLine(item: OrderPayloadItem): string {
+  const name = item.name
+    ? escapeHtml(item.name)
+    : `Позиция ${escapeHtml(item.variantId)}`;
+  const spec = Number.isFinite(item.weightGrams)
+    ? ` (${formatWeight(item.weightGrams)}, зерно)`
+    : "";
+  const sum = Number.isFinite(item.price)
+    ? ` — ${formatPrice(item.price * item.quantity)}`
+    : "";
+  return `• ${name}${spec} × ${item.quantity}${sum}`;
+}
+
+/** Builds the operator's order message. Tolerates a minimally-valid payload
+ *  (no payment / delivery / prices): optional lines get a neutral marker or
+ *  are omitted, never a fabricated value. The full-payload format is
+ *  unchanged. */
+export function buildOrderMessage(order: OrderPayload, warnings: string[], adminOrderId?: string) {
+  const paymentMethod = order.payment?.method;
+  const paymentLabel = paymentMethod
+    ? (PAYMENT_METHOD_LABELS[paymentMethod] ?? "не указана")
+    : "не указана";
+  const delivery = order.delivery;
+  const deliveryAddress = delivery?.address ? escapeHtml(delivery.address) : "адрес не указан";
   const locationLine =
-    order.delivery.method === "pickup"
-      ? `🏪 <b>Самовывоз:</b> ${escapeHtml(order.delivery.address)}`
-      : `📍 <b>Адрес:</b> ${escapeHtml(order.delivery.address)}`;
+    !delivery || !delivery.method
+      ? "🚚 <b>Получение:</b> не указано"
+      : delivery.method === "pickup"
+        ? `🏪 <b>Самовывоз:</b> ${deliveryAddress}`
+        : `📍 <b>Адрес:</b> ${deliveryAddress}`;
 
   const lines = [
     `☕ <b>НОВЫЙ ЗАКАЗ #${order.orderNumber}</b>`,
@@ -32,19 +60,18 @@ function buildOrderMessage(order: OrderPayload, warnings: string[], adminOrderId
     `📞 <b>Телефон:</b> ${escapeHtml(order.phone)}`,
     locationLine,
     `💳 <b>Оплата:</b> ${escapeHtml(paymentLabel)}`,
-    ...(order.payment.company
+    ...(order.payment?.company
       ? [
           `🏢 <b>Компания:</b> ${escapeHtml(order.payment.company.name)} (ИНН ${escapeHtml(order.payment.company.inn)})`,
         ]
       : []),
     DIVIDER,
     "🛒 <b>Состав заказа:</b>",
-    ...order.items.map(
-      (item) =>
-        `• ${escapeHtml(item.name)} (${formatWeight(item.weightGrams)}, зерно) × ${item.quantity} — ${formatPrice(item.price * item.quantity)}`,
-    ),
+    ...order.items.map(formatItemLine),
     DIVIDER,
-    `💰 <b>ИТОГО К ОПЛАТЕ: ${formatPrice(order.total)}</b>`,
+    ...(Number.isFinite(order.total)
+      ? [`💰 <b>ИТОГО К ОПЛАТЕ: ${formatPrice(order.total)}</b>`]
+      : []),
     ...(warnings.length > 0
       ? [
           DIVIDER,
