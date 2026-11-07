@@ -115,6 +115,28 @@ describe("buildOrderMessage — minimal payload (regression: no exception, no in
     );
     expect(message).toContain("🏪 <b>Самовывоз:</b> адрес не указан");
   });
+
+  it("never throws on mistyped field values that isValidPayload lets through", () => {
+    const hostile = {
+      ...minimalPayload(),
+      name: 123,
+      delivery: { method: "pickup", address: 123 },
+      payment: { method: "constructor", company: { name: 123 } },
+      items: [{ variantId: "v-250", quantity: 1, name: 123 }],
+    } as unknown as OrderPayload;
+
+    let message = "";
+    expect(() => {
+      message = buildOrderMessage(hostile, []);
+    }).not.toThrow();
+    // Neutral markers, no inherited "constructor" label, no company line.
+    expect(message).toContain("💳 <b>Оплата:</b> не указана");
+    expect(message).toContain("🏪 <b>Самовывоз:</b> адрес не указан");
+    expect(message).toContain("👤 <b>Клиент:</b> не указан");
+    expect(message).not.toContain("🏢 <b>Компания:</b>");
+    expect(message).toContain("• Позиция v-250 × 1");
+    expect(message).not.toMatch(/NaN|undefined|function/);
+  });
 });
 
 describe("sendOrderToTelegram — minimal payload still notifies (notified:false defect)", () => {

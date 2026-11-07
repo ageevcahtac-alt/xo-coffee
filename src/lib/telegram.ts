@@ -17,12 +17,19 @@ function escapeHtml(value: string) {
     .replace(/>/g, "&gt;");
 }
 
+/** isValidPayload checks presence, not types — a hand-crafted payload can
+ *  carry a number where a string is expected. Only a non-empty string is
+ *  treated as text; anything else takes the neutral path, never a crash. */
+function asText(value: unknown): string | null {
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
+
 /** One message line per ordered item. A full item renders exactly as before
  *  ("• name (250 г, зерно) × 3 — 3 702 ₽"); a minimally-valid item (only
  *  variantId + quantity — see /api/order's isValidPayload) never crashes and
  *  carries no invented name, spec or price. */
 function formatItemLine(item: OrderPayloadItem): string {
-  const name = item.name
+  const name = asText(item.name)
     ? escapeHtml(item.name)
     : `Позиция ${escapeHtml(item.variantId)}`;
   const spec = Number.isFinite(item.weightGrams)
@@ -35,16 +42,20 @@ function formatItemLine(item: OrderPayloadItem): string {
 }
 
 /** Builds the operator's order message. Tolerates a minimally-valid payload
- *  (no payment / delivery / prices): optional lines get a neutral marker or
- *  are omitted, never a fabricated value. The full-payload format is
- *  unchanged. */
+ *  (no payment / delivery / prices) and mistyped field values that
+ *  isValidPayload lets through: optional lines get a neutral marker or are
+ *  omitted, never a fabricated value. The full-payload format is unchanged. */
 export function buildOrderMessage(order: OrderPayload, warnings: string[], adminOrderId?: string) {
   const paymentMethod = order.payment?.method;
-  const paymentLabel = paymentMethod
-    ? (PAYMENT_METHOD_LABELS[paymentMethod] ?? "не указана")
-    : "не указана";
+  // Object.hasOwn: a plain object's inherited keys ("constructor", …) are
+  // not labels — an unknown or hostile method falls back to the marker.
+  const paymentLabel =
+    paymentMethod && Object.hasOwn(PAYMENT_METHOD_LABELS, paymentMethod)
+      ? PAYMENT_METHOD_LABELS[paymentMethod]
+      : "не указана";
   const delivery = order.delivery;
-  const deliveryAddress = delivery?.address ? escapeHtml(delivery.address) : "адрес не указан";
+  const addressText = asText(delivery?.address);
+  const deliveryAddress = addressText ? escapeHtml(addressText) : "адрес не указан";
   const locationLine =
     !delivery || !delivery.method
       ? "🚚 <b>Получение:</b> не указано"
@@ -52,19 +63,22 @@ export function buildOrderMessage(order: OrderPayload, warnings: string[], admin
         ? `🏪 <b>Самовывоз:</b> ${deliveryAddress}`
         : `📍 <b>Адрес:</b> ${deliveryAddress}`;
 
+  const companyName = asText(order.payment?.company?.name);
+  const companyInn = asText(order.payment?.company?.inn);
+  const companyLine =
+    companyName && companyInn
+      ? `🏢 <b>Компания:</b> ${escapeHtml(companyName)} (ИНН ${escapeHtml(companyInn)})`
+      : null;
+
   const lines = [
     `☕ <b>НОВЫЙ ЗАКАЗ #${order.orderNumber}</b>`,
     ...(adminOrderId ? [`🧾 <b>Заказ в Admin:</b> ${escapeHtml(adminOrderId)}`] : []),
     DIVIDER,
-    `👤 <b>Клиент:</b> ${escapeHtml(order.name)}`,
-    `📞 <b>Телефон:</b> ${escapeHtml(order.phone)}`,
+    `👤 <b>Клиент:</b> ${escapeHtml(asText(order.name) ?? "не указан")}`,
+    `📞 <b>Телефон:</b> ${escapeHtml(asText(order.phone) ?? "не указан")}`,
     locationLine,
     `💳 <b>Оплата:</b> ${escapeHtml(paymentLabel)}`,
-    ...(order.payment?.company
-      ? [
-          `🏢 <b>Компания:</b> ${escapeHtml(order.payment.company.name)} (ИНН ${escapeHtml(order.payment.company.inn)})`,
-        ]
-      : []),
+    ...(companyLine ? [companyLine] : []),
     DIVIDER,
     "🛒 <b>Состав заказа:</b>",
     ...order.items.map(formatItemLine),
