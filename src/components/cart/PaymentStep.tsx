@@ -21,6 +21,9 @@ export type OrderDetails = ContactInfo & {
   orderNumber: string;
   paymentMethod: PaymentMethod;
   company?: { name: string; inn: string };
+  /** Snapshot of the money to pay, captured with the items before the cart
+   *  is cleared — shown on the success screen as the order sum. */
+  total: number;
   // A snapshot of what was bought, captured before the cart is cleared —
   // this is what lets Success/Coffee Passport know which lots to open.
   items: OrderRecordItem[];
@@ -180,6 +183,7 @@ export default function PaymentStep({
           orderNumber,
           paymentMethod: method,
           company,
+          total: grandTotal,
           // One Passport entry per coffee, whatever packagings were bought.
           items: mergeOrderItemsByLot(
             items.map((item) => ({
@@ -259,10 +263,8 @@ export default function PaymentStep({
               <div className="text-center">
                 <QrPlaceholder />
                 <p className="mx-auto mt-4 max-w-xs text-sm leading-relaxed text-charcoal/70">
-                  Отсканируйте QR-код камерой телефона или откройте банковское
-                  приложение и выберите оплату через СБП. Подтверждение
-                  приходит автоматически — просто нажмите «Подтвердить заказ»
-                  ниже.
+                  Реквизиты для оплаты через СБП отправляем после подтверждения
+                  заказа — на email и по телефону из оформления.
                 </p>
               </div>
             )}

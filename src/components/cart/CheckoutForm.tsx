@@ -189,7 +189,7 @@ export default function CheckoutForm({
               type="email"
               autoComplete="email"
               defaultValue={initialValues?.email}
-              placeholder="Email — для чека и трек-номера"
+              placeholder="Email — для связи по заказу"
               aria-label="Email"
               className={inputClass}
             />
