@@ -56,11 +56,11 @@ export default function Approach() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-4">
           {PROCESS_STEPS.map((step) => (
             <div
               key={step.n}
-              className="min-w-0 rounded-xl border border-border bg-cream-dark/60 p-5 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-accent/30 hover:shadow-xl sm:p-6"
+              className="min-w-0 rounded-xl border border-border bg-cream-dark/60 p-4 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-accent/30 hover:shadow-xl sm:p-6"
             >
               <span className="font-display text-sm font-semibold text-gold-dark">
                 {step.n}
@@ -68,7 +68,9 @@ export default function Approach() {
               <h3 className="mt-2 font-display text-lg font-semibold text-burgundy">
                 {step.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-text/70">
+              {/* hyphens: honest Russian hyphenation (html lang="ru") — long
+                  words break at syllable boundaries instead of mid-word. */}
+              <p className="mt-2 hyphens-auto text-sm leading-relaxed text-text/70">
                 {step.text}
               </p>
             </div>

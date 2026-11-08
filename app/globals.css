@@ -1,21 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  /* Legacy "burgundy" token names are kept as identifiers (they are
-     referenced by text-/border-/accent-* classes across the whole site),
-     but factually map onto the project's existing neutral palette since
-     the owner dropped the maroon direction: headings/borders/buttons
-     render charcoal, hover states and the dark sections (Header, Manifest,
-     Footer) render the near-black backdrop, hover surfaces render
-     cream-dark. Gold accents are untouched. No new colors are introduced
-     here — only existing tokens are cross-referenced. */
-  --color-burgundy: var(--color-charcoal);
-  --color-burgundy-dark: var(--color-backdrop);
+  /* Warm coffee neutrals — the maroon direction was dropped and a harsh
+     near-black read was rejected at visual acceptance, so the legacy
+     "burgundy" token names (kept as identifiers; they are referenced by
+     text-/border-/accent-* classes across the whole site) factually map
+     onto two warm cocoa tones that sit calmly against the cream
+     background and the gold accents:
+       cocoa      — CTA, buttons, active filters, headings, focus rings
+       cocoa-deep — dark sections (Header, Manifest, Footer) and hovers
+     Gold accents and the logo are untouched. */
+  --color-cocoa: #3a2c1f;
+  --color-cocoa-deep: #2a1f15;
+  --color-burgundy: var(--color-cocoa);
+  --color-burgundy-dark: var(--color-cocoa-deep);
   /* P27 — very light panel surface: a neutral warm light (cream-dark),
      for the rare case a panel needs to read as "accent family" without
      the weight of a full dark fill. */
   --color-burgundy-light: var(--color-cream-dark);
-  --color-backdrop: #0f080a;
+  --color-backdrop: var(--color-cocoa-deep);
   --color-cream: #fbf8f1;
   --color-cream-dark: #f4efe6;
   --color-gold: #d4af37;
