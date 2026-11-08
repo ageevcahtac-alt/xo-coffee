@@ -21,8 +21,11 @@ export type OrderDetails = ContactInfo & {
   orderNumber: string;
   paymentMethod: PaymentMethod;
   company?: { name: string; inn: string };
+  /** Snapshot of the money to pay, captured with the items before the cart
+   *  is cleared — shown on the success screen as the order sum. */
+  total: number;
   // A snapshot of what was bought, captured before the cart is cleared —
-  // this is what lets Success/Coffee Passport know which lots to open.
+  // this is what the success screen shows as the order composition.
   items: OrderRecordItem[];
 };
 
@@ -180,7 +183,8 @@ export default function PaymentStep({
           orderNumber,
           paymentMethod: method,
           company,
-          // One Passport entry per coffee, whatever packagings were bought.
+          total: grandTotal,
+          // One summary line per coffee, whatever packagings were bought.
           items: mergeOrderItemsByLot(
             items.map((item) => ({
               lotId: item.productId,

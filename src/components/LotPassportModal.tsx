@@ -21,10 +21,6 @@ import {
   getBestFlavorDirection,
   getSimilarLots,
 } from "@/src/lib/flavorMatch";
-import {
-  getLikedDislikedLotIds,
-  getTastingRecordsForLot,
-} from "@/src/lib/coffeePassport";
 import { getCoffeePassportUrl } from "@/src/lib/coffeePassportLink";
 import { useCatalog } from "@/src/context/CatalogContext";
 import type { Lot } from "@/src/types/lot";
@@ -131,9 +127,8 @@ function LotPassportContent({
     techRows.push({ label: "Оценка Q-грейдера", value: `${lot.qScore} / 100` });
   }
   // A tasting set's one FlavorProfile blends three different lots' worth of
-  // character — same reasoning src/lib/personalTaste.ts uses to exclude it
-  // from direction tallying, so it isn't given a single misleading label
-  // here either.
+  // character — it isn't given a single misleading direction label here
+  // either.
   const characterDirection = entry ? null : getBestFlavorDirection(lot);
   const characterReason = characterDirection
     ? FLAVOR_DIRECTION_PROFILES[characterDirection].reason
@@ -142,11 +137,7 @@ function LotPassportContent({
   // Pass the same character reason through so this sentence can never
   // contradict the direction label shown just above it.
   const whoLikesIt = getWhoLikesIt(lot, characterReason);
-  // This content only ever mounts from a click (opening the modal), always
-  // well after hydration — safe to read tasting history directly here with
-  // no server/client mismatch risk.
-  const similarLots = getSimilarLots(lot, LOTS, 3, getLikedDislikedLotIds());
-  const myTastings = getTastingRecordsForLot(lot.id);
+  const similarLots = getSimilarLots(lot, LOTS, 3);
   // null until the external Coffee Passport platform's URL template is
   // configured — see src/lib/coffeePassportLink.ts. No link renders until
   // then; this is not a placeholder link to a guessed destination.
@@ -295,16 +286,6 @@ function LotPassportContent({
                     {whoLikesIt}
                   </p>
                 )
-              )}
-              {myTastings.length > 0 && (
-                <p className="mt-2 text-sm leading-relaxed text-burgundy/80">
-                  <span className="font-semibold text-burgundy">
-                    Вы уже пробовали этот кофе.{" "}
-                  </span>
-                  {myTastings.length === 1
-                    ? `Ваша оценка — ${myTastings[0].rating.overall}/5.`
-                    : `Дегустаций: ${myTastings.length}. Последняя оценка — ${myTastings[0].rating.overall}/5.`}
-                </p>
               )}
               {brewHighlight && (
                 <p className="mt-2 text-sm leading-relaxed text-burgundy/80">

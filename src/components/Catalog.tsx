@@ -17,7 +17,6 @@ import {
   getWhoLikesIt,
   isEntryProduct,
 } from "@/src/lib/lotPresentation";
-import { useDiscovery } from "@/src/context/DiscoveryContext";
 import {
   FLAVOR_DIRECTIONS,
   FLAVOR_DIRECTION_PROFILES,
@@ -25,11 +24,9 @@ import {
   rankLotsByFlavorDirection,
   type FlavorDirection,
 } from "@/src/lib/flavorMatch";
-import { getLikedDislikedLotIds } from "@/src/lib/coffeePassport";
 
 export default function Catalog() {
   const { lots, status: catalogStatus } = useCatalog();
-  const { openDiscovery } = useDiscovery();
   const [activeSection, setActiveSection] = useState<TopCategoryId>("all");
   const [activeCountry, setActiveCountry] = useState<RegionCountry | null>(
     null,
@@ -56,9 +53,8 @@ export default function Catalog() {
 
   // Flavor exploration re-ranks whatever the category tabs already show —
   // it never hides a lot, only reorders. Toggling the same chip again (or
-  // "Все") clears it. This only ever runs from a click, well after
-  // hydration, so reading tasting history directly here (no effect) can't
-  // cause a server/client mismatch.
+  // "Все") clears it. Ranking is by profile closeness alone: the tasting-
+  // history nudge existed only for the removed local tasting diary.
   const selectFlavor = (direction: FlavorDirection) => {
     gridTransition.runTransition(() => {
       setActiveFlavor((prev) => (prev === direction ? null : direction));
@@ -81,12 +77,8 @@ export default function Catalog() {
           : [];
 
   const orderedLots = activeFlavor
-    ? rankLotsByFlavorDirection(visibleLots, activeFlavor, getLikedDislikedLotIds())
+    ? rankLotsByFlavorDirection(visibleLots, activeFlavor)
     : visibleLots;
-
-  // Only the first entry-product card gets the #degustation anchor id, so
-  // adding a second specialty-set lot later can't create a duplicate DOM id.
-  const firstEntryLotId = lots.find((lot) => isEntryProduct(lot))?.id ?? null;
 
   // Keep activeIndex alive through the closing animation (Modal fades out
   // over ~400ms) so the displayed lot doesn't disappear mid-transition.
@@ -168,20 +160,6 @@ export default function Catalog() {
             Нажмите на лот, чтобы открыть полный паспорт: происхождение,
             сенсорный профиль и рекомендации по завариванию.
           </p>
-        </div>
-
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-3 border border-border bg-cream-dark px-5 py-4 sm:mb-10">
-          <p className="text-sm text-text/75">
-            Не знаете, что выбрать?{" "}
-            <span className="text-text/65">Подберём за 1 минуту.</span>
-          </p>
-          <button
-            type="button"
-            onClick={openDiscovery}
-            className="flex h-11 shrink-0 items-center justify-center border border-border px-5 text-xs font-semibold uppercase tracking-[0.1em] text-burgundy transition-all active:scale-95 hover:border-accent hover:bg-accent-surface"
-          >
-            Подобрать кофе
-          </button>
         </div>
 
         <div className="mb-8 sm:mb-10">
@@ -309,7 +287,6 @@ export default function Catalog() {
                 return (
                 <article
                   key={lot.id}
-                  id={lot.id === firstEntryLotId ? "degustation" : undefined}
                   role="button"
                   tabIndex={0}
                   onClick={() => openLot(lot)}

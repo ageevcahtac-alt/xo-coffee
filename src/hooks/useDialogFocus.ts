@@ -6,8 +6,8 @@ const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 // Module-level (shared across every Modal/Drawer instance): the currently
-// open dialogs, in open order. Two dialogs can be open at once — e.g.
-// LotPassportModal opened from inside DiscoveryModal — so Escape must only
+// open dialogs, in open order. Two dialogs can be open at once — e.g. a
+// lot passport opened from a recommendations surface — so Escape must only
 // close the topmost one, matching what clicking its own backdrop/close
 // button already does. Without this, both dialogs' listeners would fire on
 // the same keypress and Escape would silently close the one underneath too.

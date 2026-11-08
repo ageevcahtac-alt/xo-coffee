@@ -1,8 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { CARRIER_LABELS } from "@/src/components/cart/CheckoutForm";
 import { PAYMENT_LABELS, type OrderDetails } from "@/src/components/cart/PaymentStep";
+import { formatPrice } from "@/src/lib/format";
+
+// The shop's existing published contacts (see Footer) — the verified support
+// channel. No automated emails exist yet, so the success screen must not
+// promise them.
+const SUPPORT_EMAIL = "hello@xocoffee.ru";
+const SUPPORT_PHONE = "+7 (900) 000-00-00";
+
+// The real Coffee Passport — order readiness is tracked there, not in a
+// Store-side cabinet (the local /passport pages were removed). Plain link,
+// no automatic redirect.
+const COFFEE_PASSPORT_URL = "https://coffeepassport.ru";
 
 export default function OrderSuccess({
   order,
@@ -11,6 +22,15 @@ export default function OrderSuccess({
   order: OrderDetails;
   onClose: () => void;
 }) {
+  // No method is "paid" here: acquiring is not wired up, so the honest state
+  // for every method is "заказ оформлен" plus the manual payment instruction.
+  const paymentNote =
+    order.paymentMethod === "card"
+      ? "Оплата картой сейчас работает в тестовом режиме — реальное списание не выполнялось."
+      : order.paymentMethod === "invoice"
+        ? `Счёт с реквизитами для оплаты направим на ${order.email} после подтверждения заказа.`
+        : "Реквизиты для оплаты по СБП направим после подтверждения заказа.";
+
   return (
     <div
       role="status"
@@ -34,9 +54,8 @@ export default function OrderSuccess({
       </h2>
 
       <p className="mt-4 max-w-xs leading-relaxed text-charcoal/75">
-        {order.fulfillment === "pickup"
-          ? "Ваш кофе сформирован и будет ждать вас в кофейне. Мы обжигаем и упаковываем зерно бережно — важен первый глоток."
-          : "Ваш кофе сформирован и готовится к отправке. Мы обжигаем и упаковываем зерно бережно — важен первый глоток."}
+        {paymentNote} Как только оплата подтвердится, приступим к обжарке и
+        сборке заказа.
       </p>
 
       <div className="mt-6 w-full max-w-xs space-y-2 border border-charcoal/15 bg-cream-dark px-5 py-4 text-left text-sm">
@@ -66,29 +85,46 @@ export default function OrderSuccess({
         </div>
       </div>
 
-      <p className="mt-6 text-xs uppercase tracking-[0.1em] text-charcoal/65">
-        Чек и трек-номер придут на {order.email}
-      </p>
-
-      {order.items.length > 0 && (
-        <div className="mt-6 w-full max-w-xs border border-border bg-cream-dark px-5 py-4 text-left">
-          <p className="font-display text-sm font-semibold text-burgundy">
-            Coffee Passport
-          </p>
-          <p className="mt-1.5 text-sm leading-relaxed text-charcoal/70">
-            Попробуйте {order.items.length > 1 ? "эти лоты" : "этот лот"} и
-            сохраните своё впечатление в Coffee Passport — рецепт
-            приготовления и место для собственной заметки о чашке.
-          </p>
-          <Link
-            href={`/passport/${order.orderNumber}`}
-            onClick={onClose}
-            className="mt-4 flex h-11 w-full items-center justify-center bg-accent text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
-          >
-            Открыть Coffee Passport
-          </Link>
+      <div className="mt-6 w-full max-w-xs border border-border bg-cream-dark px-5 py-4 text-left">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">
+          Ваш заказ
+        </p>
+        <ul className="mt-2 space-y-1.5 text-sm">
+          {order.items.map((item) => (
+            <li key={item.lotId} className="flex justify-between gap-4">
+              <span className="text-charcoal/75">{item.name}</span>
+              <span className="shrink-0 font-medium">× {item.quantity}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-3 flex justify-between border-t border-charcoal/10 pt-2 text-sm">
+          <span className="text-charcoal/65">Сумма заказа</span>
+          <span className="font-medium">{formatPrice(order.total)}</span>
         </div>
-      )}
+      </div>
+
+      <div className="mt-6 w-full max-w-xs border border-border bg-cream-dark px-5 py-4 text-left">
+        <p className="font-display text-sm font-semibold text-burgundy">
+          Готовность заказа удобно отслеживать в Coffee Passport
+        </p>
+        <p className="mt-1.5 text-sm leading-relaxed text-charcoal/70">
+          Coffee Passport — ваш личный кабинет обжарщика: статус заказа,
+          паспорта лотов и дегустационные заметки.
+        </p>
+        <a
+          href={COFFEE_PASSPORT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 flex h-11 w-full items-center justify-center bg-accent text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
+        >
+          Отслеживать заказ в Coffee Passport
+        </a>
+      </div>
+
+      <p className="mt-6 max-w-xs text-xs leading-relaxed uppercase tracking-[0.1em] text-charcoal/65">
+        Вопросы по заказу — {SUPPORT_EMAIL} или {SUPPORT_PHONE}. Назовите
+        номер заказа.
+      </p>
 
       <button
         type="button"

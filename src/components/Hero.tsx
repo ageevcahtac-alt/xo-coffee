@@ -1,10 +1,6 @@
 "use client";
 
-import { useDiscovery } from "@/src/context/DiscoveryContext";
-
 export default function Hero() {
-  const { openDiscovery } = useDiscovery();
-
   return (
     <section id="top" className="px-4 pt-6 sm:px-6 sm:pt-8 md:px-8 md:pt-10">
       <div className="relative mx-auto max-w-7xl overflow-hidden rounded-2xl border border-border bg-surface text-text shadow-sm md:rounded-3xl">
@@ -33,13 +29,6 @@ export default function Hero() {
             >
               Смотреть каталог
             </a>
-            <button
-              type="button"
-              onClick={openDiscovery}
-              className="flex h-12 items-center justify-center border border-border px-8 text-sm font-semibold uppercase tracking-[0.15em] text-burgundy transition-all duration-300 hover:-translate-y-1.5 hover:border-accent hover:bg-accent-surface hover:shadow-xl active:scale-95 sm:h-14 sm:px-10"
-            >
-              Не знаю, что выбрать
-            </button>
           </div>
         </div>
       </div>

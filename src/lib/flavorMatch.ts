@@ -3,13 +3,13 @@ import { getWhoLikesIt, isEntryProduct, getEntryProductPitch } from "@/src/lib/l
 
 /**
  * Shared flavor-matching primitives — the canonical vocabulary for "what
- * does this lot taste like" used by Coffee Discovery, the catalog's flavor
- * exploration chips, and Similar Lots. One data model, three surfaces.
+ * does this lot taste like" used by the catalog's flavor exploration chips
+ * and Similar Lots. One data model, two surfaces.
  *
  * This is presentation/matching logic only. It reads the site's existing
  * 5-axis FlavorProfile (acidity, sweetness, body, aroma, finish), tags,
  * sensory notes and brew data — it never adds axes, never changes the
- * scale, and never touches Coffee Passport's separate MyCupRating model.
+ * scale, and never touches a personal 1-5 tasting-rating model.
  */
 
 export const FLAVOR_AXES: (keyof FlavorProfile)[] = [
@@ -58,8 +58,8 @@ export function lotSearchText(lot: Lot): string {
 
 // --- Canonical flavor directions --------------------------------------------
 //
-// Exactly the four directions validated against the real catalog for
-// Coffee Discovery's first question. Kept to four on purpose: the example
+// Exactly the four directions validated against the real catalog.
+// Kept to four on purpose: the example
 // list in the flavor-first-catalog brief ("Ягодный", "Яркий/кислотный",
 // "Плотный", "Сбалансированный", ...) mostly collapses into these once you
 // check the actual lots — e.g. every microlot tagged "Яркая кислотность"

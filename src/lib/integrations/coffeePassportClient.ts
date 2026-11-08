@@ -75,10 +75,10 @@ function isNullableNumber(value: unknown): value is number | null {
   return value === null || (typeof value === "number" && Number.isFinite(value));
 }
 
-/** Same "validate defensively, drop what doesn't match" discipline as
- *  src/lib/coffeePassport.ts's isValidOrderRecord/isValidTastingRecord — this
- *  codebase's existing house style for untrusted data, reused here rather
- *  than pulling in a schema-validation library for one small shape. */
+/** Same "validate defensively, drop what doesn't match" discipline this
+ *  codebase practices on every untrusted payload (e.g. the cart/order
+ *  records in localStorage) — reused here rather than pulling in a
+ *  schema-validation library for one small shape. */
 function isValidLot(value: unknown): value is CoffeePassportLot {
   if (!value || typeof value !== "object") return false;
   const lot = value as Record<string, unknown>;

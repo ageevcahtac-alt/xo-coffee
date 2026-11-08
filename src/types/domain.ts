@@ -128,8 +128,8 @@ export type ReferenceRoastProfile = {
  * Versioned, append-only reference taste data for a Canonical Lot. Mirrors
  * the existing 5-axis FlavorProfile (src/types/lot.ts) plus sensory notes
  * and cup note. NOT the same thing as an individual/guest tasting snapshot
- * (MyCupRating in src/types/coffeePassport.ts) — that distinction is
- * intentional and unchanged by this phase.
+ * (the personal 1-5 "my cup" rating Coffee Passport keeps on its side) —
+ * that distinction is intentional and unchanged by this phase.
  */
 export type ReferenceTasteProfile = {
   id: string; // uuid

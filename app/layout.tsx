@@ -5,9 +5,7 @@ import { connection } from "next/server";
 import { CatalogProvider } from "@/src/context/CatalogContext";
 import { getCatalog } from "@/src/lib/store/catalog";
 import { CartProvider } from "@/src/context/CartContext";
-import { DiscoveryProvider } from "@/src/context/DiscoveryContext";
 import CartDrawer from "@/src/components/CartDrawer";
-import DiscoveryModal from "@/src/components/DiscoveryModal";
 import FlyToCartLayer from "@/src/components/FlyToCartLayer";
 
 const playfair = Playfair_Display({
@@ -43,12 +41,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full w-full max-w-full flex-col overflow-x-hidden bg-background text-text font-sans">
         <CatalogProvider catalog={catalog}>
           <CartProvider>
-            <DiscoveryProvider>
-              {children}
-              <CartDrawer />
-              <DiscoveryModal />
-              <FlyToCartLayer />
-            </DiscoveryProvider>
+            {children}
+            <CartDrawer />
+            <FlyToCartLayer />
           </CartProvider>
         </CatalogProvider>
       </body>
