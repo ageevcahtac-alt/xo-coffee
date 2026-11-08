@@ -56,11 +56,11 @@ export default function Approach() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-4">
           {PROCESS_STEPS.map((step) => (
             <div
               key={step.n}
-              className="rounded-xl border border-border bg-cream-dark/60 p-5 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-accent/30 hover:shadow-xl sm:p-6"
+              className="min-w-0 rounded-xl border border-border bg-cream-dark/60 p-5 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-accent/30 hover:shadow-xl sm:p-6"
             >
               <span className="font-display text-sm font-semibold text-gold-dark">
                 {step.n}

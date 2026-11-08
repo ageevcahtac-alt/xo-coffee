@@ -1,12 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --color-burgundy: #3b1119;
-  --color-burgundy-dark: #260b10;
-  /* P27 — very light burgundy-tinted surface (not a new hue: a ~96%-cream
-     tint of --color-burgundy), for the rare case a panel needs to read as
-     "accent family" without the weight of a full dark fill. */
-  --color-burgundy-light: #f3e8e9;
+  /* Legacy "burgundy" token names are kept as identifiers (they are
+     referenced by text-/border-/accent-* classes across the whole site),
+     but factually map onto the project's existing neutral palette since
+     the owner dropped the maroon direction: headings/borders/buttons
+     render charcoal, hover states and the dark sections (Header, Manifest,
+     Footer) render the near-black backdrop, hover surfaces render
+     cream-dark. Gold accents are untouched. No new colors are introduced
+     here — only existing tokens are cross-referenced. */
+  --color-burgundy: var(--color-charcoal);
+  --color-burgundy-dark: var(--color-backdrop);
+  /* P27 — very light panel surface: a neutral warm light (cream-dark),
+     for the rare case a panel needs to read as "accent family" without
+     the weight of a full dark fill. */
+  --color-burgundy-light: var(--color-cream-dark);
   --color-backdrop: #0f080a;
   --color-cream: #fbf8f1;
   --color-cream-dark: #f4efe6;
