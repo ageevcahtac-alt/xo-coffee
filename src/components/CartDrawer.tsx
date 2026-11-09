@@ -12,7 +12,12 @@ import OrderSuccess from "@/src/components/cart/OrderSuccess";
 
 type Step = "cart" | "checkout" | "payment" | "success";
 
-export default function CartDrawer() {
+export default function CartDrawer({
+  passportBaseUrl,
+}: {
+  /** SERVER-ONLY env COFFEE_PASSPORT_PUBLIC_BASE_URL из серверного layout. */
+  passportBaseUrl?: string;
+}) {
   const { isOpen, closeCart, clearCart } = useCart();
   const [step, setStep] = useState<Step>("cart");
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
@@ -102,7 +107,11 @@ export default function CartDrawer() {
       )}
 
       {step === "success" && completedOrder && (
-        <OrderSuccess order={completedOrder} onClose={handleCloseAfterSuccess} />
+        <OrderSuccess
+          order={completedOrder}
+          onClose={handleCloseAfterSuccess}
+          passportBaseUrl={passportBaseUrl}
+        />
       )}
     </Drawer>
   );

@@ -42,7 +42,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <CatalogProvider catalog={catalog}>
           <CartProvider>
             {children}
-            <CartDrawer />
+            {/* SERVER-ONLY env пропсом — без NEXT_PUBLIC_ */}
+            <CartDrawer
+              passportBaseUrl={process.env.COFFEE_PASSPORT_PUBLIC_BASE_URL}
+            />
             <FlyToCartLayer />
           </CartProvider>
         </CatalogProvider>

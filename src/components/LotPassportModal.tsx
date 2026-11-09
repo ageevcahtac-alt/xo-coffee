@@ -24,6 +24,7 @@ import {
 } from "@/src/lib/flavorMatch";
 import { getCoffeePassportUrl } from "@/src/lib/coffeePassportLink";
 import { useCatalog } from "@/src/context/CatalogContext";
+import { landingContent } from "@/src/data/landing";
 import type { Lot } from "@/src/types/lot";
 
 const BREW_LABELS = {
@@ -327,6 +328,13 @@ function LotPassportContent({
                   рецепт ниже).
                 </p>
               )}
+              {/* Маркетинговые акценты (утверждены владельцем,
+                  src/data/landing.ts): свежая обжарка после оплаты и окно
+                  дегустации. Сроков доставки нет — здесь только обжарка. */}
+              <div className="mt-4 space-y-1.5 border-t border-border pt-3 text-sm leading-relaxed text-burgundy/75">
+                <p>{landingContent.drawer.roastLine}</p>
+                <p>{landingContent.drawer.freshLine}</p>
+              </div>
             </section>
 
             {coffeePassportUrl && (

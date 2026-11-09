@@ -3,6 +3,8 @@
 import { CARRIER_LABELS } from "@/src/components/cart/CheckoutForm";
 import { PAYMENT_LABELS, type OrderDetails } from "@/src/components/cart/PaymentStep";
 import { formatPrice } from "@/src/lib/format";
+import { DEFAULT_COFFEE_PASSPORT_PUBLIC_BASE } from "@/src/lib/coffeePassportLink";
+import { landingContent } from "@/src/data/landing";
 
 // The shop's existing published contacts (see Footer) — the verified support
 // channel. No automated emails exist yet, so the success screen must not
@@ -18,10 +20,16 @@ const COFFEE_PASSPORT_URL = "https://coffeepassport.ru";
 export default function OrderSuccess({
   order,
   onClose,
+  passportBaseUrl,
 }: {
   order: OrderDetails;
   onClose: () => void;
+  /** SERVER-ONLY env COFFEE_PASSPORT_PUBLIC_BASE_URL из серверного layout. */
+  passportBaseUrl?: string;
 }) {
+  const passportCtaUrl =
+    passportBaseUrl?.trim().replace(/\/+$/, "") ||
+    DEFAULT_COFFEE_PASSPORT_PUBLIC_BASE;
   // No method is "paid" here: acquiring is not wired up, so the honest state
   // for every method is "заказ оформлен" plus the manual payment instruction.
   const paymentNote =
@@ -75,6 +83,23 @@ export default function OrderSuccess({
             className="mt-4 flex h-11 w-full items-center justify-center whitespace-nowrap bg-accent px-4 text-xs font-semibold uppercase tracking-[0.12em] text-cream transition-all active:scale-95 hover:bg-accent-hover"
           >
             Статус в паспорте
+          </a>
+        </div>
+
+        <div className="mt-4 w-full max-w-xs border border-border bg-cream-dark px-5 py-4 text-left">
+          <p className="font-display text-sm font-semibold text-burgundy">
+            {landingContent.receipt.title}
+          </p>
+          <p className="mt-1.5 text-sm leading-relaxed text-charcoal/70">
+            {landingContent.receipt.text}
+          </p>
+          <a
+            href={passportCtaUrl}
+            target="_blank"
+            rel="noopener"
+            className="mt-4 flex h-11 w-full items-center justify-center whitespace-nowrap border border-burgundy px-4 text-xs font-semibold uppercase tracking-[0.12em] text-burgundy transition-all active:scale-95 hover:bg-accent hover:text-cream"
+          >
+            {landingContent.receipt.cta}
           </a>
         </div>
 
