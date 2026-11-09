@@ -1,8 +1,12 @@
 import Header from "@/src/components/Header";
 import Hero from "@/src/components/Hero";
-import Approach from "@/src/components/Approach";
+import TrustBar from "@/src/components/TrustBar";
 import Catalog from "@/src/components/Catalog";
-import Manifest from "@/src/components/Manifest";
+import PureRoastBlock from "@/src/components/PureRoastBlock";
+import PassportBlock from "@/src/components/PassportBlock";
+import HowToBuy from "@/src/components/HowToBuy";
+import AboutBlock from "@/src/components/AboutBlock";
+import FAQ from "@/src/components/FAQ";
 import Footer from "@/src/components/Footer";
 import { getLotImageMap } from "@/src/lib/serverAssets";
 
@@ -19,9 +23,13 @@ export default async function Home() {
       <Header />
       <main className="flex-1 pt-32 lg:pt-20">
         <Hero />
-        <Approach />
+        <TrustBar />
         <Catalog passportBaseUrl={passportBaseUrl} lotImages={lotImages} />
-        <Manifest />
+        <PureRoastBlock />
+        <PassportBlock passportBaseUrl={passportBaseUrl} />
+        <HowToBuy />
+        <AboutBlock />
+        <FAQ />
       </main>
       <Footer />
     </>

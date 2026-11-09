@@ -161,7 +161,10 @@ export default function Catalog({
   };
 
   return (
-    <section id="catalog" className="px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
+    <section
+      id="catalog"
+      className="scroll-mt-36 px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 lg:scroll-mt-24"
+    >
       <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-8 md:rounded-3xl md:p-12 lg:p-16">
         <div className="mb-8 max-w-2xl sm:mb-10">
           <span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
