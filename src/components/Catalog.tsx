@@ -24,7 +24,18 @@ import {
   type FlavorDirection,
 } from "@/src/lib/flavorMatch";
 
-export default function Catalog() {
+export default function Catalog({
+  passportBaseUrl,
+  lotImages = {},
+}: {
+  /** SERVER-ONLY env COFFEE_PASSPORT_PUBLIC_BASE_URL, прокинутый с серверного
+   *  page — drawer строит ссылку «Coffee Passport этого лота» через
+   *  getCoffeePassportUrl(lot, passportBaseUrl). */
+  passportBaseUrl?: string;
+  /** Манифест существующих фото пачек: slug региона → путь /lots/<file>
+   *  (сервер читает public/lots, битых img не бывает). */
+  lotImages?: Record<string, string>;
+}) {
   const { lots, status: catalogStatus } = useCatalog();
   const [activeSection, setActiveSection] = useState<TopCategoryId>("all");
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
@@ -407,6 +418,8 @@ export default function Catalog() {
             : null
         }
         transitionClassName={lotTransition.className}
+        passportBaseUrl={passportBaseUrl}
+        lotImages={lotImages}
       />
     </section>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, type MouseEvent } from "react";
 import Modal from "@/src/components/ui/Modal";
 import WholeBeanNotice from "@/src/components/WholeBeanNotice";
@@ -41,6 +42,8 @@ export default function LotPassportModal({
   hasMultiple,
   position,
   transitionClassName = "",
+  passportBaseUrl,
+  lotImages = {},
 }: {
   lot: Lot | null;
   isOpen: boolean;
@@ -55,6 +58,10 @@ export default function LotPassportModal({
   hasMultiple: boolean;
   position: { index: number; total: number } | null;
   transitionClassName?: string;
+  /** SERVER-ONLY env COFFEE_PASSPORT_PUBLIC_BASE_URL из серверного page. */
+  passportBaseUrl?: string;
+  /** Манифест существующих фото пачек: slug региона → /lots/<file>. */
+  lotImages?: Record<string, string>;
 }) {
   return (
     <Modal isOpen={isOpen} ariaLabel="Паспорт зерна" onClose={onClose}>
@@ -72,6 +79,8 @@ export default function LotPassportModal({
             onSelectLot={onSelectLot}
             hasMultiple={hasMultiple}
             position={position}
+            passportBaseUrl={passportBaseUrl}
+            lotImages={lotImages}
           />
         </div>
       )}
@@ -87,6 +96,8 @@ function LotPassportContent({
   onSelectLot,
   hasMultiple,
   position,
+  passportBaseUrl,
+  lotImages,
 }: {
   lot: Lot;
   onClose: () => void;
@@ -95,6 +106,8 @@ function LotPassportContent({
   onSelectLot?: (lotId: string) => void;
   hasMultiple: boolean;
   position: { index: number; total: number } | null;
+  passportBaseUrl?: string;
+  lotImages: Record<string, string>;
 }) {
   const { addItem, flyToCart } = useCart();
   const { lots: LOTS } = useCatalog();
@@ -138,10 +151,13 @@ function LotPassportContent({
   // contradict the direction label shown just above it.
   const whoLikesIt = getWhoLikesIt(lot, characterReason);
   const similarLots = getSimilarLots(lot, LOTS, 3);
-  // null until the external Coffee Passport platform's URL template is
-  // configured — see src/lib/coffeePassportLink.ts. No link renders until
-  // then; this is not a placeholder link to a guessed destination.
-  const coffeePassportUrl = getCoffeePassportUrl(lot);
+  // null у лота без passport_public_id — ссылка не рендерится совсем, никогда
+  // не строится «угадайка» (см. src/lib/coffeePassportLink.ts). База приходит
+  // пропсом из серверного page (env COFFEE_PASSPORT_PUBLIC_BASE_URL).
+  const coffeePassportUrl = getCoffeePassportUrl(lot, passportBaseUrl);
+  // Фото пачки — одно на регион; файла может ещё не быть (пользователь грузит
+  // сам) — тогда блок целиком не рендерится, drawer выглядит как раньше.
+  const lotImage = lot.origin ? lotImages[lot.origin.slug] : undefined;
 
   const handleAdd = (event: MouseEvent<HTMLButtonElement>) => {
     if (!variant) return;
@@ -240,6 +256,20 @@ function LotPassportContent({
           )}
 
           <div className="flex-1 space-y-8 overflow-y-auto px-6 py-6">
+            {lotImage && (
+              <div className="relative mx-auto aspect-square w-full max-w-56 sm:max-w-64">
+                {/* Квадрат зарезервирован до загрузки — без CLS; фото любого
+                    аспекта (вертикаль/квадрат) вписывается object-contain. */}
+                <Image
+                  src={lotImage}
+                  alt={`Пачка кофе — ${lot.origin?.label ?? lot.name}`}
+                  fill
+                  sizes="(max-width: 640px) 224px, 256px"
+                  className="object-contain"
+                />
+              </div>
+            )}
+
             {/* Level 1: plain-language summary — read this, then scroll for the full Passport. */}
             <section className="rounded-xl border border-border bg-cream-dark/60 p-5">
               {entry && (
@@ -303,7 +333,7 @@ function LotPassportContent({
               <a
                 href={coffeePassportUrl}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener"
                 className="block text-sm font-semibold text-burgundy underline-offset-2 hover:underline"
               >
                 Coffee Passport этого лота →
