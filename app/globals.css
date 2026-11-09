@@ -9,7 +9,7 @@
      background and the gold accents:
        cocoa      — CTA, buttons, active filters, headings, focus rings
        cocoa-deep — dark sections (Header, Manifest, Footer) and hovers
-     Gold accents and the logo are untouched. */
+     Gold accents match the PNG logo (sampled value below). */
   --color-cocoa: #3a2c1f;
   --color-cocoa-deep: #2a1f15;
   --color-burgundy: var(--color-cocoa);
@@ -21,7 +21,14 @@
   --color-backdrop: var(--color-cocoa-deep);
   --color-cream: #fbf8f1;
   --color-cream-dark: #f4efe6;
-  --color-gold: #d4af37;
+  /* Единое золото с логотипом (public/logo.png): средний цвет основных
+     штрихов PNG, сэмплированный пипеткой по ~200k непрозрачных пикселей
+     штрихов (без антиалиас-кромок) — #d9b475 против прежнего #d4af37:
+     логотип несёт более светлый «шампань»-оттенок, и кнопка/акценты должны
+     совпадать с ним. Контраст на cocoa-deep 8.2:1, на cocoa 6.9:1 (AA и
+     выше); текст cocoa на золотом (бейдж счётчика) 6.9:1. Для текста на
+     светлых поверхностях этот токен не используется — там gold-dark ниже. */
+  --color-gold: #d9b475;
   /* P29 — darkened from #a9872c (3.20:1 on cream, 2.96:1 on cream-dark —
      both fail WCAG AA's 4.5:1 for normal text). This token is used
      exclusively as `text-gold-dark` for small uppercase labels on light

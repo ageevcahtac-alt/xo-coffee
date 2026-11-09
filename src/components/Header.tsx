@@ -9,6 +9,45 @@ import MobileMenu from "@/src/components/MobileMenu";
 
 const PASSPORT_URL = "https://coffeepassport.ru";
 
+const passportIcon = (
+  <svg
+    width="10"
+    height="10"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M15 3h6v6" />
+    <path d="M10 14 21 3" />
+    <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
+  </svg>
+);
+
+const passportLinkClassName =
+  "flex items-center justify-center gap-1.5 border border-gold/40 text-xs font-medium uppercase tracking-[0.12em] text-gold transition-colors hover:border-gold";
+
+/** Desktop: sits in the header row between the logo and the nav.
+ *  Mobile: a thin second row inside the same header — full width, centered,
+ *  ~36px tall, same calm ghost (thin outline, no fill). */
+function CoffeePassportLink({ className = "" }: { className?: string }) {
+  return (
+    <a
+      href={PASSPORT_URL}
+      target="_blank"
+      rel="noopener"
+      aria-label="Coffee Passport — паспорт зерна"
+      className={`${passportLinkClassName} ${className}`}
+    >
+      {passportIcon}
+      Coffee Passport
+    </a>
+  );
+}
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [bump, setBump] = useState(false);
@@ -27,10 +66,10 @@ export default function Header() {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 border-b border-cream/10 bg-backdrop/90 backdrop-blur-md">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
-        <Link href="/#top" className="flex shrink-0 items-center">
-          {/* h-6 → h-10 across breakpoints keeps the row inside 390px while
-              the header itself stays h-20; width follows the 6084:684 ratio */}
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
+        <Link href="/#top" className="flex min-w-0 max-w-[58%] shrink-0 items-center sm:max-w-none">
+          {/* The PNG wordmark is ~8.9:1 — the link is capped at 58% of the row
+              on mobile so the logo+burger row can breathe; height follows */}
           <Image
             src="/logo.png"
             alt="XO COFFEE"
@@ -41,12 +80,14 @@ export default function Header() {
           />
         </Link>
 
+        <CoffeePassportLink className="hidden self-center px-3.5 py-2 lg:inline-flex" />
+
         <nav
           aria-label="Основная навигация"
           className="hidden items-center gap-10 lg:flex"
         >
-          {/* Корзина lives in the menus (here on desktop, the burger below
-              on mobile) — the header no longer has a cart icon */}
+          {/* Корзина lives in the menus (here on desktop, the burger's menu
+              on mobile) — the header has no cart icon */}
           <button
             type="button"
             onClick={toggleCart}
@@ -74,57 +115,33 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Calm ghost, not a CTA: thin gold outline on the dark header, no
-              fill, visually weaker than the logo and the burger */}
-          <a
-            href={PASSPORT_URL}
-            target="_blank"
-            rel="noopener"
-            aria-label="Coffee Passport — паспорт зерна"
-            className="flex items-center gap-1.5 border border-gold/40 px-2 py-2 text-xs font-medium uppercase tracking-[0.12em] text-gold/90 transition-colors hover:border-gold hover:text-gold sm:px-3.5"
+        {/* The burger is where the cart lives now (menu → «Корзина»), so the
+            fly-to-cart dot lands on it */}
+        <button
+          ref={registerCartIcon}
+          type="button"
+          aria-label="Меню"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(true)}
+          className="flex h-11 w-11 shrink-0 items-center justify-center border border-cream/20 text-cream transition-transform active:scale-90 hover:border-gold/50 hover:text-gold lg:hidden"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
           >
-            <svg
-              width="10"
-              height="10"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M15 3h6v6" />
-              <path d="M10 14 21 3" />
-              <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
-            </svg>
-            <span className="sm:hidden">Паспорт</span>
-            <span className="hidden sm:inline">Coffee Passport</span>
-          </a>
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+      </div>
 
-          {/* The burger is where the cart lives now (menu → «Корзина»), so
-              the fly-to-cart dot lands on it */}
-          <button
-            ref={registerCartIcon}
-            type="button"
-            aria-label="Меню"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(true)}
-            className="flex h-11 w-11 items-center justify-center border border-cream/20 text-cream transition-transform active:scale-90 hover:border-gold/50 hover:text-gold lg:hidden"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <path d="M4 7h16M4 12h16M4 17h16" />
-            </svg>
-          </button>
-        </div>
+      {/* Mobile-only second row: the passport link leaves the icon row, so
+          the first row is just logo + burger */}
+      <div className="mx-auto max-w-7xl px-4 pb-3 sm:px-6 lg:hidden">
+        <CoffeePassportLink className="h-9 w-full" />
       </div>
 
       <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
