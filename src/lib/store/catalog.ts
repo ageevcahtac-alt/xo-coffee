@@ -1,20 +1,35 @@
 /**
  * SERVER-ONLY. Never import from a "use client" file.
  *
- * The Store's customer-facing catalog. Production source: Admin Panel's
- * published products (src/lib/integrations/adminStoreClient.ts). Nothing here
- * is persisted — there is no Store-side copy of Admin's products.
+ * The Store's customer-facing catalog. Live source: Admin Panel's published
+ * products (src/lib/integrations/adminStoreClient.ts), mirrored best-effort
+ * into the persistent on-disk snapshot
+ * (src/lib/store/catalogSnapshot.ts). When Admin is unreachable, the
+ * catalog is served from that snapshot — active plus archived — so a
+ * sleeping or crashed Admin degrades to possibly-stale data instead of a
+ * dead storefront. Syncing never removes snapshot rows on its own: a lot
+ * unpublished in Admin keeps selling from the snapshot until it is removed
+ * there, so real stock can be flushed instead of the listing vanishing
+ * mid-sale.
  *
- * The only fallback is the legacy static demo catalog, and only when Admin is
- * *not configured at all* outside production (local development). A
- * configured-but-failing Admin (401/403/5xx/malformed) is never masked by a
- * fallback, in any environment.
+ * The snapshot is a cache, not a source of truth — Admin stays the
+ * publisher, and the only Store-side persistence is this one JSON file.
+ *
+ * The only non-snapshot fallback is the legacy static demo catalog, and only
+ * when Admin is *not configured at all* outside production (local
+ * development). A configured-but-failing Admin (401/403/5xx/malformed) is
+ * never masked by the demo catalog, in any environment.
  */
 
 import {
   fetchAdminPublishedProducts,
   type AdminStoreProduct,
 } from "@/src/lib/integrations/adminStoreClient";
+import {
+  buildNextSnapshot,
+  readSnapshot,
+  writeSnapshot,
+} from "@/src/lib/store/catalogSnapshot";
 import { LOTS as LEGACY_DEMO_LOTS } from "@/src/data/lots";
 import type { Lot } from "@/src/types/lot";
 
@@ -54,11 +69,41 @@ export function mapAdminProductToLot(product: AdminStoreProduct): Lot {
   };
 }
 
+/** Best-effort mirror of a fresh Admin feed into the snapshot. Never throws
+ *  and never changes the response: while Admin is reachable, the buyer sees
+ *  Admin's data regardless of what happens to the snapshot file on the way. */
+async function syncSnapshot(products: AdminStoreProduct[]): Promise<void> {
+  try {
+    const previous = await readSnapshot();
+    const written = await writeSnapshot(buildNextSnapshot(previous, products));
+    if (!written) {
+      console.warn("[store-catalog] Catalog snapshot write failed.");
+    }
+  } catch {
+    // Snapshot sync is auxiliary — a bug here must never break a live catalog.
+  }
+}
+
 export async function getCatalog(): Promise<Catalog> {
   const result = await fetchAdminPublishedProducts();
 
   if (result.ok) {
+    await syncSnapshot(result.products);
     return { status: "ok", lots: result.products.map(mapAdminProductToLot) };
+  }
+
+  const snapshot = await readSnapshot();
+  if (snapshot) {
+    // Only reachable when Admin failed. A valid-but-empty snapshot is served
+    // truthfully as an empty catalog ("Admin had published nothing as of
+    // syncedAt"), not as an outage.
+    console.error(
+      `[store-catalog] Admin unavailable — serving catalog snapshot synced at ${snapshot.syncedAt} (${snapshot.active.length} active, ${snapshot.archived.length} archived).`,
+    );
+    return {
+      status: "ok",
+      lots: [...snapshot.active, ...snapshot.archived].map(mapAdminProductToLot),
+    };
   }
 
   if (result.error.kind === "not_configured" && process.env.NODE_ENV !== "production") {

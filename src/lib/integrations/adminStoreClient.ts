@@ -80,7 +80,7 @@ function isValidVariant(value: unknown): value is AdminStoreVariant {
   );
 }
 
-function isValidProduct(value: unknown): value is AdminStoreProduct {
+export function isValidProduct(value: unknown): value is AdminStoreProduct {
   if (!value || typeof value !== "object") return false;
   const product = value as Record<string, unknown>;
   return (
@@ -222,28 +222,44 @@ export function getAdminOrdersUrl(productsUrl: string | undefined): string | nul
   }
 }
 
-/** Creates the order in Admin. Never throws; a non-201 is never a success. */
-export async function placeAdminOrder(request: AdminOrderRequest): Promise<AdminOrderResult> {
-  const url = getAdminOrdersUrl(process.env.ADMIN_INTEGRATION_URL);
-  const secret = process.env.ADMIN_INTEGRATION_SECRET;
-  if (!url || !secret) return { ok: false, error: "not_configured" };
+const ORDER_FIRST_ATTEMPT_TIMEOUT_MS = 10_000;
+/** The retry exists to outlast a slow or contended server start; on the VPS
+ *  there are no Render-free-style ~50 s cold starts, so 30 s of budget is
+ *  enough. */
+const ORDER_RETRY_TIMEOUT_MS = 30_000;
 
+/** Internal outcome of one POST attempt, before the retry policy is applied.
+ *  `transient` (timeout, network failure, 5xx) is the signature of a
+ *  sleeping Admin and gets one long retry; everything else is final after
+ *  the first attempt. */
+type AdminOrderAttempt =
+  | { kind: "created"; orderId: string }
+  | { kind: "rejected"; detail?: string }
+  | { kind: "unauthorized" }
+  | { kind: "transient" }
+  | { kind: "unavailable" }
+  | { kind: "invalid_contract" };
+
+async function sendAdminOrder(
+  url: string,
+  secret: string,
+  request: AdminOrderRequest,
+  timeoutMs: number,
+): Promise<AdminOrderAttempt> {
   let response: Response;
   try {
     response = await fetch(url, {
       method: "POST",
       headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
       body: JSON.stringify(request),
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
       cache: "no-store",
     });
   } catch {
-    return { ok: false, error: "unavailable" };
+    return { kind: "transient" };
   }
 
-  if (response.status === 401 || response.status === 403) {
-    return { ok: false, error: "unauthorized" };
-  }
+  if (response.status === 401 || response.status === 403) return { kind: "unauthorized" };
   if (response.status === 400 || response.status === 422) {
     let detail: string | undefined;
     try {
@@ -252,15 +268,49 @@ export async function placeAdminOrder(request: AdminOrderRequest): Promise<Admin
     } catch {
       // detail stays undefined
     }
-    return { ok: false, error: "rejected", detail };
+    return { kind: "rejected", detail };
   }
-  if (!response.ok) return { ok: false, error: "unavailable" };
+  if (response.status >= 500) return { kind: "transient" };
+  if (!response.ok) return { kind: "unavailable" };
 
   try {
     const body = (await response.json()) as { order_id?: unknown };
-    if (isNonEmptyString(body.order_id)) return { ok: true, orderId: body.order_id };
+    if (isNonEmptyString(body.order_id)) return { kind: "created", orderId: body.order_id };
   } catch {
     // fall through
   }
-  return { ok: false, error: "invalid_contract" };
+  return { kind: "invalid_contract" };
+}
+
+function toOrderResult(attempt: AdminOrderAttempt): AdminOrderResult {
+  switch (attempt.kind) {
+    case "created":
+      return { ok: true, orderId: attempt.orderId };
+    case "rejected":
+      return { ok: false, error: "rejected", detail: attempt.detail };
+    case "unauthorized":
+      return { ok: false, error: "unauthorized" };
+    case "transient":
+    case "unavailable":
+      return { ok: false, error: "unavailable" };
+    case "invalid_contract":
+      return { ok: false, error: "invalid_contract" };
+  }
+}
+
+/** Creates the order in Admin. Never throws; a non-201 is never a success.
+ *  A transient first failure (timeout or 5xx — exactly what an unreachable
+ *  or still-starting Admin looks like) is retried once with a 30 s budget,
+ *  enough to outlast a slow server start. A 4xx (Admin is up and refuses)
+ *  is never retried: retrying an unknown variant or a bad secret unchanged
+ *  cannot help. */
+export async function placeAdminOrder(request: AdminOrderRequest): Promise<AdminOrderResult> {
+  const url = getAdminOrdersUrl(process.env.ADMIN_INTEGRATION_URL);
+  const secret = process.env.ADMIN_INTEGRATION_SECRET;
+  if (!url || !secret) return { ok: false, error: "not_configured" };
+
+  const first = await sendAdminOrder(url, secret, request, ORDER_FIRST_ATTEMPT_TIMEOUT_MS);
+  if (first.kind !== "transient") return toOrderResult(first);
+
+  return toOrderResult(await sendAdminOrder(url, secret, request, ORDER_RETRY_TIMEOUT_MS));
 }

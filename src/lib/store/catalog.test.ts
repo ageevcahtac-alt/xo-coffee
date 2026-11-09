@@ -1,3 +1,6 @@
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getCatalog, mapAdminProductToLot } from "@/src/lib/store/catalog";
 import { LOTS as LEGACY_DEMO_LOTS } from "@/src/data/lots";
@@ -45,8 +48,11 @@ describe("mapAdminProductToLot", () => {
 
 describe("getCatalog", () => {
   const fetchMock = vi.fn();
+  let snapshotDir: string;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    snapshotDir = await mkdtemp(join(tmpdir(), "xo-catalog-test-"));
+    vi.stubEnv("CATALOG_SNAPSHOT_PATH", join(snapshotDir, "snapshot.json"));
     vi.stubEnv("ADMIN_INTEGRATION_URL", "https://admin.example.test/products");
     vi.stubEnv("ADMIN_INTEGRATION_SECRET", SECRET);
     vi.stubGlobal("fetch", fetchMock);
@@ -55,10 +61,11 @@ describe("getCatalog", () => {
     vi.spyOn(console, "warn").mockImplementation(() => {});
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    await rm(snapshotDir, { recursive: true, force: true });
   });
 
   it("returns exactly the published products Admin sends", async () => {

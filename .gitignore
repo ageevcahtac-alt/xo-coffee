@@ -45,3 +45,6 @@ next-env.d.ts
 /.agents/runs/
 /.agents/health/last.json
 /.agents/prompts/
+
+# runtime data (default catalog snapshot location, src/lib/store/catalogSnapshot.ts)
+/.data/

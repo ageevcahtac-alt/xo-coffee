@@ -1,3 +1,6 @@
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { POST as postOrder } from "@/app/api/order/route";
 import { submitOrder } from "@/src/lib/checkout/submitOrder";
@@ -83,7 +86,11 @@ const adminOrderCalls = (m: Mock) => callsTo(m, (url) => url === ORDERS_URL);
 const telegramCalls = (m: Mock) => callsTo(m, (url) => url.startsWith("https://api.telegram.org/"));
 const initOf = (call: unknown[]) => call[1] as RequestInit;
 
-beforeEach(() => {
+let snapshotDir: string;
+
+beforeEach(async () => {
+  snapshotDir = await mkdtemp(join(tmpdir(), "xo-order-flow-test-"));
+  vi.stubEnv("CATALOG_SNAPSHOT_PATH", join(snapshotDir, "snapshot.json"));
   resetOrderDedupe();
   vi.stubEnv("ADMIN_INTEGRATION_URL", PRODUCTS_URL);
   vi.stubEnv("ADMIN_INTEGRATION_SECRET", SECRET);
@@ -93,10 +100,11 @@ beforeEach(() => {
   vi.spyOn(console, "log").mockImplementation(() => {});
 });
 
-afterEach(() => {
+afterEach(async () => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  await rm(snapshotDir, { recursive: true, force: true });
 });
 
 describe("F/G. what Store sends to Admin", () => {
