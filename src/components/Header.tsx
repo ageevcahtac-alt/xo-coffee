@@ -67,16 +67,17 @@ export default function Header() {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 border-b border-cream/10 bg-backdrop/90 backdrop-blur-md">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
-        <Link href="/#top" className="flex min-w-0 max-w-[58%] shrink-0 items-center sm:max-w-none">
-          {/* The PNG wordmark is ~8.9:1 — the link is capped at 58% of the row
-              on mobile so the logo+burger row can breathe; height follows */}
+        <Link href="/#top" className="flex min-w-0 flex-1 items-center lg:flex-none">
+          {/* The PNG wordmark is ~8.9:1 — below lg it takes the row's
+              leftover width (burger 44 + gap 16 + insets), capped at 65vw;
+              on desktop it gets the full 44px burger height instead */}
           <Image
             src="/logo.png"
             alt="XO COFFEE"
             width={6084}
             height={684}
             priority
-            className="h-6 w-auto sm:h-8 lg:h-10"
+            className="block h-auto max-w-[65vw] w-full lg:h-11 lg:w-auto lg:max-w-none"
           />
         </Link>
 
