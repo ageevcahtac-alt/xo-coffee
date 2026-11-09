@@ -8,6 +8,43 @@
 
 ---
 
+## 2026-11-09 — chore: Docker-артефакты для переезда на VPS
+
+**Что:** Витрина подготовлена к переезду с Render на собственный VPS (Docker).
+`next.config.ts`: `output: "standalone"` (локальные `npm run build`/`npm start`
+прежние — подтверждено смоуком: `next start` отвечает 200). Новое: `Dockerfile`
+(multi-stage node:24-alpine: deps `npm ci` → builder `npm run build` → runner из
+`.next/standalone` + `.next/static` + `public`; non-root `node`, `/data`
+создан и принадлежит пользователю процесса под volume снимка, EXPOSE 3000,
+ENV HOSTNAME=0.0.0.0 PORT=3000, HEALTHCHECK `wget --spider`, CMD
+`node server.js`), `.dockerignore` (node_modules/.next/.agents/.env*/.data/.git),
+`docker-compose.yml` (store: build ., env_file .env.production, volume
+xo-data:/data, restart unless-stopped, без наружных портов; caddy:2-alpine с
+80/443 и Caddyfile; volumes xo-data/caddy-data/caddy-config; закомментированный
+блок под admin из другого репозитория), `Caddyfile` (`{$DOMAIN}` →
+reverse_proxy store:3000), `.env.example`: +`DOMAIN`. `render.yaml` и код
+приложения не тронуты — Render работает до переключения DNS.
+
+**Почему:** деплой на сервер делает владелец вручную; нужны артефакты в репо.
+
+**Проверки:** `npm test` 134/134 ✓ · `npm run lint` — 0 ошибок (warning прежний,
+в `.agents/before-fix.mjs`) · `npm run build` ✓, роуты прежние ·
+`.next/standalone/server.js` создан ✓ · смоук `npx next start`: GET / → 200,
+заголовок страницы на месте ✓ · **docker build НЕ прогонялся**: демон Docker
+локально недоступен (CLI 29.8.2 есть) — первую сборку проверить на сервере.
+Caddyfile/compose конфиг проверены чтением, не запуском.
+
+**Ревью:** не запускалось (по условиям задачи).
+
+**Риски:** низкие. Render задеплоит коммиты автоматически — безопасно:
+снимок там эфемерен, поведение сайта не меняется (standalone — только
+дополнительный вывод сборки). На сервере понадобятся env: ADMIN_INTEGRATION_URL,
+ADMIN_INTEGRATION_SECRET, COFFEE_PASSPORT_INTEGRATION_URL,
+COFFEE_PASSPORT_INTEGRATION_SECRET, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID,
+CATALOG_SNAPSHOT_PATH=/data/catalog-snapshot.json, DOMAIN.
+
+---
+
 ## 2026-11-09 — feat: файловый снимок каталога + ретрай заказа (master напрямую, без PR)
 
 **Что:** У витрины собственный персистентный снимок каталога в JSON-файле на

@@ -1,0 +1,40 @@
+# XO Store — VPS (Docker) deployment.
+# Render keeps serving until DNS switches: render.yaml and `npm start` are
+# untouched. This stack is the new home: Caddy terminates TLS and proxies
+# to the store; the store has no published ports.
+
+services:
+  store:
+    build: .
+    env_file: .env.production
+    volumes:
+      - xo-data:/data
+    restart: unless-stopped
+    # no published ports — Caddy is the only public entrypoint
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file: .env.production
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+    depends_on:
+      - store
+
+  # Admin Panel lives in a separate repository. Uncomment when it moves to
+  # this host; the store reaches it over the compose network, e.g.
+  # ADMIN_INTEGRATION_URL=http://admin:<port>/api/integrations/xo-store/products
+  # admin:
+  #   build: ../xo-coffee-admin
+  #   env_file: ../xo-coffee-admin/.env.production
+  #   restart: unless-stopped
+
+volumes:
+  xo-data:
+  caddy-data:
+  caddy-config:
