@@ -4,14 +4,13 @@ import { useEffect, useState, type KeyboardEvent } from "react";
 import LotPurchaseControls from "@/src/components/LotPurchaseControls";
 import { useCrossfadeTransition } from "@/src/hooks/useCrossfadeTransition";
 import LotPassportModal from "@/src/components/LotPassportModal";
-import {
-  REGION_COUNTRIES,
-  TOP_CATEGORIES,
-  type RegionCountry,
-  type TopCategoryId,
-} from "@/src/data/categories";
+import { TOP_CATEGORIES, type TopCategoryId } from "@/src/data/categories";
 import { useCatalog } from "@/src/context/CatalogContext";
 import type { Lot } from "@/src/types/lot";
+import {
+  buildRegionChips,
+  filterLotsByRegion,
+} from "@/src/lib/lotRegions";
 import {
   getBrewHighlight,
   getWhoLikesIt,
@@ -28,9 +27,7 @@ import {
 export default function Catalog() {
   const { lots, status: catalogStatus } = useCatalog();
   const [activeSection, setActiveSection] = useState<TopCategoryId>("all");
-  const [activeCountry, setActiveCountry] = useState<RegionCountry | null>(
-    null,
-  );
+  const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [activeFlavor, setActiveFlavor] = useState<FlavorDirection | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -41,13 +38,18 @@ export default function Catalog() {
     if (id === activeSection) return;
     gridTransition.runTransition(() => {
       setActiveSection(id);
-      if (id !== "region") setActiveCountry(null);
+      if (id !== "region") setActiveRegion(null);
     });
   };
 
-  const selectCountry = (country: RegionCountry) => {
+  // Чипсы строятся только из регионов, реально присутствующих в выдаче
+  // (`lots` уже = active + archived снимка по логике getCatalog) — пустых
+  // кнопок для стран, которых нет в каталоге, не появляется.
+  const regionChips = buildRegionChips(lots);
+
+  const selectRegion = (slug: string) => {
     gridTransition.runTransition(() => {
-      setActiveCountry((prev) => (prev === country ? null : country));
+      setActiveRegion((prev) => (prev === slug ? null : slug));
     });
   };
 
@@ -61,9 +63,10 @@ export default function Catalog() {
     });
   };
 
-  const regionLots = lots.filter((lot) =>
-    REGION_COUNTRIES.includes(lot.country as RegionCountry),
-  );
+  // Лот без определившегося региона никогда не выпадает из общей выдачи:
+  // во «Все лоты» показываются все, а «По региону» — только лоты с регионом
+  // (без пустых чипсов и без «чужих» лотов при выбранном фильтре).
+  const regionLots = lots.filter((lot) => lot.origin);
 
   const visibleLots =
     activeSection === "all"
@@ -71,8 +74,8 @@ export default function Catalog() {
       : activeSection === "specialty-set"
         ? lots.filter((lot) => lot.category === "specialty-set")
         : activeSection === "region"
-          ? activeCountry
-            ? regionLots.filter((lot) => lot.country === activeCountry)
+          ? activeRegion
+            ? filterLotsByRegion(lots, activeRegion)
             : regionLots
           : [];
 
@@ -126,7 +129,7 @@ export default function Catalog() {
     }
     gridTransition.runTransition(() => {
       setActiveSection("all");
-      setActiveCountry(null);
+      setActiveRegion(null);
       setActiveFlavor(null);
     });
     const indexInAll = lots.findIndex((l) => l.id === lotId);
@@ -222,20 +225,20 @@ export default function Catalog() {
             ))}
           </div>
 
-          {activeSection === "region" && (
+          {activeSection === "region" && regionChips.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2 border-l-2 border-gold/40 pl-4">
-              {REGION_COUNTRIES.map((country) => (
+              {regionChips.map((region) => (
                 <button
-                  key={country}
+                  key={region.slug}
                   type="button"
-                  onClick={() => selectCountry(country)}
+                  onClick={() => selectRegion(region.slug)}
                   className={`min-h-11 border px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.08em] transition-all duration-150 active:scale-95 ${
-                    activeCountry === country
+                    activeRegion === region.slug
                       ? "tab-active"
                       : "border-border bg-cream-dark text-text/65 hover:border-accent/40 hover:bg-accent-surface hover:text-burgundy"
                   }`}
                 >
-                  {country}
+                  {region.label}
                 </button>
               ))}
             </div>

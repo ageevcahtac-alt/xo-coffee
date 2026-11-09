@@ -115,6 +115,10 @@ export async function fetchXoRoasterLots(): Promise<CoffeePassportLotsResult> {
       method: "GET",
       headers: { Authorization: `Bearer ${secret}` },
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      // Canonical Lot data (origin, variety, process) changes rarely —
+      // cache one response briefly instead of hitting P23 per page view.
+      // Only 200 responses are stored by Next, so a failure is never cached.
+      next: { revalidate: 600 },
     });
   } catch {
     // Network failure, DNS failure, or the timeout above firing — none of

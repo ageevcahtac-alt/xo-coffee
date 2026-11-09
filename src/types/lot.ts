@@ -67,6 +67,13 @@ export type Lot = {
   /** Packagings from Admin. `undefined` on the legacy static demo lots; `[]`
    *  on an Admin product that has no packaging yet (nothing to order). */
   variants?: LotVariant[];
+  /** Регион (страна) происхождения — единый ключ фильтра «По региону» и фото
+   *  пачки (public/lots/<slug>.png). Ставится на сервере в getCatalog():
+   *  страна Canonical Lot из Coffee Passport, иначе первое слово названия;
+   *  если не определился — поле отсутствует, лот живёт во «Все лоты» как
+   *  раньше. Не путать с каноническими `country`/`region` ниже — они
+   *  по-прежнему пустые для admin-лотов и UI их не использует. */
+  origin?: { label: string; slug: string };
   brew?: {
     v60?: BrewSpec;
     immersion?: BrewSpec;

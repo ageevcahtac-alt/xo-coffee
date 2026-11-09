@@ -103,11 +103,19 @@ describe("getCatalog", () => {
     expect(logged).not.toContain(SECRET);
   });
 
-  it("uses the demo catalog only when unconfigured outside production", async () => {
+  it("uses the demo catalog only when unconfigured outside production, enriched with origins", async () => {
     vi.stubEnv("ADMIN_INTEGRATION_URL", "");
     vi.stubEnv("ADMIN_INTEGRATION_SECRET", "");
     vi.stubEnv("NODE_ENV", "development");
-    expect(await getCatalog()).toEqual({ status: "ok", lots: LEGACY_DEMO_LOTS });
+    const catalog = await getCatalog();
+    expect(catalog.status).toBe("ok");
+    expect(catalog.lots.map((lot) => lot.id)).toEqual(
+      LEGACY_DEMO_LOTS.map((lot) => lot.id),
+    );
+    // Демо-лоты с указанной страной получают origin для фильтра «По региону»
+    for (const lot of catalog.lots) {
+      if (lot.country?.trim()) expect(lot.origin).toBeDefined();
+    }
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

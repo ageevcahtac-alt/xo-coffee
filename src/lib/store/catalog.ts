@@ -25,11 +25,13 @@ import {
   fetchAdminPublishedProducts,
   type AdminStoreProduct,
 } from "@/src/lib/integrations/adminStoreClient";
+import { fetchXoRoasterLots } from "@/src/lib/integrations/coffeePassportClient";
 import {
   buildNextSnapshot,
   readSnapshot,
   writeSnapshot,
 } from "@/src/lib/store/catalogSnapshot";
+import { regionFromLotName, resolveLotRegion } from "@/src/lib/lotRegions";
 import { LOTS as LEGACY_DEMO_LOTS } from "@/src/data/lots";
 import type { Lot } from "@/src/types/lot";
 
@@ -69,6 +71,39 @@ export function mapAdminProductToLot(product: AdminStoreProduct): Lot {
   };
 }
 
+/** Регион происхождения для фильтра «По региону» и фото пачек. Источники по
+ *  приоритету: (a) страна Canonical Lot из Coffee Passport по
+ *  passport_public_id (один запрос на вызов, кэш 10 мин в самом клиенте,
+ *  no-throw); (b) первое слово названия лота по словарю lotRegions. Не
+ *  определился — поле не ставится: лот остаётся во «Все лоты» и не рождает
+ *  пустых чипсов. Никогда не бросает исключений — каталог дороже региона. */
+async function withOrigins(lots: Lot[]): Promise<Lot[]> {
+  let passportCountries: Map<string, string> | null = null;
+  try {
+    const result = await fetchXoRoasterLots();
+    if (result.ok) {
+      passportCountries = new Map(
+        result.lots
+          .filter((lot) => typeof lot.country === "string" && lot.country.trim() !== "")
+          .map((lot) => [lot.public_id, lot.country as string]),
+      );
+    }
+  } catch {
+    passportCountries = null;
+  }
+  return lots.map((lot) => {
+    const passportCountry =
+      lot.passportPublicId && passportCountries
+        ? passportCountries.get(lot.passportPublicId)
+        : undefined;
+    const origin =
+      resolveLotRegion(passportCountry) ??
+      resolveLotRegion(lot.country) ??
+      regionFromLotName(lot.name);
+    return origin ? { ...lot, origin } : lot;
+  });
+}
+
 /** Best-effort mirror of a fresh Admin feed into the snapshot. Never throws
  *  and never changes the response: while Admin is reachable, the buyer sees
  *  Admin's data regardless of what happens to the snapshot file on the way. */
@@ -89,7 +124,8 @@ export async function getCatalog(): Promise<Catalog> {
 
   if (result.ok) {
     await syncSnapshot(result.products);
-    return { status: "ok", lots: result.products.map(mapAdminProductToLot) };
+    const lots = await withOrigins(result.products.map(mapAdminProductToLot));
+    return { status: "ok", lots };
   }
 
   const snapshot = await readSnapshot();
@@ -100,17 +136,17 @@ export async function getCatalog(): Promise<Catalog> {
     console.error(
       `[store-catalog] Admin unavailable — serving catalog snapshot synced at ${snapshot.syncedAt} (${snapshot.active.length} active, ${snapshot.archived.length} archived).`,
     );
-    return {
-      status: "ok",
-      lots: [...snapshot.active, ...snapshot.archived].map(mapAdminProductToLot),
-    };
+    const lots = await withOrigins(
+      [...snapshot.active, ...snapshot.archived].map(mapAdminProductToLot),
+    );
+    return { status: "ok", lots };
   }
 
   if (result.error.kind === "not_configured" && process.env.NODE_ENV !== "production") {
     console.warn(
       "[store-catalog] Admin integration is not configured — serving the DEV-ONLY static demo catalog.",
     );
-    return { status: "ok", lots: LEGACY_DEMO_LOTS };
+    return { status: "ok", lots: await withOrigins(LEGACY_DEMO_LOTS) };
   }
 
   const { error } = result;
