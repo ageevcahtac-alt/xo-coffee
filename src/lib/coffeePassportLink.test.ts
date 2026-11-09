@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mapAdminProductToLot } from "@/src/lib/store/catalog";
 import {
-  DEFAULT_COFFEE_PASSPORT_LOT_URL_TEMPLATE,
+  DEFAULT_COFFEE_PASSPORT_PUBLIC_BASE,
   getCoffeePassportUrl,
 } from "@/src/lib/coffeePassportLink";
 import type { AdminStoreProduct } from "@/src/lib/integrations/adminStoreClient";
@@ -30,7 +30,7 @@ describe("getCoffeePassportUrl", () => {
     expect(colombia.passportPublicId).toBe(PUBLIC_ID);
 
     const link = getCoffeePassportUrl(colombia);
-    expect(link).toBe(`https://coffee-passport.onrender.com/passport/${PUBLIC_ID}`);
+    expect(link).toBe(`${DEFAULT_COFFEE_PASSPORT_PUBLIC_BASE}/passport/${PUBLIC_ID}`);
     expect(link).not.toContain(V250);
     expect(link).not.toContain(V1000);
     expect(link).not.toContain(colombia.id);
@@ -41,17 +41,29 @@ describe("getCoffeePassportUrl", () => {
     expect(getCoffeePassportUrl(bare)).toBeNull();
   });
 
-  it("honours a configured URL template but still substitutes the public id", () => {
-    expect(getCoffeePassportUrl(colombia, "https://cp.example.test/l/{lotId}")).toBe(
-      `https://cp.example.test/l/${PUBLIC_ID}`,
+  it("honours the server-provided base but keeps the /passport/<id> path", () => {
+    expect(getCoffeePassportUrl(colombia, "https://cp.example.test")).toBe(
+      `https://cp.example.test/passport/${PUBLIC_ID}`,
     );
-    // a template without the placeholder is ignored, never used to build a wrong link
+    // trailing slashes on the base are normalized away, never doubled
     expect(getCoffeePassportUrl(colombia, "https://cp.example.test/")).toBe(
-      DEFAULT_COFFEE_PASSPORT_LOT_URL_TEMPLATE.replace("{lotId}", PUBLIC_ID),
+      `https://cp.example.test/passport/${PUBLIC_ID}`,
     );
   });
 
-  it("never writes to Coffee Passport: the builder only builds a URL", () => {
-    expect(DEFAULT_COFFEE_PASSPORT_LOT_URL_TEMPLATE).toMatch(/^https:\/\/[^/]+\//);
+  it("falls back to the default base when the server provides none", () => {
+    expect(getCoffeePassportUrl(colombia, undefined)).toBe(
+      `${DEFAULT_COFFEE_PASSPORT_PUBLIC_BASE}/passport/${PUBLIC_ID}`,
+    );
+    expect(getCoffeePassportUrl(colombia, "   ")).toBe(
+      `${DEFAULT_COFFEE_PASSPORT_PUBLIC_BASE}/passport/${PUBLIC_ID}`,
+    );
+  });
+
+  it("URL-encodes the public id", () => {
+    const spaced = { ...colombia, passportPublicId: "LOT XO/COL 004" };
+    expect(getCoffeePassportUrl(spaced)).toBe(
+      `${DEFAULT_COFFEE_PASSPORT_PUBLIC_BASE}/passport/${encodeURIComponent("LOT XO/COL 004")}`,
+    );
   });
 });

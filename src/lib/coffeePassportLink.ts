@@ -12,23 +12,30 @@ import type { Lot } from "@/src/types/lot";
  * therefore the same link. A lot with no `passportPublicId` gets no link
  * rather than a guessed one.
  *
- * The URL shape comes from NEXT_PUBLIC_COFFEE_PASSPORT_LOT_URL_TEMPLATE (a
- * `{lotId}` placeholder, substituted with the public id). Unset, it falls back
- * to the Coffee Passport deployment's public lot route
- * `/passport/<public_id>` on https://coffee-passport.onrender.com (the
- * deployment named in that repository's README).
+ * URL shape: `<base>/passport/<public_id>`. The base comes from the
+ * SERVER-ONLY env `COFFEE_PASSPORT_PUBLIC_BASE_URL` (never a NEXT_PUBLIC_
+ * variable — the value is read in a server component and passed down as a
+ * prop), defaulting to the platform's current public host.
  */
-export const DEFAULT_COFFEE_PASSPORT_LOT_URL_TEMPLATE =
-  "https://coffee-passport.onrender.com/passport/{lotId}";
+
+export const DEFAULT_COFFEE_PASSPORT_PUBLIC_BASE = "https://coffeepassport.ru";
+
+export const COFFEE_PASSPORT_LOT_PATH_TEMPLATE = "/passport/{lotId}";
+
+function normalizeBase(base: string | undefined): string {
+  const trimmed = base?.trim().replace(/\/+$/, "");
+  return trimmed ? trimmed : DEFAULT_COFFEE_PASSPORT_PUBLIC_BASE;
+}
 
 export function getCoffeePassportUrl(
   lot: Pick<Lot, "passportPublicId">,
-  template: string | undefined = process.env.NEXT_PUBLIC_COFFEE_PASSPORT_LOT_URL_TEMPLATE,
+  baseUrl?: string,
 ): string | null {
   const publicId = lot.passportPublicId?.trim();
   if (!publicId) return null;
-  const effective = template && template.includes("{lotId}")
-    ? template
-    : DEFAULT_COFFEE_PASSPORT_LOT_URL_TEMPLATE;
-  return effective.replace("{lotId}", encodeURIComponent(publicId));
+  const base = normalizeBase(baseUrl);
+  return `${base}${COFFEE_PASSPORT_LOT_PATH_TEMPLATE.replace(
+    "{lotId}",
+    encodeURIComponent(publicId),
+  )}`;
 }
