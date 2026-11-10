@@ -3,6 +3,7 @@ import Hero from "@/src/components/Hero";
 import TrustBar from "@/src/components/TrustBar";
 import Catalog from "@/src/components/Catalog";
 import PureRoastBlock from "@/src/components/PureRoastBlock";
+import Manifest from "@/src/components/Manifest";
 import PassportBlock from "@/src/components/PassportBlock";
 import HowToBuy from "@/src/components/HowToBuy";
 import AboutBlock from "@/src/components/AboutBlock";
@@ -26,6 +27,7 @@ export default async function Home() {
         <TrustBar />
         <Catalog passportBaseUrl={passportBaseUrl} lotImages={lotImages} />
         <PureRoastBlock />
+        <Manifest />
         <PassportBlock passportBaseUrl={passportBaseUrl} />
         <HowToBuy />
         <AboutBlock />
