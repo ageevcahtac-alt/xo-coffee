@@ -5,12 +5,17 @@ import LotPurchaseControls from "@/src/components/LotPurchaseControls";
 import { useCrossfadeTransition } from "@/src/hooks/useCrossfadeTransition";
 import LotPassportModal from "@/src/components/LotPassportModal";
 import { TOP_CATEGORIES, type TopCategoryId } from "@/src/data/categories";
+import { characterKeywords, landingContent } from "@/src/data/landing";
 import { useCatalog } from "@/src/context/CatalogContext";
 import type { Lot } from "@/src/types/lot";
 import {
   buildRegionChips,
   filterLotsByRegion,
 } from "@/src/lib/lotRegions";
+import {
+  CHARACTER_PREVIEW_LIMIT,
+  filterLotsByCharacter,
+} from "@/src/lib/characterFilter";
 import {
   getBrewHighlight,
   getWhoLikesIt,
@@ -20,7 +25,6 @@ import {
   FLAVOR_DIRECTIONS,
   FLAVOR_DIRECTION_PROFILES,
   getBestFlavorDirection,
-  rankLotsByFlavorDirection,
   type FlavorDirection,
 } from "@/src/lib/flavorMatch";
 
@@ -40,6 +44,7 @@ export default function Catalog({
   const [activeSection, setActiveSection] = useState<TopCategoryId>("all");
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [activeFlavor, setActiveFlavor] = useState<FlavorDirection | null>(null);
+  const [showAllCharacterLots, setShowAllCharacterLots] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const gridTransition = useCrossfadeTransition(300);
@@ -50,6 +55,9 @@ export default function Catalog({
     gridTransition.runTransition(() => {
       setActiveSection(id);
       if (id !== "region") setActiveRegion(null);
+      // Выбранный характер при смене вкладки сохраняется, выдача
+      // пересчитывается, а раскрытый список возвращается к топ-3.
+      setShowAllCharacterLots(false);
     });
   };
 
@@ -64,13 +72,22 @@ export default function Catalog({
     });
   };
 
-  // Flavor exploration re-ranks whatever the category tabs already show —
-  // it never hides a lot, only reorders. Toggling the same chip again (or
-  // "Все") clears it. Ranking is by profile closeness alone: the tasting-
-  // history nudge existed only for the removed local tasting diary.
+  // Фильтр «По характеру» сокращает выдачу активной вкладки до лотов,
+  // текст которых матчит словарь characterKeywords (src/data/landing.ts):
+  // без учёта регистра, «ё» = «е», корни ищутся в названии, тегах, сенсорике,
+  // заметке о чашке, истории фермы и описании. Повторный клик по чипсу или
+  // «Все характеры» сбрасывает фильтр на полный список.
   const selectFlavor = (direction: FlavorDirection) => {
     gridTransition.runTransition(() => {
       setActiveFlavor((prev) => (prev === direction ? null : direction));
+      setShowAllCharacterLots(false);
+    });
+  };
+
+  const clearFlavor = () => {
+    gridTransition.runTransition(() => {
+      setActiveFlavor(null);
+      setShowAllCharacterLots(false);
     });
   };
 
@@ -90,9 +107,27 @@ export default function Catalog({
             : regionLots
           : [];
 
-  const orderedLots = activeFlavor
-    ? rankLotsByFlavorDirection(visibleLots, activeFlavor)
+  // Сначала набор активной вкладки («Все лоты» / «По региону» / «Спешелти-наборы»),
+  // затем внутри него фильтр характера: остаются лоты с ≥1 совпадением корня,
+  // сортировка по убыванию числа совпадений (при равенстве — порядок вкладки).
+  // По выбранному чипсу показываем не больше CHARACTER_PREVIEW_LIMIT лотов,
+  // остальное раскрывается строкой «и ещё N».
+  const activeCharacterKeywords = activeFlavor
+    ? (characterKeywords[FLAVOR_DIRECTION_PROFILES[activeFlavor].label] ?? [])
+    : [];
+
+  const characterLots = activeFlavor
+    ? filterLotsByCharacter(visibleLots, activeCharacterKeywords)
     : visibleLots;
+
+  const characterHiddenCount = activeFlavor
+    ? Math.max(0, characterLots.length - CHARACTER_PREVIEW_LIMIT)
+    : 0;
+
+  const displayLots =
+    activeFlavor && !showAllCharacterLots
+      ? characterLots.slice(0, CHARACTER_PREVIEW_LIMIT)
+      : characterLots;
 
   // Keep activeIndex alive through the closing animation (Modal fades out
   // over ~400ms) so the displayed lot doesn't disappear mid-transition.
@@ -103,10 +138,10 @@ export default function Catalog({
     }
   }, [modalOpen]);
 
-  const displayLot = activeIndex !== null ? (orderedLots[activeIndex] ?? null) : null;
+  const displayLot = activeIndex !== null ? (displayLots[activeIndex] ?? null) : null;
 
   const openLot = (lot: Lot) => {
-    const index = orderedLots.findIndex((l) => l.id === lot.id);
+    const index = displayLots.findIndex((l) => l.id === lot.id);
     setActiveIndex(index === -1 ? 0 : index);
     setModalOpen(true);
   };
@@ -114,8 +149,8 @@ export default function Catalog({
   const goToPrevLot = () => {
     lotTransition.runTransition(() => {
       setActiveIndex((index) => {
-        if (index === null || orderedLots.length === 0) return index;
-        return (index - 1 + orderedLots.length) % orderedLots.length;
+        if (index === null || displayLots.length === 0) return index;
+        return (index - 1 + displayLots.length) % displayLots.length;
       });
     });
   };
@@ -123,8 +158,8 @@ export default function Catalog({
   const goToNextLot = () => {
     lotTransition.runTransition(() => {
       setActiveIndex((index) => {
-        if (index === null || orderedLots.length === 0) return index;
-        return (index + 1) % orderedLots.length;
+        if (index === null || displayLots.length === 0) return index;
+        return (index + 1) % displayLots.length;
       });
     });
   };
@@ -133,9 +168,9 @@ export default function Catalog({
   // currently active category/region — fall back to "Все" so it's always
   // reachable, then open it there.
   const selectLotById = (lotId: string) => {
-    const indexInOrdered = orderedLots.findIndex((l) => l.id === lotId);
-    if (indexInOrdered !== -1) {
-      lotTransition.runTransition(() => setActiveIndex(indexInOrdered));
+    const indexInDisplayed = displayLots.findIndex((l) => l.id === lotId);
+    if (indexInDisplayed !== -1) {
+      lotTransition.runTransition(() => setActiveIndex(indexInDisplayed));
       return;
     }
     gridTransition.runTransition(() => {
@@ -168,26 +203,25 @@ export default function Catalog({
       <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-8 md:rounded-3xl md:p-12 lg:p-16">
         <div className="mb-8 max-w-2xl sm:mb-10">
           <span className="text-xs font-semibold uppercase tracking-[0.25em] text-gold-dark">
-            Каталог
+            {landingContent.catalog.badge}
           </span>
           <h2 className="mt-4 font-display text-3xl font-semibold text-burgundy sm:text-4xl md:text-5xl">
-            Лоты с паспортом зерна
+            {landingContent.catalog.title}
           </h2>
           <p className="mt-4 leading-relaxed text-text/70">
-            Нажмите на лот, чтобы открыть полный паспорт: происхождение,
-            сенсорный профиль и рекомендации по завариванию.
+            {landingContent.catalog.subtitle}
           </p>
         </div>
 
         <div className="mb-8 sm:mb-10">
           <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-dark">
-            Какой характер кофе вы ищете?
+            {landingContent.catalog.characterPrompt}
           </span>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               aria-pressed={activeFlavor === null}
-              onClick={() => setActiveFlavor(null)}
+              onClick={clearFlavor}
               className={`min-h-11 border px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] transition-all duration-150 active:scale-95 ${
                 activeFlavor === null
                   ? "tab-active"
@@ -212,13 +246,6 @@ export default function Catalog({
               </button>
             ))}
           </div>
-          {activeFlavor && (
-            <p className="mt-3 text-xs text-text/65">
-              Каталог ниже отсортирован по близости к «
-              {FLAVOR_DIRECTION_PROFILES[activeFlavor].label}» — остальные лоты никуда
-              не делись, просто ниже в списке.
-            </p>
-          )}
         </div>
 
         <div className="mb-8 sm:mb-12">
@@ -274,7 +301,14 @@ export default function Catalog({
                 Мы уже разбираемся — обновите страницу через несколько минут.
               </p>
             </div>
-          ) : orderedLots.length === 0 ? (
+          ) : activeFlavor && characterLots.length === 0 ? (
+            // Чипсы остаются на месте и активны — меняется только выдача.
+            <div className="rounded-xl border border-dashed border-border bg-cream-dark px-8 py-16 text-center">
+              <p className="text-sm leading-relaxed text-text/60">
+                {landingContent.catalog.characterEmpty}
+              </p>
+            </div>
+          ) : displayLots.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border bg-cream-dark px-8 py-16 text-center">
               <p className="font-display text-xl font-semibold text-burgundy">
                 Скоро в каталоге
@@ -285,7 +319,7 @@ export default function Catalog({
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {orderedLots.map((lot) => {
+              {displayLots.map((lot) => {
                 const entry = isEntryProduct(lot);
                 const brewHighlight = getBrewHighlight(lot);
                 // Same "one lot, one blended profile can't honestly stand
@@ -314,8 +348,10 @@ export default function Catalog({
                     <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text/65">
                       {lot.name}
                     </span>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text/65">
-                      Паспорт
+                    <span className="inline-block text-right text-[11px] font-semibold uppercase leading-[1.4] tracking-[0.12em] text-text/65">
+                      Coffee
+                      <br />
+                      Passport
                     </span>
                   </div>
 
@@ -404,6 +440,19 @@ export default function Catalog({
               })}
             </div>
           )}
+          {activeFlavor && characterLots.length > CHARACTER_PREVIEW_LIMIT && (
+            <div className="mt-6 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowAllCharacterLots((prev) => !prev)}
+                className="text-xs font-semibold uppercase tracking-[0.1em] text-text/60 underline decoration-border underline-offset-4 transition-colors hover:text-burgundy hover:decoration-accent/50"
+              >
+                {showAllCharacterLots
+                  ? "Свернуть"
+                  : `И ещё ${characterHiddenCount} — показать все`}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -414,10 +463,10 @@ export default function Catalog({
         onPrev={goToPrevLot}
         onNext={goToNextLot}
         onSelectLot={selectLotById}
-        hasMultiple={orderedLots.length > 1}
+        hasMultiple={displayLots.length > 1}
         position={
           activeIndex !== null
-            ? { index: activeIndex, total: orderedLots.length }
+            ? { index: activeIndex, total: displayLots.length }
             : null
         }
         transitionClassName={lotTransition.className}
